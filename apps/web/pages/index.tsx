@@ -180,6 +180,7 @@ export default function Index({
               >
                 Releases
               </FooterLinkItem>
+              <FooterLinkItem href='/privacy'>Privacy Policy</FooterLinkItem>
             </FooterLinksRow>
             <FooterCopyright>
               ©2023 - present <Link href='https://github.com/drl990114'>drl990114</Link>. All
