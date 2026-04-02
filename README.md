@@ -35,9 +35,9 @@
 
 <img src="./public/show-en.png" alt="screenshot" />
 
-## MarkFlowy is in Beta Stage ⚠️
+## MarkFlowy is in the reconstruction phase ⚠️
 
-Currently, MarkFlowy is in the beta stage, and it is recommended to use it with data backups.
+At present, MarkFlowy needs about 3 - 6 months to perform reconstruction, which will bring an exciting new version. If there is no major bug in the three months, the new version will not be released.
 
 ## Features
 
