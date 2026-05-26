@@ -1,35 +1,62 @@
 import { useEditorStore } from '@/stores'
 import useEditorCounterStore from '@/stores/useEditorCounterStore'
-import { Popover, Radio } from 'antd'
+import { Popover } from 'antd'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 const Container = styled.div`
-  padding: 8px 12px 8px 8px;
+  padding: 6px 10px;
   z-index: 2;
-  opacity: 0.8;
   font-size: 0.85rem;
   user-select: none;
   box-sizing: border-box;
-  cursor: default;
+  cursor: pointer;
   background-color: ${(props) => props.theme.statusBarBgColor};
   white-space: nowrap;
   overflow: hidden;
   max-width: 100%;
+  border-radius: 6px;
+  color: ${(props) => props.theme.labelFontColor};
+
+  &:hover {
+    background: ${(props) => props.theme.hoverColor};
+    color: ${(props) => props.theme.primaryFontColor};
+  }
+
+  i {
+    margin-right: 6px;
+    font-size: 0.9rem;
+  }
 `
 
 const PopoverContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 120px;
+  min-width: 240px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
 `
 
 const PopoverTitle = styled.div`
+  grid-column: 1 / -1;
   font-size: 0.75rem;
   color: #666;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+`
+
+const Metric = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`
+
+const MetricValue = styled.strong`
+  font-size: 0.95rem;
+`
+
+const MetricLabel = styled.span`
+  font-size: 0.72rem;
+  color: #666;
 `
 
 export const EditorCount = () => {
@@ -37,7 +64,6 @@ export const EditorCount = () => {
   const { editorCounterMap } = useEditorCounterStore()
   const { activeId } = useEditorStore()
   const [popoverVisible, setPopoverVisible] = useState(false)
-  const [displayMode, setDisplayMode] = useState<'words' | 'chars'>('chars')
 
   if (!activeId) {
     return null
@@ -49,31 +75,53 @@ export const EditorCount = () => {
     return null
   }
 
-  const { wordCount, characterCount } = counter
-
-  const displayParts: string[] = []
-  if (displayMode === 'words') {
-    displayParts.push(`${wordCount} ${t('statusBar.words')}`)
-  }
-  if (displayMode === 'chars') {
-    displayParts.push(`${characterCount} ${t('statusBar.chars')}`)
-  }
-
-  if (displayParts.length === 0) {
-    return null
-  }
+  const readTime = counter.readingTimeMinutes
+  const completedTasks = `${counter.completedTaskCount}/${counter.taskCount}`
+  const minLabel = readTime === 1 ? t('statusBar.min') : t('statusBar.mins')
 
   const popoverContent = (
     <PopoverContent>
-      <PopoverTitle>{t('statusBar.displaySettings')}</PopoverTitle>
-      <Radio.Group
-        value={displayMode}
-        onChange={(e) => setDisplayMode(e.target.value)}
-        style={{ display: 'flex', flexDirection: 'column' }}
-      >
-        <Radio value='words'>{t('statusBar.words')}</Radio>
-        <Radio value='chars'>{t('statusBar.chars')}</Radio>
-      </Radio.Group>
+      <PopoverTitle>{t('statusBar.documentInsights')}</PopoverTitle>
+      <Metric>
+        <MetricValue>{readTime} {minLabel}</MetricValue>
+        <MetricLabel>{t('statusBar.readingTime')}</MetricLabel>
+      </Metric>
+      <Metric>
+        <MetricValue>{counter.wordCount.toLocaleString()}</MetricValue>
+        <MetricLabel>{t('statusBar.words')}</MetricLabel>
+      </Metric>
+      <Metric>
+        <MetricValue>{counter.characterCount.toLocaleString()}</MetricValue>
+        <MetricLabel>{t('statusBar.chars')}</MetricLabel>
+      </Metric>
+      <Metric>
+        <MetricValue>{counter.headingCount}</MetricValue>
+        <MetricLabel>{t('statusBar.headings')}</MetricLabel>
+      </Metric>
+      <Metric>
+        <MetricValue>{completedTasks}</MetricValue>
+        <MetricLabel>{t('statusBar.tasks')}</MetricLabel>
+      </Metric>
+      <Metric>
+        <MetricValue>{counter.linkCount}</MetricValue>
+        <MetricLabel>{t('statusBar.links')}</MetricLabel>
+      </Metric>
+      <Metric>
+        <MetricValue>{counter.imageCount}</MetricValue>
+        <MetricLabel>{t('statusBar.images')}</MetricLabel>
+      </Metric>
+      <Metric>
+        <MetricValue>{counter.codeBlockCount}</MetricValue>
+        <MetricLabel>{t('statusBar.codeBlocks')}</MetricLabel>
+      </Metric>
+      <Metric>
+        <MetricValue>{counter.tableCount}</MetricValue>
+        <MetricLabel>{t('statusBar.tables')}</MetricLabel>
+      </Metric>
+      <Metric>
+        <MetricValue>{counter.frontmatter ? t('common.yes') : t('common.no')}</MetricValue>
+        <MetricLabel>{t('statusBar.frontmatter')}</MetricLabel>
+      </Metric>
     </PopoverContent>
   )
 
@@ -86,7 +134,8 @@ export const EditorCount = () => {
       placement='topRight'
     >
       <Container>
-        <span style={{ opacity: 0.8, cursor: 'pointer' }}>{displayParts.join(' ')}</span>
+        <i className='ri-timer-flash-line' />
+        <span>{readTime} {minLabel} · {counter.wordCount.toLocaleString()} {t('statusBar.words')}</span>
       </Container>
     </Popover>
   )

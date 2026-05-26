@@ -15,6 +15,7 @@ import {
 } from '@/helper/filesys'
 import { FileTypeConfig } from '@/helper/fileTypeHandler'
 import { logger } from '@/helper/logger'
+import { analyzeMarkdownContent } from '@/helper/markdownInsights'
 import { useEditorKeybindingStore } from '@/hooks/useKeyboard'
 import { useCommandStore, useEditorStateStore, useEditorStore } from '@/stores'
 import useAppSettingStore from '@/stores/useAppSettingStore'
@@ -102,11 +103,27 @@ function TextEditor(props: TextEditorProps) {
   const editorRef = useRef<EditorRef>(null)
   const editorContextRef = useRef<EditorChangeEventParams>(null)
 
+  const updateEditorCounter = useCallback(
+    (markdown: string) => {
+      useEditorCounterStore.getState().addEditorCounter({
+        id,
+        data: analyzeMarkdownContent(markdown),
+      })
+    },
+    [id],
+  )
+
+  const debounceUpdateEditorCounter = useMemo(
+    () => debounce(updateEditorCounter, 150),
+    [updateEditorCounter],
+  )
+
   useMount(async () => {
     setEditorDelegate(id, delegate)
   })
 
   useUnmount(() => {
+    debounceUpdateEditorCounter.cancel()
     useEditorCounterStore.getState().deleteEditorCounter({ id })
     const { delIdStateMap } = useEditorStateStore.getState()
 
@@ -127,17 +144,19 @@ function TextEditor(props: TextEditorProps) {
             return
           }
           setContent(res.content)
+          updateEditorCounter(res.content)
         } else {
           return setStatus(TextEditorStatus.NOTEXIST)
         }
       } else if (file.content !== undefined) {
         setContent(file.content)
+        updateEditorCounter(file.content)
       }
 
       return setStatus(TextEditorStatus.SUCCESS)
     }
     init()
-  }, [delegate, curFile, setEditorDelegate])
+  }, [delegate, curFile, setEditorDelegate, updateEditorCounter])
 
   const saveHandler = useCallback(
     async (params: SaveHandlerParams = {}) => {
@@ -291,6 +310,7 @@ function TextEditor(props: TextEditorProps) {
       if (!active) return
       editorRef.current?.setContent(newContent)
       setContent(newContent)
+      updateEditorCounter(newContent)
       
       // Set save state to unsaved after content change
       const { setIdStateMap } = useEditorStateStore.getState()
@@ -298,7 +318,7 @@ function TextEditor(props: TextEditorProps) {
         hasUnsavedChanges: true,
       })
     },
-    [active, id],
+    [active, id, updateEditorCounter],
   )
 
   const editorTypeSwitchingRef = useRef(false)
@@ -535,18 +555,7 @@ function TextEditor(props: TextEditorProps) {
   const handleChange: EditorChangeHandler = useCallback(
     (params) => {
       const { tr, helpers } = params
-      const { getCharacterCount, getWordCount } = helpers
-
-      const characterCount = getCharacterCount()
-      const wordCount = getWordCount()
-
-      useEditorCounterStore.getState().addEditorCounter({
-        id,
-        data: {
-          characterCount,
-          wordCount,
-        },
-      })
+      debounceUpdateEditorCounter(delegate.docToString(params.state.doc))
 
       if (!active) return
       editorContextRef.current = params
@@ -566,7 +575,15 @@ function TextEditor(props: TextEditorProps) {
         }
       }
     },
-    [id, debounceSaveHandler, active, debounceRefreshToc, settingData],
+    [
+      active,
+      debounceRefreshToc,
+      debounceSaveHandler,
+      debounceUpdateEditorCounter,
+      delegate,
+      id,
+      settingData,
+    ],
   )
 
   if (status === TextEditorStatus.NOTEXIST) {

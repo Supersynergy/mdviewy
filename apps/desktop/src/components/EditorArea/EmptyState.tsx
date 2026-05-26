@@ -72,7 +72,7 @@ export const EmptyState = memo(() => {
         <div className='logo-mark'>
           <span className='logo-glyph'>md</span>
         </div>
-        <h1 className='app-title'>MDmaster</h1>
+        <h1 className='app-title'>MDviewy</h1>
         <p className='tagline'>A calm place to read & write markdown.</p>
 
         <div className='primary-actions'>

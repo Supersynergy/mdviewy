@@ -1,5 +1,5 @@
 {
-  "app_name": "MDmaster",
+  "app_name": "MDviewy",
   "common": {
     "none": "aucun",
     "name": "nom",
@@ -19,7 +19,9 @@
     "value": "Valeur",
     "success": "Succès",
     "import": "Importer",
-    "menu": "Menu"
+    "menu": "Menu",
+    "yes": "Oui",
+    "no": "Non"
   },
   "view": {
     "label": "vue",
@@ -494,6 +496,17 @@
   "statusBar": {
     "words": "Mots",
     "chars": "Caractères",
-    "displaySettings": "Paramètres d'affichage"
+    "displaySettings": "Paramètres d'affichage",
+    "documentInsights": "Indicateurs du document",
+    "readingTime": "Temps de lecture",
+    "min": "min",
+    "mins": "min",
+    "headings": "titres",
+    "tasks": "tâches",
+    "links": "liens",
+    "images": "images",
+    "codeBlocks": "blocs de code",
+    "tables": "tableaux",
+    "frontmatter": "métadonnées"
   }
 }

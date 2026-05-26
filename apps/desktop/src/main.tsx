@@ -5,7 +5,7 @@ declare global {
 window.__MDM_BOOT__ = performance.now()
 ;(window as any).__mdm_log_boot = (label: string) => {
   const t = performance.now() - (window.__MDM_BOOT__ || 0)
-  console.log(`[mdmaster.boot] ${label}: ${t.toFixed(1)}ms`)
+  console.log(`[mdviewy.boot] ${label}: ${t.toFixed(1)}ms`)
 }
 
 import { lightTheme } from '@mdviewy/theme'

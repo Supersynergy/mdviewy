@@ -1,5 +1,5 @@
 {
-  "app_name": "MDmaster",
+  "app_name": "MDviewy",
   "common": {
     "none": "なし",
     "name": "名前",
@@ -19,7 +19,9 @@
     "value": "値",
     "success": "成功",
     "import": "インポート",
-    "menu": "メニュー"
+    "menu": "メニュー",
+    "yes": "はい",
+    "no": "いいえ"
   },
   "view": {
     "label": "表示",
@@ -494,6 +496,17 @@
   "statusBar": {
     "words": "ワード",
     "chars": "文字",
-    "displaySettings": "表示設定"
+    "displaySettings": "表示設定",
+    "documentInsights": "ドキュメント分析",
+    "readingTime": "読了時間",
+    "min": "分",
+    "mins": "分",
+    "headings": "見出し",
+    "tasks": "タスク",
+    "links": "リンク",
+    "images": "画像",
+    "codeBlocks": "コードブロック",
+    "tables": "表",
+    "frontmatter": "フロントマター"
   }
 }

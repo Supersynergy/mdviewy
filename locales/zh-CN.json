@@ -1,5 +1,5 @@
 {
-  "app_name": "MDmaster",
+  "app_name": "MDviewy",
   "common": {
     "none": "無",
     "name": "名称",
@@ -19,7 +19,9 @@
     "value": "值",
     "success": "成功",
     "import": "导入",
-    "menu": "菜单"
+    "menu": "菜单",
+    "yes": "是",
+    "no": "否"
   },
   "view": {
     "label": "视图",
@@ -103,7 +105,18 @@
   "statusBar": {
     "words": "词",
     "chars": "字符",
-    "displaySettings": "显示设置"
+    "displaySettings": "显示设置",
+    "documentInsights": "文档洞察",
+    "readingTime": "阅读时间",
+    "min": "分钟",
+    "mins": "分钟",
+    "headings": "标题",
+    "tasks": "任务",
+    "links": "链接",
+    "images": "图片",
+    "codeBlocks": "代码块",
+    "tables": "表格",
+    "frontmatter": "元数据"
   },
   "file": {
     "untitled": "未命名",

@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { MarkdownInsights } from '@/helper/markdownInsights'
 
 const useEditorCounterStore = create<EditorCountStore>((set) => {
   return {
@@ -39,7 +40,4 @@ export default useEditorCounterStore
 
 type EditorCounterMap = Record<string, EditorCounterData>
 
-interface EditorCounterData {
-  characterCount: number
-  wordCount: number
-}
+type EditorCounterData = MarkdownInsights
