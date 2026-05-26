@@ -1,10 +1,26 @@
 import Explorer from '@/components/Explorer'
 import { RIGHTBARITEMKEYS } from '@/constants'
-import BookMarks from '@/extensions/bookmarks'
 import classNames from 'classnames'
-import { memo, useMemo, useState } from 'react'
+import { lazy, memo, Suspense, useMemo, useState } from 'react'
 import { Tooltip } from 'zens'
 import { Container as SideBarContainer, SideBarHeader } from './styles'
+
+const LazyBookMarksPanel = lazy(async () => {
+  const mod = await import('@/extensions/bookmarks')
+  const node = mod.default.components as React.ReactElement
+  return { default: () => node }
+})
+
+const BookMarks = {
+  title: RIGHTBARITEMKEYS.BookMarks,
+  key: RIGHTBARITEMKEYS.BookMarks,
+  icon: <i className='ri-bookmark-line' />,
+  components: (
+    <Suspense fallback={<div style={{ padding: 12, fontSize: 12, opacity: 0.6 }}>Loading bookmarks...</div>}>
+      <LazyBookMarksPanel />
+    </Suspense>
+  ),
+}
 
 const SearchTrigger = {
   title: RIGHTBARITEMKEYS.Search,

@@ -1,6 +1,6 @@
+import Popover from '@/components/ui-v2/Popover'
 import { useEditorStore } from '@/stores'
 import useEditorCounterStore from '@/stores/useEditorCounterStore'
-import { Popover } from 'antd'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'

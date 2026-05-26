@@ -1,3 +1,4 @@
+import '@/antdStyles'
 import { EVENT } from '@/constants'
 import { Setting } from '@/router'
 import { useCommandStore } from '@/stores'

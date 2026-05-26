@@ -1,3 +1,4 @@
+import '@/antdStyles'
 import { useCommandStore } from '@/stores'
 import { Select } from 'antd'
 import { useEffect, useMemo, useState } from 'react'

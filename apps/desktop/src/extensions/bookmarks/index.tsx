@@ -1,3 +1,4 @@
+import '@/antdStyles'
 import type { RightBarItem } from '@/components/SideBar'
 import type { RightNavItem } from '@/components/SideBar/SideBarHeader'
 import SideBarHeader from '@/components/SideBar/SideBarHeader'

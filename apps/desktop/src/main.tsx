@@ -11,7 +11,6 @@ window.__MDM_BOOT__ = performance.now()
 import { lightTheme } from '@mdviewy/theme'
 import * as Sentry from '@sentry/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import 'antd/dist/antd.css'
 import { HoxRoot } from 'hox'
 import { enableMapSet } from 'immer'
 import { StrictMode, Suspense } from 'react'

@@ -1,13 +1,13 @@
 import Empty from '@/components/Empty'
 import { FileTree } from '@/components/FileTree'
 import List from '@/components/ui-v2/List'
+import Popover from '@/components/ui-v2/Popover'
 import type { IFile } from '@/helper/filesys'
 import { useOpen } from '@/hooks'
 import { createNewWindow } from '@/services/windows'
 import { useEditorStore } from '@/stores'
 import useOpenedCacheStore from '@/stores/useOpenedCacheStore'
 import { homeDir } from '@tauri-apps/api/path'
-import { Popover } from 'antd'
 import classNames from 'classnames'
 import type { FC, MouseEventHandler } from 'react'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
@@ -141,28 +141,26 @@ const Explorer: FC<ExplorerProps> = (props) => {
         <span className='explorer-bottom__action cursor-pointer' onClick={openFolderDialog}>
           {t('file.openDir')}
         </span>
-        <Popover
-          classNames={{
-            container: 'popover',
-          }}
-          placement='bottomRight'
-          content={
-            <>
-              <List
-                title={t('file.recentDir')}
-                data={listData}
-                onItemClick={handleOpenHistoryListItemClick}
-              />
-              <RecentListBottom onClick={handleClearRecent}>
-                {t('file.clearRecent')}
-              </RecentListBottom>
-            </>
-          }
-        >
-          {listData.length > 0 ? (
+        {listData.length > 0 ? (
+          <Popover
+            contentClassName='popover'
+            placement='bottomRight'
+            content={
+              <>
+                <List
+                  title={t('file.recentDir')}
+                  data={listData}
+                  onItemClick={handleOpenHistoryListItemClick}
+                />
+                <RecentListBottom onClick={handleClearRecent}>
+                  {t('file.clearRecent')}
+                </RecentListBottom>
+              </>
+            }
+          >
             <i className='ri-more-2-fill explorer-bottom__action__icon' />
-          ) : null}
-        </Popover>
+          </Popover>
+        ) : null}
       </div>
     </Container>
   )

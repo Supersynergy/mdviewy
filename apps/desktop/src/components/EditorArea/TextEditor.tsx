@@ -1,3 +1,4 @@
+import '@/antdStyles'
 import { EVENT } from '@/constants'
 import { clipboardRead } from '@/helper/clipboard'
 import bus from '@/helper/eventBus'
