@@ -1,11 +1,9 @@
 import NiceModal from '@ebay/nice-modal-react'
 import isPropValid from '@emotion/is-prop-valid'
 import { useMemo } from 'react'
-import { ThemeProvider as EditorProvider } from 'rme'
 import { IStyleSheetContext, StyleSheetManager, ThemeProvider } from 'styled-components'
 import { ThemeProvider as ZensThemeProvider } from 'zens'
 import { GlobalStyles } from './globalStyles'
-import { editorResources } from './i18n'
 import { InjectFonts } from './injectFonts'
 import useAppSettingStore from './stores/useAppSettingStore'
 import useThemeStore from './stores/useThemeStore'
@@ -32,23 +30,13 @@ const AppThemeProvider: React.FC<BaseComponentProps> = function ({ children }) {
     ],
   )
 
-  const i18nProp = useMemo(
-    () => ({
-      locales: editorResources,
-      language: settingData.language,
-    }),
-    [settingData.language],
-  )
-
   return (
     <StyleSheetManager shouldForwardProp={shouldForwardProp}>
       <ThemeProvider theme={theme}>
         <ZensThemeProvider theme={themeProp}>
-          <EditorProvider theme={themeProp} i18n={i18nProp}>
-            <InjectFonts />
-            <GlobalStyles />
-            <NiceModal.Provider>{children}</NiceModal.Provider>
-          </EditorProvider>
+          <InjectFonts />
+          <GlobalStyles />
+          <NiceModal.Provider>{children}</NiceModal.Provider>
         </ZensThemeProvider>
       </ThemeProvider>
     </StyleSheetManager>

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { FileTypeConfig } from '@/helper/fileTypeHandler'
+import type { FileTypeConfig } from '@/helper/fileTypeHandler'
 
 const useFileTypeConfigStore = create(
   immer<FileTypeConfigStore>((set, get) => {

@@ -1,10 +1,26 @@
 import { RIGHTBARITEMKEYS } from '@/constants'
 import smartActionsExtension from '@/extensions/smart-actions'
-import TABLEOFCONTENT from '@/extensions/table-of-content'
 import classNames from 'classnames'
 import { lazy, memo, Suspense, useState } from 'react'
 import { Tooltip } from 'zens'
 import { Container as SideBarContainer, SideBarHeader } from './styles'
+
+const LazyTocPanel = lazy(async () => {
+  const mod = await import('@/extensions/table-of-content')
+  const node = mod.default.components as React.ReactElement
+  return { default: () => node }
+})
+
+const tocExtensionMeta = {
+  title: RIGHTBARITEMKEYS.TableOfContent,
+  key: RIGHTBARITEMKEYS.TableOfContent,
+  icon: <i className='ri-list-unordered' />,
+  components: (
+    <Suspense fallback={<div style={{ padding: 12, fontSize: 12, opacity: 0.6 }}>Loading TOC...</div>}>
+      <LazyTocPanel />
+    </Suspense>
+  ),
+}
 
 // Lazy: AI chat extension pulls in ant-design/x + sentry + xmarkdown (~MBs).
 // Defer until user opens the AI tab — keeps first paint <1s.
@@ -30,7 +46,7 @@ function RightBar() {
   )
 
   const rightBarDataSource: RightBarItem[] = [
-    TABLEOFCONTENT,
+    tocExtensionMeta,
     smartActionsExtension,
     aiExtensionMeta,
   ]

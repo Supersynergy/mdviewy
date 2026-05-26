@@ -37,33 +37,9 @@ export default defineConfig({
             return 'vendor-react'
           }
 
-          if (
-            /[\\/]node_modules[\\/](@codemirror|@lezer|codemirror|prosemirror|rme)[\\/]/.test(id)
-          ) {
-            return 'vendor-editor'
-          }
-
-          if (/[\\/]node_modules[\\/](mermaid|cytoscape|dagre|khroma)[\\/]/.test(id)) {
-            return 'vendor-diagrams'
-          }
-
           if (/[\\/]node_modules[\\/](@tauri-apps)[\\/]/.test(id)) {
             return 'vendor-tauri'
           }
-
-          if (
-            /[\\/]node_modules[\\/](@ai-sdk|ai|ollama-ai-provider-v2)[\\/]/.test(id)
-          ) {
-            return 'vendor-ai'
-          }
-
-          if (
-            /[\\/]node_modules[\\/](antd|zens|styled-components|@emotion|@ant-design)[\\/]/.test(id)
-          ) {
-            return 'vendor-ui'
-          }
-
-          return 'vendor'
         },
       },
     },

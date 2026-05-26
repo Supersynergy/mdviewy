@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { EditorViewType } from 'rme'
+import type { EditorViewType } from 'rme'
 import { immer } from 'zustand/middleware/immer'
 
 const useEditorViewTypeStore = create(
@@ -19,7 +19,7 @@ const useEditorViewTypeStore = create(
         if (viewType) {
           return viewType
         }
-        return EditorViewType.PREVIEW
+        return 'preview' as EditorViewType
       },
     }
   }),

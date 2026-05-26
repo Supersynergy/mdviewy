@@ -1,7 +1,9 @@
 import { changeLng, Langs, locales } from '@/i18n'
 import { currentWebview } from '@/services/windows'
 import i18n from 'i18next'
-import { EditorViewType } from 'rme'
+
+const VIEW_WYSIWYG = 'wysiwyg'
+const VIEW_SOURCECODE = 'sourceCode'
 
 export const getSettingMap = () => {
   return {
@@ -177,8 +179,8 @@ export const getSettingMap = () => {
             i18nKey: 'settings.editor.behavior.md_default_mode.desc',
           },
           options: [
-            { value: EditorViewType.WYSIWYG, title: i18n.t('view.wysiwyg') },
-            { value: EditorViewType.SOURCECODE, title: i18n.t('view.source_code') },
+            { value: VIEW_WYSIWYG, title: i18n.t('view.wysiwyg') },
+            { value: VIEW_SOURCECODE, title: i18n.t('view.source_code') },
           ],
         },
       },

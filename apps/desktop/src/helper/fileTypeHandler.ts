@@ -1,9 +1,13 @@
 import useAppSettingStore from '@/stores/useAppSettingStore'
 import { extname } from '@tauri-apps/api/path'
-import { EditorViewType } from 'rme'
+import type { EditorViewType } from 'rme'
 import { IFile } from './filesys'
 
 export type FileType = 'markdown' | 'image' | 'json' | 'text' | 'unsupported'
+
+const VIEW_PREVIEW = 'preview' as EditorViewType
+const VIEW_WYSIWYG = 'wysiwyg' as EditorViewType
+const VIEW_SOURCECODE = 'sourceCode' as EditorViewType
 
 export interface FileTypeConfig {
   type: FileType
@@ -22,8 +26,8 @@ export async function getFileTypeConfig(file: IFile): Promise<FileTypeConfig> {
 
   const markdownFileType: FileTypeConfig = {
     type: 'markdown',
-    supportedModes: [EditorViewType.PREVIEW, EditorViewType.WYSIWYG, EditorViewType.SOURCECODE],
-    defaultMode: settingData.md_editor_default_mode || EditorViewType.WYSIWYG,
+    supportedModes: [VIEW_PREVIEW, VIEW_WYSIWYG, VIEW_SOURCECODE],
+    defaultMode: settingData.md_editor_default_mode || VIEW_WYSIWYG,
     exporters: ['Html', 'Image'],
   }
 
@@ -32,33 +36,33 @@ export async function getFileTypeConfig(file: IFile): Promise<FileTypeConfig> {
     markdown: markdownFileType,
     json: {
       type: 'json',
-      supportedModes: [EditorViewType.SOURCECODE],
-      defaultMode: EditorViewType.SOURCECODE,
+      supportedModes: [VIEW_SOURCECODE],
+      defaultMode: VIEW_SOURCECODE,
     },
     txt: {
       type: 'text',
-      supportedModes: [EditorViewType.SOURCECODE],
-      defaultMode: EditorViewType.SOURCECODE,
+      supportedModes: [VIEW_SOURCECODE],
+      defaultMode: VIEW_SOURCECODE,
     },
     jpg: {
       type: 'image',
-      supportedModes: [EditorViewType.PREVIEW],
-      defaultMode: EditorViewType.PREVIEW,
+      supportedModes: [VIEW_PREVIEW],
+      defaultMode: VIEW_PREVIEW,
     },
     jpeg: {
       type: 'image',
-      supportedModes: [EditorViewType.PREVIEW],
-      defaultMode: EditorViewType.PREVIEW,
+      supportedModes: [VIEW_PREVIEW],
+      defaultMode: VIEW_PREVIEW,
     },
     png: {
       type: 'image',
-      supportedModes: [EditorViewType.PREVIEW],
-      defaultMode: EditorViewType.PREVIEW,
+      supportedModes: [VIEW_PREVIEW],
+      defaultMode: VIEW_PREVIEW,
     },
     gif: {
       type: 'image',
-      supportedModes: [EditorViewType.PREVIEW],
-      defaultMode: EditorViewType.PREVIEW,
+      supportedModes: [VIEW_PREVIEW],
+      defaultMode: VIEW_PREVIEW,
     },
   }
 
@@ -66,8 +70,8 @@ export async function getFileTypeConfig(file: IFile): Promise<FileTypeConfig> {
   return (
     tar || {
       type: 'unsupported',
-      supportedModes: [EditorViewType.SOURCECODE],
-      defaultMode: EditorViewType.SOURCECODE,
+      supportedModes: [VIEW_SOURCECODE],
+      defaultMode: VIEW_SOURCECODE,
     }
   )
 }

@@ -2,9 +2,10 @@ import { EVENT } from '@/constants'
 import { useCommandStore, useEditorStore } from '@/stores'
 import useEditorViewTypeStore from '@/stores/useEditorViewTypeStore'
 import { memo, useCallback } from 'react'
-import { EditorViewType } from 'rme'
 import styled from 'styled-components'
 import { Tooltip } from 'zens'
+
+const WYSIWYG_VIEW_TYPE = 'wysiwyg'
 
 const Btn = styled.button`
   display: inline-flex;
@@ -49,8 +50,8 @@ export const EditorModeBtn = memo(() => {
 
   if (!activeId) return null
 
-  const cur = editorViewTypeMap.get(activeId) ?? EditorViewType.WYSIWYG
-  const isWys = cur === EditorViewType.WYSIWYG
+  const cur = editorViewTypeMap.get(activeId) ?? WYSIWYG_VIEW_TYPE
+  const isWys = cur === WYSIWYG_VIEW_TYPE
 
   return (
     <Tooltip title={isWys ? 'Switch to Source (Cmd+Shift+M)' : 'Switch to Pretty (Cmd+Shift+M)'}>
