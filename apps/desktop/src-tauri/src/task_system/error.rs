@@ -4,6 +4,7 @@ use super::task::{Task, TaskId};
 
 /// Task system's error type definition, representing when internal errors occurs.
 #[derive(Debug, thiserror::Error)]
+#[allow(clippy::enum_variant_names)]
 pub enum SystemError {
     #[error("task not found <task_id='{0}'>")]
     TaskNotFound(TaskId),

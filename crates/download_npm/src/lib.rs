@@ -1,10 +1,8 @@
-use reqwest;
+use flate2::read::GzDecoder;
 use std::fs;
 use std::io::{copy, Read, Write};
 use std::path::Path;
 use std::time::Duration;
-use flate2::read::GzDecoder;
-use tar;
 use tar::Archive;
 
 pub fn generate_registry_url(package_name: &str) -> String {
@@ -20,7 +18,7 @@ pub fn generate_download_url(package_name: &str, version: &str) -> String {
 
 pub struct DownloadOptions {
     pub dest_path: String,
-    pub untar: bool
+    pub untar: bool,
 }
 
 pub async fn download(
@@ -72,11 +70,13 @@ pub async fn download(
             let mut content = String::new();
 
             // only copy main files
-            if path.clone().ends_with("package.json") || path.ends_with("index.js") || path.ends_with("style.css") {
-
+            if path.clone().ends_with("package.json")
+                || path.ends_with("index.js")
+                || path.ends_with("style.css")
+            {
                 let target_dir_path = target_dest_path.parent().unwrap().join(package_name);
 
-                let file_name = path.file_name().unwrap().to_str().clone().unwrap();
+                let file_name = path.file_name().unwrap().to_str().unwrap();
                 let target_file_path = target_dir_path.join(Path::new(file_name));
 
                 if !target_dir_path.clone().join(path.clone()).exists() {
@@ -97,7 +97,6 @@ pub async fn download(
 
         copy(&mut download_response.bytes().await?.as_ref(), &mut dest)?;
     }
-
 
     Ok(())
 }

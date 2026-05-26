@@ -1,6 +1,6 @@
 use anyhow::Result as AnyResult;
 use chrono::{DateTime, Local};
-use mdviewy_utils::is_supported_file_name;
+use mdmaster_utils::is_supported_file_name;
 use natural_sort_rs::Natural;
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -116,10 +116,7 @@ pub fn read_directory(dir_path: &str) -> Result<Vec<FileInfo>, FileResultCode> {
 
         if file_type.is_dir() {
             kind = String::from("dir");
-            children = match read_directory(file_path.to_str().unwrap_or("")) {
-                Ok(children) => Some(children),
-                Err(_) => None,
-            };
+            children = read_directory(file_path.to_str().unwrap_or("")).ok();
         }
 
         let new_file_info = FileInfo {
@@ -127,7 +124,7 @@ pub fn read_directory(dir_path: &str) -> Result<Vec<FileInfo>, FileResultCode> {
             kind,
             path: file_path.to_str().unwrap_or("").to_string(),
             children,
-            ext: file_ext.into(),
+            ext: file_ext,
         };
 
         if is_supported_file_name(&new_file_info.name) || file_type.is_dir() {
@@ -217,7 +214,7 @@ pub fn read_directory_async(
             Ok(crate::task_system::task::TaskStatus::Done((_, TaskOutput::Empty))) => {
                 Ok(Vec::new())
             }
-            Ok(crate::task_system::task::TaskStatus::Error(ReadDirError::FileError(fc))) => {
+            Ok(crate::task_system::task::TaskStatus::Error(ReadDirError::FileError(_fc))) => {
                 // 使用TaskJoin替代不存在的TaskFailed
                 Err(SystemError::TaskJoin(TaskId::nil()))
             }
@@ -236,7 +233,7 @@ pub fn read_directory_async(
     }
 }
 
-pub fn sort_files_by_kind_and_name(files: &mut Vec<FileInfo>) {
+pub fn sort_files_by_kind_and_name(files: &mut [FileInfo]) {
     use std::cmp::Ordering;
 
     files.sort_by(|a, b| {
@@ -461,10 +458,7 @@ pub fn rename_fs(old_path: &Path, new_path: &Path) -> AnyResult<MoveFileInfo> {
     if is_folder {
         let res = read_directory(new_path.to_str().unwrap_or(""));
 
-        let files: Option<Vec<FileInfo>> = match res {
-            Ok(files) => Some(files),
-            Err(_) => None,
-        };
+        let files: Option<Vec<FileInfo>> = res.ok();
         if files.is_none() {
             return Err(anyhow::anyhow!("Failed to read directory"));
         }
@@ -472,7 +466,7 @@ pub fn rename_fs(old_path: &Path, new_path: &Path) -> AnyResult<MoveFileInfo> {
         Ok(MoveFileInfo {
             old_path: old_path.to_str().unwrap_or("").to_string(),
             new_path: new_path.to_str().unwrap_or("").to_string(),
-            is_folder: is_folder,
+            is_folder,
             children: files,
             is_replaced: Some(false),
         })
@@ -480,7 +474,7 @@ pub fn rename_fs(old_path: &Path, new_path: &Path) -> AnyResult<MoveFileInfo> {
         Ok(MoveFileInfo {
             old_path: old_path.to_str().unwrap_or("").to_string(),
             new_path: new_path.to_str().unwrap_or("").to_string(),
-            is_folder: is_folder,
+            is_folder,
             children: None,
             is_replaced: Some(false),
         })
@@ -719,7 +713,7 @@ pub mod cmd {
                     _ => String::from(""),
                 };
 
-                if content == "" {
+                if content.is_empty() {
                     return FileResult {
                         code: fc::FileResultCode::NotFound,
                         content: String::from("Folder not found"),
@@ -728,7 +722,7 @@ pub mod cmd {
 
                 FileResult {
                     code: fc::FileResultCode::Success,
-                    content: content,
+                    content,
                 }
             }
             Err(_) => FileResult {
@@ -748,7 +742,7 @@ pub mod cmd {
                     _ => String::from(""),
                 };
 
-                if content == "" {
+                if content.is_empty() {
                     return FileResult {
                         code: fc::FileResultCode::NotFound,
                         content: String::from("Folder not found"),
@@ -757,7 +751,7 @@ pub mod cmd {
 
                 FileResult {
                     code: fc::FileResultCode::Success,
-                    content: content,
+                    content,
                 }
             }
             Err(_) => FileResult {
@@ -867,10 +861,7 @@ pub mod cmd {
     ) -> Option<Vec<MoveFileInfo>> {
         let res = fc::move_files_to_target_folder(files, target_folder, replace_exist);
 
-        match res {
-            Ok(path_map_old_to_new) => Some(path_map_old_to_new),
-            Err(_) => None,
-        }
+        res.ok()
     }
 
     #[tauri::command]
@@ -916,10 +907,7 @@ pub mod cmd {
             .take_while(|(a, b)| a == b)
             .count();
 
-        let mut components = vec![];
-        for _ in common_prefix_len..relative_to_components.len() {
-            components.push("..");
-        }
+        let mut components = vec![".."; relative_to_components.len() - common_prefix_len];
 
         for component in &cur_components[common_prefix_len..] {
             if let Component::Normal(name) = component {
@@ -986,7 +974,7 @@ pub mod cmd {
         let file_ext = from_path.extension()?;
 
         while parent_path
-            .join(&format!(
+            .join(format!(
                 "{}.{}",
                 to_path_name.clone(),
                 file_ext.to_str().unwrap_or("")

@@ -432,13 +432,13 @@ const styledNordTheme = {
 }
 
 export const lightTheme: MfTheme = {
-  name: 'mdviewy Light',
+  name: 'mdmaster Light',
   mode: 'light',
   styledConstants: styledLightTheme,
 }
 
 export const darkTheme: MfTheme = {
-  name: 'mdviewy Dark',
+  name: 'mdmaster Dark',
   mode: 'dark',
   styledConstants: styledDarkTheme,
 }

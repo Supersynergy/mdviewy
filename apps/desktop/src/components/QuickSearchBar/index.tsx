@@ -6,7 +6,7 @@ import { Bar, Counter, HistoryDropdown, HistoryItem, Input, ResetBtn, Wrap } fro
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 const MIN_QUERY = 2
-const HISTORY_KEY = 'mdviewy.qs.history'
+const HISTORY_KEY = 'mdmaster.qs.history'
 const MAX_HISTORY = 10
 
 const loadHistory = (): string[] => {

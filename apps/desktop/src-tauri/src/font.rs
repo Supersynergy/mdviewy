@@ -5,8 +5,7 @@ pub mod cmd {
     #[command]
     pub fn font_list() -> Vec<String> {
         let source = SystemSource::new();
-        let fonts = source.all_families().unwrap();
 
-        fonts
+        source.all_families().unwrap()
     }
 }

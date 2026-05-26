@@ -1,6 +1,6 @@
-# 为 mdviewy 做贡献
+# 为 mdmaster 做贡献
 
-欢迎，并感谢你对 mdviewy 的关注与贡献！
+欢迎，并感谢你对 mdmaster 的关注与贡献！
 
 ## 如何贡献代码
 
@@ -17,7 +17,7 @@
 
 ### 目录
 
-- [为 mdviewy 做贡献](#为-mdviewy-做贡献)
+- [为 mdmaster 做贡献](#为-mdmaster-做贡献)
   - [如何贡献代码](#如何贡献代码)
     - [前置条件](#前置条件)
     - [目录](#目录)
@@ -27,7 +27,7 @@
     - [开发工作步骤](#开发工作步骤)
       - [Fork](#fork-1)
       - [安装依赖](#安装依赖)
-      - [启动 mdviewy](#启动-mdviewy)
+      - [启动 mdmaster](#启动-mdmaster)
 - [致谢](#致谢)
 
 ### 多语言翻译贡献步骤
@@ -36,7 +36,7 @@
 
 #### Fork
 
-Fork [mdviewy](https://github.com/Supersynergy/mdviewy) 并执行 `git clone`。
+Fork [mdmaster](https://github.com/Supersynergy/mdmaster) 并执行 `git clone`。
 
 #### 翻译文件
 
@@ -52,7 +52,7 @@ Fork [mdviewy](https://github.com/Supersynergy/mdviewy) 并执行 `git clone`。
 
 #### Fork
 
-Fork [mdviewy](https://github.com/Supersynergy/mdviewy) 并执行 `git clone`。
+Fork [mdmaster](https://github.com/Supersynergy/mdmaster) 并执行 `git clone`。
 
 #### 安装依赖
 
@@ -64,11 +64,11 @@ yarn install --immutable
 cargo install --locked --path apps/desktop/src-tauri
 ```
 
-#### 启动 mdviewy
+#### 启动 mdmaster
 
 注意：首次启动前，需要执行 `yarn build` 来编译工作区里的包。
 
-执行以下命令即可启动 mdviewy：
+执行以下命令即可启动 mdmaster：
 
 ```bash
 yarn dev:desktop
@@ -76,11 +76,11 @@ yarn dev:desktop
 
 ## 如何提交主题到主题商店
 
-mdviewy 内置了主题商店功能，用户可以浏览、下载和安装社区创建的主题。如果你想将自己的主题提交到主题商店供其他用户使用，请参考 [自定义主题文档](./Extension/CustomTheme.md) 中的"分享你的主题"部分，该文档详细介绍了主题创建的完整流程和提交到主题商店的具体步骤。
+mdmaster 内置了主题商店功能，用户可以浏览、下载和安装社区创建的主题。如果你想将自己的主题提交到主题商店供其他用户使用，请参考 [自定义主题文档](./Extension/CustomTheme.md) 中的"分享你的主题"部分，该文档详细介绍了主题创建的完整流程和提交到主题商店的具体步骤。
 
 # 致谢
 
-无论大小，你对开源项目的贡献都会让它变得更好。感谢你抽出时间为 mdviewy 做出贡献！
+无论大小，你对开源项目的贡献都会让它变得更好。感谢你抽出时间为 mdmaster 做出贡献！
 
 
 

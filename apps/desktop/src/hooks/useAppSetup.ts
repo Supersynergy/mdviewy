@@ -116,7 +116,7 @@ async function appWorkspaceSetup() {
   logger.debug('window.openedUrls', window.openedUrls)
 
   try {
-    const cacheStore = await new LazyStore('.mdviewy_workspaces.dat')
+    const cacheStore = await new LazyStore('.mdmaster_workspaces.dat')
 
     const getOpenedCacheRes = await invoke<{ recent_workspaces: WorkspaceInfo[] }>(
       'get_opened_cache',
@@ -211,6 +211,8 @@ const useMainStoreSetup = () => {
 }
 
 const appSetup = once(async function () {
+  // CRITICAL PATH — minimum work to render the shell correctly.
+  // Goal: first paint in <1s. Everything else is deferred to idle time.
   useMainStoreSetup()
 
   const settingData = await appSettingStoreSetup()
@@ -218,17 +220,32 @@ const appSetup = once(async function () {
   window.removeEventListener('message', listener)
   window.addEventListener('message', listener)
 
-  appThemeExtensionsSetup(settingData.theme)
+  // i18n and theme are required before first paint (visible flash otherwise).
   i18nInit({ lng: settingData.language })
-  checkUpdate({ install: settingData.auto_update })
+  appThemeExtensionsSetup(settingData.theme)
 
-  // Initialize zoom level based on webview_zoom setting
+  // Initialize zoom level — required before paint.
   if (settingData.webview_zoom) {
     const webview = getCurrentWebview()
     webview.setZoom(Number(settingData.webview_zoom))
   }
 
-  await appWorkspaceSetup()
+  // DEFERRED — run after the shell has painted. Schedule via requestIdleCallback
+  // (fallback setTimeout) so the viewer is interactive instantly.
+  const schedule = (cb: () => void) => {
+    const ric = (window as any).requestIdleCallback as undefined | ((c: () => void, opts?: any) => number)
+    if (ric) ric(cb, { timeout: 500 })
+    else setTimeout(cb, 0)
+  }
+
+  schedule(() => {
+    appWorkspaceSetup().catch((e) => logger.error('appWorkspaceSetup deferred failed', e))
+  })
+
+  schedule(() => {
+    // Network call — never block startup on it.
+    checkUpdate({ install: settingData.auto_update })
+  })
 
   return settingData
 })

@@ -1,26 +1,18 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug, Default)]
 pub struct SearchOptions {
     content_case_sensitive: bool,
 }
 
-impl Default for SearchOptions {
-    fn default() -> Self {
-        Self {
-            content_case_sensitive: false,
-        }
-    }
-}
-
 pub mod cmd {
-    use mdviewy_file_search::{
+    use mdmaster_file_search::{
         manager,
         options::{ContentOptions, Options},
         search::Search,
     };
-    use std::{sync::mpsc::channel, thread::spawn};
-    use tauri::{command, AppHandle, Emitter, EventTarget};
+    use std::sync::mpsc::channel;
+    use tauri::command;
 
     use super::SearchOptions;
 

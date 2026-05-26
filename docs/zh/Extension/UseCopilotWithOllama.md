@@ -83,11 +83,11 @@ launchctl getenv OLLAMA_ORIGINS
 
 ## Copilot 如何使用
 
-Copilot 可以配合任何 mdviewy 已经支持的 AI 供应商使用，但需要你在 `设置`中的 AI 部分配置，并且确认在 AI chat 中可以正常使用，然后在 Copilot 设置中选择你设置好的供应商和模型即可。
+Copilot 可以配合任何 mdmaster 已经支持的 AI 供应商使用，但需要你在 `设置`中的 AI 部分配置，并且确认在 AI chat 中可以正常使用，然后在 Copilot 设置中选择你设置好的供应商和模型即可。
 
 ### Copilot 的触发机制
 
-通常，在一个段落输入一定的文本后，mdviewy 会把你所在的附近的字符，作为上下文让 AI 提供一些建议，大概的样子是这样的:![](https://raw.githubusercontent.com/Supersynergy/mdviewy/refs/heads/main/public/copilot.png)
+通常，在一个段落输入一定的文本后，mdmaster 会把你所在的附近的字符，作为上下文让 AI 提供一些建议，大概的样子是这样的:![](https://raw.githubusercontent.com/Supersynergy/mdmaster/refs/heads/main/public/copilot.png)
 
 ### 建议
 

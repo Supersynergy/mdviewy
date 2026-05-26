@@ -58,14 +58,24 @@ const Empty = styled.div`
   opacity: 0.7;
 `
 
-const stripMd = (s: string) =>
-  s
-    .replace(/\*\*([^*]+)\*\*/g, '$1')
-    .replace(/\*([^*]+)\*/g, '$1')
-    .replace(/_([^_]+)_/g, '$1')
-    .replace(/`([^`]+)`/g, '$1')
-    .replace(/^#+\s*/, '')
+const stripMd = (s: string): string => {
+  if (!s) return ''
+  return s
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')      // images ![alt](url) → alt
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')       // links [text](url) → text
+    .replace(/\[([^\]]+)\]\[[^\]]*\]/g, '$1')      // ref links [text][id] → text
+    .replace(/<[^>]+>/g, '')                       // html tags
+    .replace(/\*\*([^*]+)\*\*/g, '$1')             // **bold**
+    .replace(/__([^_]+)__/g, '$1')                 // __bold__
+    .replace(/\*([^*]+)\*/g, '$1')                 // *italic*
+    .replace(/_([^_]+)_/g, '$1')                   // _italic_
+    .replace(/~~([^~]+)~~/g, '$1')                 // ~~strike~~
+    .replace(/`([^`]+)`/g, '$1')                   // `code`
+    .replace(/\\([\\`*_{}[\]()#+\-.!~])/g, '$1')   // escaped chars
+    .replace(/^#+\s*/, '')                         // leading #
+    .replace(/\s+/g, ' ')                          // collapse whitespace
     .trim()
+}
 
 type FlatHeading = {
   chapter: string
@@ -91,15 +101,27 @@ const CustomToc = memo(({ headings, activeId, filterQuery }: Props) => {
       setFlat([])
       return
     }
-    const tree = new HeadingTree(headings)
+    let tree: HeadingTree
+    try {
+      tree = new HeadingTree(headings)
+    } catch (err) {
+      console.warn('[CustomToc] HeadingTree build failed', err)
+      setFlat([])
+      return
+    }
     const arr: FlatHeading[] = []
+    const seen = new Map<string, number>()
     tree.traverseInPreorder((node) => {
       if (node.depth < 0) return TraverseResult.Continue
+      const baseId = node.id || `${node.chapter}-${node.title}`.replace(/\s+/g, '-').toLowerCase()
+      const count = seen.get(baseId) ?? 0
+      seen.set(baseId, count + 1)
+      const id = count === 0 ? baseId : `${baseId}-${count}`
       arr.push({
         chapter: node.chapter,
         title: stripMd(node.title),
-        id: node.id,
-        depth: node.depth,
+        id,
+        depth: Math.max(0, node.depth),
         onClick: node.onClick,
         raw: node.h,
       })
@@ -144,7 +166,18 @@ const CustomToc = memo(({ headings, activeId, filterQuery }: Props) => {
           $active={activeId === h.id}
           onClick={(e) => {
             e.preventDefault()
-            h.onClick?.(h.raw)
+            try {
+              h.onClick?.(h.raw)
+            } catch (err) {
+              console.warn('[CustomToc] onClick handler threw', err)
+            }
+            // DOM fallback: scroll viewport to the heading element if it exists.
+            const target =
+              document.getElementById(h.id) ||
+              (document.querySelector(`[data-heading-id="${h.id}"]`) as HTMLElement | null)
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
           }}
         >
           <Chapter>{h.chapter}</Chapter>

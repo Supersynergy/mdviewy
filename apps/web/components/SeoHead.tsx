@@ -13,7 +13,7 @@ export default function SeoHead({
   children,
   description = 'Modern Markdown editor.',
   image = 'https://www.styled-components.com/atom.png',
-  title = 'mdviewy',
+  title = 'mdmaster',
   url = '',
 }: React.PropsWithChildren<SeoHeadProps>) {
   return (
@@ -23,7 +23,7 @@ export default function SeoHead({
       <meta name="description" content={description} />
 
       {/* Open Graph */}
-      <link itemProp="url" href="https://mdviewy.vercel.app/" />
+      <link itemProp="url" href="https://mdmaster.vercel.app/" />
       <meta itemProp="name" content={title} />
       <meta itemProp="description" content={description} />
       <meta itemProp="image" content="/atom.png" />
@@ -36,7 +36,7 @@ export default function SeoHead({
       <meta property="og:image:height" content="652" />
       <meta property="og:image:width" content="652" />
       <meta property="og:description" content={description} />
-      <meta property="og:site_name" content="mdviewy" />
+      <meta property="og:site_name" content="mdmaster" />
 
       {children}
 

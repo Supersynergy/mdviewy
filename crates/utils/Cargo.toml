@@ -1,8 +1,8 @@
 [package]
-name = "mdviewy-utils"
+name = "mdmaster-utils"
 version = "0.0.1"
 edition = "2021"
-description = "mdviewy utils"
+description = "mdmaster utils"
 license = "MIT"
 
 [dependencies]

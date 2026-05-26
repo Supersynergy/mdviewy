@@ -1,12 +1,8 @@
 use super::conf;
-use crate::fc::{create_file, exists};
+use crate::fc::exists;
 use download_npm;
 use serde::{Deserialize, Serialize};
-use std::{
-    fs::create_dir,
-    path::{self, PathBuf},
-    vec,
-};
+use std::{fs::create_dir, path::PathBuf, vec};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Extension {
@@ -61,7 +57,7 @@ impl AppExtensions {
 
     pub async fn init(mut self) -> Self {
         if !exists(&Self::dir_path()) {
-            create_dir(&Self::dir_path());
+            let _ = create_dir(Self::dir_path());
         }
 
         // let _ = &Self::downloadBuiltInExtensions(self.clone()).await;
@@ -90,13 +86,14 @@ impl AppExtensions {
         self
     }
 
+    #[allow(non_snake_case)]
     pub async fn downloadBuiltInExtensions(self) -> Self {
-        if exists(&Self::dir_path().join("mdviewy-theme-template")) {
+        if exists(&Self::dir_path().join("mdmaster-theme-template")) {
             return self;
         }
 
         let _ = download_npm::download(
-            "mdviewy-theme-template",
+            "mdmaster-theme-template",
             download_npm::DownloadOptions {
                 untar: true,
                 dest_path: Self::dir_path().to_str().unwrap().to_string(),

@@ -112,7 +112,7 @@ function Setting() {
   }
 
   const handleOpenThemeStoreFile = () => {
-    openUrl('https://github.com/Supersynergy/mdviewy')
+    openUrl('https://github.com/Supersynergy/mdmaster')
   }
 
   const renderAction = () => {

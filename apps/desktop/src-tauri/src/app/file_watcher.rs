@@ -81,14 +81,13 @@ impl FileWatcher {
             }
 
             // 尝试接收文件系统事件，设置超时以便定期检查停止信号
-            match rx.recv_timeout(Duration::from_millis(500)) {
-                Ok(res) => match res {
+            if let Ok(res) = rx.recv_timeout(Duration::from_millis(500)) {
+                match res {
                     Ok(event) => {
                         callback(event);
                     }
                     Err(e) => println!("监听错误: {:?}", e),
-                },
-                Err(_) => {} // 超时，继续循环检查停止信号
+                }
             }
         }
     }
@@ -217,7 +216,7 @@ pub mod cmd {
     use super::{FileWatcherManager, WatcherEvent};
     use lazy_static::lazy_static;
     use std::sync::Mutex;
-    use tauri::{command, AppHandle, Emitter, EventTarget, Manager};
+    use tauri::{command, AppHandle, Emitter, EventTarget};
 
     lazy_static! {
         static ref FILE_WATCHER_MANAGER: Mutex<FileWatcherManager> =

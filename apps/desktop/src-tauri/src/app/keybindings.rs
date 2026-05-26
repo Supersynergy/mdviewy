@@ -227,7 +227,7 @@ impl Keybindings {
             self.write();
             return true;
         }
-        return false;
+        false
     }
 
     pub fn get_path() -> PathBuf {

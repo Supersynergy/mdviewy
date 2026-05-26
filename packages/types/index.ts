@@ -1,4 +1,4 @@
-import type { MfTheme } from '@mdviewy/theme'
+import type { MfTheme } from '@mdmaster/theme'
 
 export type MDVIEWY_CONTEXT = {
   theme: {

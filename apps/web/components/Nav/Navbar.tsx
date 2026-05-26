@@ -37,10 +37,10 @@ export default function Navbar({
 
       <NormalNavbar>
         <StartWrapper>
-          <LogoLink aria-label='mdviewy logo' href={`./${i18n?.language || 'en'}`}>
+          <LogoLink aria-label='mdmaster logo' href={`./${i18n?.language || 'en'}`}>
             <Logo />
             <Brand> / </Brand>
-            <strong>mdviewy</strong>
+            <strong>mdmaster</strong>
           </LogoLink>
 
           <NavLinks />

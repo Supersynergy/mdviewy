@@ -69,11 +69,11 @@ pub_struct!(AppConf {
     upload_image_save_relative_path_rule: Option<String>,
 });
 
-pub const APP_CONF_PATH: &str = "mdviewy.conf.json";
+pub const APP_CONF_PATH: &str = "mdmaster.conf.json";
 pub const STORE_KEY: &str = "app_config_v3";
 
 fn create_store(app: &AppHandle) -> Result<std::sync::Arc<Store<tauri::Wry>>, String> {
-    let store_path = "mdviewy_store.bin";
+    let store_path = "mdmaster_store.bin";
 
     StoreBuilder::new(app.app_handle(), store_path)
         .build()
@@ -83,11 +83,49 @@ fn create_store(app: &AppHandle) -> Result<std::sync::Arc<Store<tauri::Wry>>, St
 pub fn app_root() -> PathBuf {
     let app_dir = APP_DIR.lock().unwrap();
     let home_dir = app_dir.get(&0).unwrap();
-    let legacy_path = home_dir.join(".mdviewy");
+    let legacy_path = home_dir.join(".mdmaster");
+    let pre_rename_path = home_dir.join(".mdviewy");
+
+    // One-shot migration from pre-rename `.mdviewy` → `.mdmaster`.
+    if !exists(&legacy_path) && exists(&pre_rename_path) {
+        if let Err(e) = std::fs::rename(&pre_rename_path, &legacy_path) {
+            eprintln!("[conf] migrate .mdviewy → .mdmaster failed: {e}");
+            return pre_rename_path;
+        }
+    }
 
     // If legacy config exists, keep using it for backward compatibility
     if exists(&legacy_path) {
         return legacy_path;
+    }
+
+    // Also try XDG-style pre-rename location and migrate once.
+    #[cfg(not(target_os = "windows"))]
+    {
+        if let Ok(strategy) = choose_app_strategy(AppStrategyArgs {
+            top_level_domain: "com".to_string(),
+            author: "supersynergy".to_string(),
+            app_name: "mdmaster".to_string(),
+        }) {
+            let new_xdg = strategy.config_dir();
+            if !new_xdg.exists() {
+                if let Ok(old_strategy) = choose_app_strategy(AppStrategyArgs {
+                    top_level_domain: "com".to_string(),
+                    author: "supersynergy".to_string(),
+                    app_name: "mdviewy".to_string(),
+                }) {
+                    let old_xdg = old_strategy.config_dir();
+                    if old_xdg.exists() {
+                        if let Some(parent) = new_xdg.parent() {
+                            let _ = std::fs::create_dir_all(parent);
+                        }
+                        if let Err(e) = std::fs::rename(&old_xdg, &new_xdg) {
+                            eprintln!("[conf] migrate XDG mdviewy → mdmaster failed: {e}");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Use platform-specific paths via etcetera
@@ -102,7 +140,7 @@ pub fn app_root() -> PathBuf {
         match choose_app_strategy(AppStrategyArgs {
             top_level_domain: "com".to_string(),
             author: "supersynergy".to_string(),
-            app_name: "mdviewy".to_string(),
+            app_name: "mdmaster".to_string(),
         }) {
             Ok(strategy) => strategy.config_dir(),
             Err(_) => legacy_path, // Fallback to legacy path if something goes wrong
@@ -113,13 +151,10 @@ pub fn app_root() -> PathBuf {
 fn migrate_from_file(_app: &AppHandle) -> Option<AppConf> {
     let legacy_path = app_root().join(APP_CONF_PATH);
     if exists(&legacy_path) {
-        match std::fs::read_to_string(&legacy_path) {
-            Ok(content) => {
-                if let Ok(conf) = serde_json::from_str::<AppConf>(&content) {
-                    return Some(conf);
-                }
+        if let Ok(content) = std::fs::read_to_string(&legacy_path) {
+            if let Ok(conf) = serde_json::from_str::<AppConf>(&content) {
+                return Some(conf);
             }
-            Err(_) => {}
         }
     }
     None
@@ -194,7 +229,7 @@ impl AppConf {
             // Store 中没有配置，尝试从旧文件迁移
             if let Some(migrated_conf) = migrate_from_file(app) {
                 // 将迁移的配置写入 Store
-                let _ = store.set(
+                store.set(
                     STORE_KEY.to_string(),
                     serde_json::to_value(&migrated_conf).unwrap(),
                 );
@@ -207,7 +242,7 @@ impl AppConf {
             } else {
                 // 使用默认配置
                 let default_conf = Self::new();
-                let _ = store.set(
+                store.set(
                     STORE_KEY.to_string(),
                     serde_json::to_value(&default_conf).unwrap(),
                 );
@@ -429,7 +464,7 @@ pub mod cmd {
         tauri::async_runtime::spawn(async move {
             let conf_win =
                 WebviewWindowBuilder::new(&app, "conf", WebviewUrl::App("./setting".into()))
-                    .title("mdviewy setting")
+                    .title("mdmaster setting")
                     .resizable(true)
                     .fullscreen(false)
                     .theme(Some(theme))

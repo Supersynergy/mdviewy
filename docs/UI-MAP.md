@@ -1,4 +1,4 @@
-# mdviewy UI Map
+# mdmaster UI Map
 
 Status: restored from the local Claude file history on 2026-05-26.
 

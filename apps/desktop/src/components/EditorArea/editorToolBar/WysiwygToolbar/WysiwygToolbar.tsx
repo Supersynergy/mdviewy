@@ -8,6 +8,7 @@ import { ToolbarSection, usePriorityHidden } from '../responsive'
 import { CommandButton } from './CommandButton'
 import { AIButton } from './components/AIButton'
 import { MenuButton } from './components/MenuButton'
+import { SmartActionsButton } from './components/SmartActionsButton'
 
 const ToolbarWrapper = styled.div`
   background-color: ${({ theme }) => theme.bgColor};
@@ -67,6 +68,7 @@ export const WysiwygToolbar: FC = () => {
         hidden={hiddenIds.has('common')}
       >
         <MenuButton />
+        <SmartActionsButton />
         <AIButton />
       </ToolbarSection>
 

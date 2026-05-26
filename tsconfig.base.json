@@ -24,7 +24,17 @@
     "noEmitOnError": true,
     "emitDeclarationOnly": true,
     "composite": true,
-    "incremental": true
+    "incremental": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@mdmaster/runtime-api": ["packages/runtime-api/src/index.ts"],
+      "@mdmaster/runtime-api/*": ["packages/runtime-api/src/*"],
+      "@mdmaster/theme": ["packages/theme/src/index.ts"],
+      "@mdmaster/theme/*": ["packages/theme/src/*"],
+      "@mdmaster/types": ["packages/types/index.ts"],
+      "@mdmaster/types/*": ["packages/types/*"]
+    }
   },
   "exclude": [
     "node_modules",
