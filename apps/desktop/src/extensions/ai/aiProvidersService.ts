@@ -1,8 +1,4 @@
-import { createDeepSeek } from '@ai-sdk/deepseek'
-import { createGoogleGenerativeAI } from '@ai-sdk/google'
-import { createOpenAI } from '@ai-sdk/openai'
-import { generateText, ModelMessage, streamText } from 'ai'
-import { createOllama } from 'ollama-ai-provider-v2'
+import type { ModelMessage } from 'ai'
 
 export type AIGenerateTextParams = {
   sdkProvider: keyof typeof generateTextHandlerMap
@@ -14,14 +10,8 @@ export type AIGenerateTextParams = {
   abortSignal?: AbortSignal
 }
 
-export type AIStreamTextParams = Parameters<typeof streamText>[0] & {
-  sdkProvider: keyof typeof generateTextHandlerMap
-  url: string
-  apiKey: string
-  model: string
-  messages: Array<ModelMessage>
-  headers?: Record<string, string>
-  abortSignal?: AbortSignal
+export type AIStreamTextParams = AIGenerateTextParams & {
+  onError?: (event: { error: unknown }) => void
 }
 
 export type AIProviders = AIGenerateTextParams['sdkProvider']
@@ -29,6 +19,10 @@ export type AIProviders = AIGenerateTextParams['sdkProvider']
 export const generateTextHandlerMap = {
   deepseek: {
     generateText: async (params: AIGenerateTextParams) => {
+      const [{ createDeepSeek }, { generateText }] = await Promise.all([
+        import('@ai-sdk/deepseek'),
+        import('ai'),
+      ])
       const deepseek = createDeepSeek({
         baseURL: params.url || undefined,
         apiKey: params.apiKey,
@@ -42,7 +36,11 @@ export const generateTextHandlerMap = {
 
       return text
     },
-    streamText: async (params: AIGenerateTextParams) => {
+    streamText: async (params: AIStreamTextParams) => {
+      const [{ createDeepSeek }, { streamText }] = await Promise.all([
+        import('@ai-sdk/deepseek'),
+        import('ai'),
+      ])
       const deepseek = createDeepSeek({
         baseURL: params.url || undefined,
         apiKey: params.apiKey,
@@ -59,6 +57,10 @@ export const generateTextHandlerMap = {
   },
   openai: {
     generateText: async (params: AIGenerateTextParams) => {
+      const [{ createOpenAI }, { generateText }] = await Promise.all([
+        import('@ai-sdk/openai'),
+        import('ai'),
+      ])
       const openai = createOpenAI({
         baseURL: params.url || undefined,
         apiKey: params.apiKey,
@@ -72,7 +74,11 @@ export const generateTextHandlerMap = {
 
       return text
     },
-    streamText: async (params: AIGenerateTextParams) => {
+    streamText: async (params: AIStreamTextParams) => {
+      const [{ createOpenAI }, { streamText }] = await Promise.all([
+        import('@ai-sdk/openai'),
+        import('ai'),
+      ])
       const openai = createOpenAI({
         baseURL: params.url || undefined,
         apiKey: params.apiKey,
@@ -89,6 +95,10 @@ export const generateTextHandlerMap = {
   },
   ollama: {
     generateText: async (params: AIGenerateTextParams) => {
+      const [{ createOllama }, { generateText }] = await Promise.all([
+        import('ollama-ai-provider-v2'),
+        import('ai'),
+      ])
       const ollama = createOllama({
         baseURL: params.url || undefined,
         headers: params.headers,
@@ -101,7 +111,11 @@ export const generateTextHandlerMap = {
 
       return text
     },
-    streamText: async (params: AIGenerateTextParams) => {
+    streamText: async (params: AIStreamTextParams) => {
+      const [{ createOllama }, { streamText }] = await Promise.all([
+        import('ollama-ai-provider-v2'),
+        import('ai'),
+      ])
       const ollama = createOllama({
         baseURL: params.url || undefined,
         headers: params.headers,
@@ -117,6 +131,10 @@ export const generateTextHandlerMap = {
   },
   google: {
     generateText: async (params: AIGenerateTextParams) => {
+      const [{ createGoogleGenerativeAI }, { generateText }] = await Promise.all([
+        import('@ai-sdk/google'),
+        import('ai'),
+      ])
       const google = createGoogleGenerativeAI({
         baseURL: params.url || undefined,
         apiKey: params.apiKey,
@@ -130,7 +148,11 @@ export const generateTextHandlerMap = {
 
       return text
     },
-    streamText: async (params: AIGenerateTextParams) => {
+    streamText: async (params: AIStreamTextParams) => {
+      const [{ createGoogleGenerativeAI }, { streamText }] = await Promise.all([
+        import('@ai-sdk/google'),
+        import('ai'),
+      ])
       const google = createGoogleGenerativeAI({
         baseURL: params.url || undefined,
         apiKey: params.apiKey,
