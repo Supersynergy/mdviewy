@@ -1,5 +1,6 @@
 import '@/antdStyles'
 import { EVENT } from '@/constants'
+import { captureError } from '@/errorReporting'
 import { clipboardRead } from '@/helper/clipboard'
 import bus from '@/helper/eventBus'
 import {
@@ -22,11 +23,9 @@ import { useCommandStore, useEditorStateStore, useEditorStore } from '@/stores'
 import useAppSettingStore from '@/stores/useAppSettingStore'
 import useEditorCounterStore from '@/stores/useEditorCounterStore'
 import useEditorViewTypeStore from '@/stores/useEditorViewTypeStore'
-import * as Sentry from '@sentry/react'
 import { invoke } from '@tauri-apps/api/core'
 import { save } from '@tauri-apps/plugin-dialog'
 import classNames from 'classnames'
-import html2canvas from 'html2canvas'
 import { debounce, DebouncedFunc, throttle } from 'lodash'
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -394,6 +393,7 @@ function TextEditor(props: TextEditorProps) {
 
         const n = toast.loading(t('contextmenu.editor_tab.export_image') + '...')
 
+        const { default: html2canvas } = await import('html2canvas')
         html2canvas(document.getElementById(id) as HTMLElement).then((canvas) => {
           // to base 64
           const image = canvas.toDataURL('image/jpg')
@@ -545,7 +545,7 @@ function TextEditor(props: TextEditorProps) {
       errorHandler: {
         onError(params) {
           if (params.error) {
-            Sentry.captureException(params.error)
+            void captureError(params.error)
           }
         },
       },

@@ -7,3 +7,8 @@ export async function initErrorReporting(dsn: string | undefined) {
     integrations: [],
   })
 }
+
+export async function captureError(error: unknown) {
+  const Sentry = await import('@sentry/react')
+  Sentry.captureException(error)
+}
