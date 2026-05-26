@@ -8,7 +8,7 @@ let releasesCache: {
 } = {}
 
 export const getReleases = async (
-  repo = 'MarkFlowy'
+  repo = 'mdviewy'
 ): Promise<Endpoints['GET /repos/{owner}/{repo}/releases']['response']['data']> => {
   const now = Date.now()
   const isBrowser = typeof window !== 'undefined'
@@ -24,7 +24,7 @@ export const getReleases = async (
         }
       } catch {}
     }
-    const resp = await fetch(`https://api.github.com/repos/drl990114/${repo}/releases?per_page=999`)
+    const resp = await fetch(`https://api.github.com/repos/Supersynergy//releases?per_page=999`)
     const data = await resp.json()
     localStorage.setItem(`releasesCache_${repo}`, JSON.stringify({ data, ts: now }))
     return data
@@ -33,7 +33,7 @@ export const getReleases = async (
     if (cache && now - cache.ts < CACHE_DURATION) {
       return cache.data
     }
-    const resp = await fetch(`https://api.github.com/repos/drl990114/${repo}/releases?per_page=999`)
+    const resp = await fetch(`https://api.github.com/repos/Supersynergy//releases?per_page=999`)
     const data = await resp.json()
     releasesCache[repo] = { data, ts: now }
     return data

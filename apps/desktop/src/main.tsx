@@ -1,4 +1,4 @@
-import { lightTheme } from '@markflowy/theme'
+import { lightTheme } from '@mdviewy/theme'
 import * as Sentry from '@sentry/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import 'antd/dist/antd.css'

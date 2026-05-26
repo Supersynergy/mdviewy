@@ -16,12 +16,12 @@ async fn test_download() {
 #[tokio::test]
 async fn test_download_untar() {
   const TEST_FOLDER: &'static str = "./tests/untar";
-  let _ = download_npm::download("markflowy-theme-template", download_npm::DownloadOptions {
+  let _ = download_npm::download("mdviewy-theme-template", download_npm::DownloadOptions {
     dest_path: TEST_FOLDER.to_string(),
     untar: true,
   }).await;
 
   assert!(std::path::Path::new(TEST_FOLDER).exists());
-  assert!(std::path::Path::new(TEST_FOLDER).join("markflowy-theme-template").join("package.json").exists());
-  assert!(std::path::Path::new(TEST_FOLDER).join("markflowy-theme-template").join("index.js").exists());
+  assert!(std::path::Path::new(TEST_FOLDER).join("mdviewy-theme-template").join("package.json").exists());
+  assert!(std::path::Path::new(TEST_FOLDER).join("mdviewy-theme-template").join("index.js").exists());
 }

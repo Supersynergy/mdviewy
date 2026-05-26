@@ -23,7 +23,7 @@ export const writeSettingData = async (item: Pick<Setting.SettingItem, 'key' | '
     [item.key]: value,
   }
 
-  await invoke('save_app_conf', { data: newSettingData, label: 'markflowy' })
+  await invoke('save_app_conf', { data: newSettingData, label: 'mdviewy' })
 
   emit('app_conf_change')
 

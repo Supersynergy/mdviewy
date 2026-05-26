@@ -1,10 +1,10 @@
 # Custom Theme
 
-MarkFlowy supports custom themes, and you can also share your themes with others.
+mdviewy supports custom themes, and you can also share your themes with others.
 
 ## Develop Environment
 
-- MarkFlowy > 0.7.0
+- mdviewy > 0.7.0
 - nodejs >= 18.x
 - pnpm >= 7.x
 
@@ -12,7 +12,7 @@ MarkFlowy supports custom themes, and you can also share your themes with others
 
 ### 1. Create theme files
 
-You can fork [MarkFlowy-Theme-Template](https://github.com/MarkFlowy/custom-theme-template) to create your theme.
+You can fork [mdviewy-Theme-Template](https://github.com/mdviewy/custom-theme-template) to create your theme.
 
 ```bash
 pnpm install
@@ -22,7 +22,7 @@ pnpm run dev
 
 ### 2. Edit theme files
 
-Open MarkFlowy, click `Settings`, you can see `path`, Open this path folder, create `themes` folder in `.markflowy` folder, and then create your theme folder in `themes` folder, e.g. `markflowy-theme-template`.
+Open mdviewy, click `Settings`, you can see `path`, Open this path folder, create `themes` folder in `.mdviewy` folder, and then create your theme folder in `themes` folder, e.g. `mdviewy-theme-template`.
 
 You can edit `rollup.config.js` to change the theme build files output.
 
@@ -30,7 +30,7 @@ You can edit `rollup.config.js` to change the theme build files output.
 ```js
 output: {
   // change this output file to development
-  // e.g. file: '/Users/xxx/.markflowy/themes/markflowy-theme-template/index.js',
+  // e.g. file: '/Users/xxx/.mdviewy/themes/mdviewy-theme-template/index.js',
   file: pkg.browser,
   format: 'es',
   sourcemap: true,
@@ -38,7 +38,7 @@ output: {
 },
 ```
 
-change your theme, reload MarkFlowy to see the effect.
+change your theme, reload mdviewy to see the effect.
 
 ## Share your theme
 
@@ -46,7 +46,7 @@ After completing theme development, you can share your theme with other users in
 
 ### Submit to Theme Store
 
-If you want more users to use your theme, you can submit it to MarkFlowy's official theme store:
+If you want more users to use your theme, you can submit it to mdviewy's official theme store:
 
 1. **Prepare your theme**
    - Ensure the theme is fully functional and tested

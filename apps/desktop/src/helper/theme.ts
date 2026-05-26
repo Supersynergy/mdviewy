@@ -1,5 +1,5 @@
 import useThemeStore from '@/stores/useThemeStore'
-import { darken, lighten } from '@markflowy/theme'
+import { darken, lighten } from '@mdviewy/theme'
 
 export const colorAdaptiveChange = (
   color: string,

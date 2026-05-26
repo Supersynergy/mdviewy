@@ -1,5 +1,5 @@
 {
-  "app_name": "MarkFlowy",
+  "app_name": "mdviewy",
   "common": {
     "none": "Nada",
     "name": "nombre",
@@ -430,7 +430,9 @@
   "explorer": {
     "collapse_folders": "Contraer carpetas",
     "refresh_folder_data": "Actualizar los datos de la carpeta",
-    "focus_active_file": "Centrarse en el archivo actual"
+    "focus_active_file": "Centrarse en el archivo actual",
+    "emptyTitle": "No hay archivos para mostrar",
+    "emptyHint": "Abre una carpeta o borra el filtro actual."
   },
   "workspace": {
     "info": "Información del área de trabajo",

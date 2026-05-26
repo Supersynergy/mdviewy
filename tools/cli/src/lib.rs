@@ -5,7 +5,7 @@ mod release;
 
 #[derive(Parser)]
 #[command(version)]
-#[command(about = "MarkFlowy Development Tool")]
+#[command(about = "mdviewy Development Tool")]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,

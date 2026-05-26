@@ -1,4 +1,5 @@
 import { AppInfoDialog, SideBar } from '@/components'
+import CommandPalette from '@/components/CommandPalette'
 import EditorArea from '@/components/EditorArea'
 import { PageLayout } from '@/components/Layout'
 import RightBar from '@/components/SideBar/RightBar'
@@ -8,6 +9,7 @@ import { useRefreshAIProvidersModels } from '@/extensions/ai/useAiChatStore'
 import { BookMarkDialog } from '@/extensions/bookmarks/BookMarkDialog'
 import useBookMarksStore from '@/extensions/bookmarks/useBookMarksStore'
 import { useCommandInit } from '@/hooks/useCommandInit'
+import { useExternalLinks } from '@/hooks/useExternalLinks'
 import { appInfoStoreSetup } from '@/services/app-info'
 import { useCommandStore } from '@/stores'
 import useLayoutStore from '@/stores/useLayoutStore'
@@ -59,6 +61,7 @@ function Root() {
   const { getBookMarkList } = useBookMarksStore()
 
   useCommandInit()
+  useExternalLinks()
 
   useEffect(() => {
     appInfoStoreSetup()
@@ -116,6 +119,7 @@ function Root() {
       <BookMarkDialog />
       <SettingDialog />
       <WorkspaceDialog />
+      <CommandPalette />
     </PageLayout>
   )
 }

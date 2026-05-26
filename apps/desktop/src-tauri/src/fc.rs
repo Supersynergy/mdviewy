@@ -1,6 +1,6 @@
 use anyhow::Result as AnyResult;
 use chrono::{DateTime, Local};
-use mf_utils::is_supported_file_name;
+use mdviewy_utils::is_supported_file_name;
 use natural_sort_rs::Natural;
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -8,6 +8,30 @@ use std::future::Future;
 use std::path::Path;
 
 use crate::task_system::error::SystemError;
+
+const SKIPPED_DIRECTORY_NAMES: &[&str] = &[
+    ".git",
+    ".hg",
+    ".svn",
+    ".cache",
+    ".next",
+    ".nuxt",
+    ".parcel-cache",
+    ".pytest_cache",
+    ".turbo",
+    ".venv",
+    "__pycache__",
+    "build",
+    "coverage",
+    "dist",
+    "node_modules",
+    "target",
+    "venv",
+];
+
+fn should_skip_directory(name: &str) -> bool {
+    SKIPPED_DIRECTORY_NAMES.contains(&name)
+}
 
 // #[warn(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -66,8 +90,8 @@ pub fn read_directory(dir_path: &str) -> Result<Vec<FileInfo>, FileResultCode> {
             Err(_) => continue,
         };
 
-        let meta = match path_unwrap.metadata() {
-            Ok(m) => m,
+        let file_type = match path_unwrap.file_type() {
+            Ok(file_type) => file_type,
             Err(_) => continue,
         };
 
@@ -80,13 +104,17 @@ pub fn read_directory(dir_path: &str) -> Result<Vec<FileInfo>, FileResultCode> {
         };
 
         let file_path = new_path.join(filename.clone());
+        if file_type.is_dir() && should_skip_directory(&filename) {
+            continue;
+        }
+
         let ext = file_path.extension();
         let file_ext = match ext {
             Some(ext) => ext.to_str().unwrap_or("").to_string(),
             None => String::from(""),
         };
 
-        if meta.is_dir() {
+        if file_type.is_dir() {
             kind = String::from("dir");
             children = match read_directory(file_path.to_str().unwrap_or("")) {
                 Ok(children) => Some(children),
@@ -102,7 +130,7 @@ pub fn read_directory(dir_path: &str) -> Result<Vec<FileInfo>, FileResultCode> {
             ext: file_ext.into(),
         };
 
-        if is_supported_file_name(&new_file_info.name) || meta.is_dir() {
+        if is_supported_file_name(&new_file_info.name) || file_type.is_dir() {
             files.push(new_file_info);
         }
     }
@@ -229,6 +257,39 @@ pub fn sort_files_by_kind_and_name(files: &mut Vec<FileInfo>) {
             Ordering::Equal
         }
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[test]
+    fn read_directory_prunes_vendor_and_build_dirs() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        fs::create_dir(root.join("docs")).unwrap();
+        fs::write(root.join("docs").join("guide.md"), "# Guide").unwrap();
+        fs::create_dir(root.join("node_modules")).unwrap();
+        fs::write(root.join("node_modules").join("hidden.md"), "# Hidden").unwrap();
+        fs::create_dir(root.join("target")).unwrap();
+        fs::write(root.join("target").join("build.md"), "# Build").unwrap();
+
+        let files = read_directory(root.to_str().unwrap()).unwrap();
+        let names: Vec<_> = files.iter().map(|file| file.name.as_str()).collect();
+
+        assert_eq!(names, vec!["docs"]);
+        assert_eq!(
+            files[0]
+                .children
+                .as_ref()
+                .unwrap()
+                .iter()
+                .map(|file| file.name.as_str())
+                .collect::<Vec<_>>(),
+            vec!["guide.md"]
+        );
+    }
 }
 
 pub fn files_to_json(files: Vec<FileInfo>) -> FileResult {

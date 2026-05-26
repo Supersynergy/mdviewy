@@ -1,5 +1,5 @@
 import useThemeStore from "@/stores/useThemeStore"
-import type { MfTheme } from "@markflowy/theme"
+import type { MfTheme } from "@mdviewy/theme"
 
 /**
  * register custom theme

@@ -1,5 +1,5 @@
 import { loadThemeCss, removeInsertedTheme } from '@/helper/extensions'
-import { builtInThemes, lightTheme, type MfTheme } from '@markflowy/theme'
+import { builtInThemes, lightTheme, type MfTheme } from '@mdviewy/theme'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { create } from 'zustand'
 import useAppSettingStore from './useAppSettingStore'

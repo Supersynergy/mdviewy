@@ -1,6 +1,6 @@
-# Contributing to MarkFlowy
+# Contributing to mdviewy
 
-Welcome, and thank you for your interest in contributing to MarkFlowy!
+Welcome, and thank you for your interest in contributing to mdviewy!
 
 ## How to Contribute Code
 
@@ -17,7 +17,7 @@ You'll need the following tools:
 
 ### Table of Contents
 
-- [Contributing to MarkFlowy](#contributing-to-markflowy)
+- [Contributing to mdviewy](#contributing-to-mdviewy)
   - [How to Contribute Code](#how-to-contribute-code)
     - [Prerequisites](#prerequisites)
     - [Table of Contents](#table-of-contents)
@@ -27,7 +27,7 @@ You'll need the following tools:
     - [Development work steps](#development-work-steps)
       - [Fork](#fork-1)
       - [Dependency installation](#dependency-installation)
-      - [Startup MarkFlowy](#startup-markflowy)
+      - [Startup mdviewy](#startup-mdviewy)
 - [Thank You!](#thank-you)
 
 ### Contribute multilingual translations steps
@@ -36,7 +36,7 @@ For some users who don't want to go through the complicated project startup step
 
 #### Fork
 
-Fork [MarkFlowy](https://github.com/drl990114/MarkFlowy) and `git clone`
+Fork [mdviewy](https://github.com/Supersynergy/mdviewy) and `git clone`
 
 #### Translation file
 
@@ -52,7 +52,7 @@ Modifying the existing language may not be particularly easy to find the corresp
 
 #### Fork
 
-Fork [MarkFlowy](https://github.com/drl990114/MarkFlowy) and `git clone`
+Fork [mdviewy](https://github.com/Supersynergy/mdviewy) and `git clone`
 
 #### Dependency installation
 
@@ -64,11 +64,11 @@ yarn install --immutable
 cargo install --locked --path apps/desktop/src-tauri
 ```
 
-#### Startup MarkFlowy
+#### Startup mdviewy
 
 Note: that before the first startup, it is necessary to execute `yarn build` to compile the packages for the workspace.
 
-Execute the following command, you will start MarkFlowy.
+Execute the following command, you will start mdviewy.
 
 ```bash
 yarn dev:desktop
@@ -76,7 +76,7 @@ yarn dev:desktop
 
 ## How to Submit Themes to the Theme Store
 
-MarkFlowy has a built-in theme store feature where users can browse, download, and install community-created themes. If you want to submit your own theme to the theme store for other users, please refer to the "Sharing Your Theme" section in the [Custom Theme Documentation](./Extension/CustomTheme.md), which details the complete process for theme creation and submission to the theme store.
+mdviewy has a built-in theme store feature where users can browse, download, and install community-created themes. If you want to submit your own theme to the theme store for other users, please refer to the "Sharing Your Theme" section in the [Custom Theme Documentation](./Extension/CustomTheme.md), which details the complete process for theme creation and submission to the theme store.
 
 # Thank You!
 

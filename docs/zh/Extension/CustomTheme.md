@@ -1,10 +1,10 @@
 # 自定义主题
 
-MarkFlowy 支持自定义主题，你还可以与他人分享你的主题。
+mdviewy 支持自定义主题，你还可以与他人分享你的主题。
 
 ## 开发环境
 
-- MarkFlowy > 0.7.0
+- mdviewy > 0.7.0
 - nodejs >= 18.x
 - pnpm >= 7.x
 
@@ -12,7 +12,7 @@ MarkFlowy 支持自定义主题，你还可以与他人分享你的主题。
 
 ### 1. 创建主题文件
 
-你可以 fork [MarkFlowy-Theme-Template](https://github.com/MarkFlowy/custom-theme-template) 来创建你的主题。
+你可以 fork [mdviewy-Theme-Template](https://github.com/mdviewy/custom-theme-template) 来创建你的主题。
 
 ```bash
 pnpm install
@@ -22,14 +22,14 @@ pnpm run dev
 
 ### 2. 编辑主题文件
 
-打开 MarkFlowy，点击 `设置`，你可以看到 `路径`，打开这个路径文件夹，在 `.markflowy` 文件夹中创建 `themes` 文件夹，然后在 `themes` 文件夹中创建你的主题文件夹，例如 `markflowy-theme-template`。
+打开 mdviewy，点击 `设置`，你可以看到 `路径`，打开这个路径文件夹，在 `.mdviewy` 文件夹中创建 `themes` 文件夹，然后在 `themes` 文件夹中创建你的主题文件夹，例如 `mdviewy-theme-template`。
 
 你可以编辑 `rollup.config.js` 来更改主题构建文件的输出。
 
 ```js
 output: {
   // 将此输出文件更改为开发环境
-  // 例如 file: '/Users/xxx/.markflowy/themes/markflowy-theme-template/index.js',
+  // 例如 file: '/Users/xxx/.mdviewy/themes/mdviewy-theme-template/index.js',
   file: pkg.browser,
   format: 'es',
   sourcemap: true,
@@ -37,7 +37,7 @@ output: {
 },
 ```
 
-更改你的主题后，重新加载 MarkFlowy 即可看到效果。
+更改你的主题后，重新加载 mdviewy 即可看到效果。
 
 ## 分享你的主题
 
@@ -45,7 +45,7 @@ output: {
 
 ### 提交到主题商店
 
-如果你想让更多用户使用你的主题，可以将主题提交到 MarkFlowy 的官方主题商店：
+如果你想让更多用户使用你的主题，可以将主题提交到 mdviewy 的官方主题商店：
 
 1. **准备你的主题**
    - 确保主题功能完整且测试通过

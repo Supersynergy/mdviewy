@@ -1,8 +1,8 @@
 [package]
-name = "mf-utils"
+name = "mdviewy-utils"
 version = "0.0.1"
 edition = "2021"
-description = "markflow utils"
+description = "mdviewy utils"
 license = "MIT"
 
 [dependencies]

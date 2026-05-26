@@ -50,7 +50,7 @@ const StyledIcon = styled.div<{ $height?: number; $width?: number }>`
 
 const Social = (props: React.ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
-    <SocialLink href="https://github.com/drl990114/MarkFlowy" title="GitHub: Source code" target="_blank">
+    <SocialLink href="https://github.com/Supersynergy/mdviewy" title="GitHub: Source code" target="_blank">
       <StyledIcon as={Github} $height={24} />
     </SocialLink>
   </Wrapper>

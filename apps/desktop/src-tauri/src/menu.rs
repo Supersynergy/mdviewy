@@ -65,35 +65,177 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         &[
             &Submenu::with_items(
                 app,
-                "MarkFlowy",
+                "mdviewy",
                 true,
                 &[
-                    &MenuItemBuilder::new("About MarkFlowy")
+                    &MenuItemBuilder::new("About mdviewy")
                         .id("About")
                         .build(app)?,
-                    &MenuItemBuilder::new("Settings")
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Settings...")
                         .id("Settings")
+                        .accelerator("CmdOrCtrl+,")
                         .build(app)?,
-                    &PredefinedMenuItem::quit(app, Some("Quit"))?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &PredefinedMenuItem::hide(app, None)?,
+                    &PredefinedMenuItem::hide_others(app, None)?,
+                    &PredefinedMenuItem::show_all(app, None)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &PredefinedMenuItem::quit(app, Some("Quit mdviewy"))?,
                 ],
             )?,
             &Submenu::with_items(
                 app,
                 "File",
                 true,
-                &[&MenuItemBuilder::new("Save").id("app_save").build(app)?],
+                &[
+                    &MenuItemBuilder::new("New File")
+                        .id("app_newFile")
+                        .accelerator("CmdOrCtrl+N")
+                        .build(app)?,
+                    &MenuItemBuilder::new("New Window")
+                        .id("app_newWindow")
+                        .accelerator("CmdOrCtrl+Shift+N")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Open Folder...")
+                        .id("app_openFolder")
+                        .accelerator("CmdOrCtrl+O")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Quick Open")
+                        .id("app_openCommandPalette")
+                        .accelerator("CmdOrCtrl+P")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Save")
+                        .id("app_save")
+                        .accelerator("CmdOrCtrl+S")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Save As...")
+                        .id("app_saveAs")
+                        .accelerator("CmdOrCtrl+Shift+S")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Close Tab")
+                        .id("app_closeCurrentEditorTab")
+                        .accelerator("CmdOrCtrl+W")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Close Window")
+                        .id("app_closeWindow")
+                        .accelerator("CmdOrCtrl+Shift+W")
+                        .build(app)?,
+                ],
             )?,
             &Submenu::with_items(
                 app,
                 "Edit",
                 true,
                 &[
-                    &PredefinedMenuItem::redo(app, None)?,
                     &PredefinedMenuItem::undo(app, None)?,
+                    &PredefinedMenuItem::redo(app, None)?,
+                    &PredefinedMenuItem::separator(app)?,
                     &PredefinedMenuItem::cut(app, None)?,
                     &PredefinedMenuItem::copy(app, None)?,
                     &PredefinedMenuItem::paste(app, None)?,
                     &PredefinedMenuItem::select_all(app, None)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Find")
+                        .id("app_find")
+                        .accelerator("CmdOrCtrl+F")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Find in Files...")
+                        .id("app_findInFiles")
+                        .accelerator("CmdOrCtrl+Shift+F")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Find Next")
+                        .id("app_findNext")
+                        .accelerator("CmdOrCtrl+G")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Find Previous")
+                        .id("app_findPrev")
+                        .accelerator("CmdOrCtrl+Shift+G")
+                        .build(app)?,
+                ],
+            )?,
+            &Submenu::with_items(
+                app,
+                "View",
+                true,
+                &[
+                    &MenuItemBuilder::new("Command Palette")
+                        .id("app_openCommandPalette")
+                        .accelerator("CmdOrCtrl+K")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Toggle Left Sidebar")
+                        .id("app_toggleLeftsidebarVisible")
+                        .accelerator("CmdOrCtrl+B")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Toggle Right Sidebar")
+                        .id("app_toggleRightsidebarVisible")
+                        .accelerator("CmdOrCtrl+Alt+B")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Toggle Editor Mode")
+                        .id("app_toggleEditorType")
+                        .accelerator("CmdOrCtrl+Shift+E")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Refresh TOC")
+                        .id("app:toc_refresh")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &PredefinedMenuItem::fullscreen(app, None)?,
+                ],
+            )?,
+            &Submenu::with_items(
+                app,
+                "Go",
+                true,
+                &[
+                    &MenuItemBuilder::new("Go to File...")
+                        .id("app_openCommandPalette")
+                        .accelerator("CmdOrCtrl+P")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Go to Heading...")
+                        .id("app_openHeadingJumper")
+                        .accelerator("CmdOrCtrl+Shift+O")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Next Tab")
+                        .id("app_nextTab")
+                        .accelerator("CmdOrCtrl+Alt+Right")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Previous Tab")
+                        .id("app_prevTab")
+                        .accelerator("CmdOrCtrl+Alt+Left")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Recent Files")
+                        .id("app_showRecent")
+                        .accelerator("CmdOrCtrl+R")
+                        .build(app)?,
+                ],
+            )?,
+            &Submenu::with_items(
+                app,
+                "Window",
+                true,
+                &[
+                    &PredefinedMenuItem::minimize(app, None)?,
+                    &PredefinedMenuItem::maximize(app, None)?,
+                ],
+            )?,
+            &Submenu::with_items(
+                app,
+                "Help",
+                true,
+                &[
+                    &MenuItemBuilder::new("mdviewy GitHub")
+                        .id("app_openGithub")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Report Issue")
+                        .id("app_reportIssue")
+                        .build(app)?,
                 ],
             )?,
             // &Submenu::with_items(

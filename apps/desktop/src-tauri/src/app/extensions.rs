@@ -91,12 +91,12 @@ impl AppExtensions {
     }
 
     pub async fn downloadBuiltInExtensions(self) -> Self {
-        if exists(&Self::dir_path().join("markflowy-theme-template")) {
+        if exists(&Self::dir_path().join("mdviewy-theme-template")) {
             return self;
         }
 
         let _ = download_npm::download(
-            "markflowy-theme-template",
+            "mdviewy-theme-template",
             download_npm::DownloadOptions {
                 untar: true,
                 dest_path: Self::dir_path().to_str().unwrap().to_string(),
