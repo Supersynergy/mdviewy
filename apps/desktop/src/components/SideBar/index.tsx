@@ -1,11 +1,18 @@
 import { Explorer } from '@/components'
 import { RIGHTBARITEMKEYS } from '@/constants'
 import BookMarks from '@/extensions/bookmarks'
-import { Search } from '@/extensions/search'
 import classNames from 'classnames'
 import { memo, useMemo, useState } from 'react'
 import { Tooltip } from 'zens'
 import { Container as SideBarContainer, SideBarHeader } from './styles'
+
+const SearchTrigger = {
+  title: RIGHTBARITEMKEYS.Search,
+  key: RIGHTBARITEMKEYS.Search,
+  icon: <i className='ri-search-2-line' />,
+  onClick: () =>
+    window.dispatchEvent(new CustomEvent('mf:cmd_palette:open', { detail: 'content' })),
+}
 
 function SideBar() {
   const [activeRightBarItemKey, setActiveRightBarItemKey] = useState<RIGHTBARITEMKEYS>(
@@ -20,7 +27,6 @@ function SideBar() {
         icon: <i className='ri-file-list-3-line' />,
         components: <Explorer />,
       },
-      Search,
       BookMarks,
     ]
   }, [])
@@ -54,6 +60,14 @@ function SideBar() {
               </Tooltip>
             )
           })}
+          <Tooltip title='Search (Cmd+Shift+F)'>
+            <div
+              className='icon icon-small icon-smooth icon-unselected'
+              onClick={SearchTrigger.onClick}
+            >
+              {SearchTrigger.icon}
+            </div>
+          </Tooltip>
         </SideBarHeader>
         {activeRightBarItem?.components ?? null}
       </div>

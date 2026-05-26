@@ -8,6 +8,8 @@ use super::conf::AppConf;
 
 #[cfg(target_os = "macos")]
 use tauri::TitleBarStyle;
+#[cfg(target_os = "macos")]
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
 /// 获取所有窗口实例信息
 #[command]
@@ -104,7 +106,7 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
             WebviewWindowBuilder::new(&_app, window_label, WebviewUrl::App("index.html".into()))
                 .initialization_script(&format!("window.openedUrls = {escaped_urls}"))
                 .initialization_script(&format!("console.log('window.openedUrl:{}')", escaped_urls))
-                .title("MarkFlowy")
+                .title("mdviewy")
                 .resizable(true)
                 .fullscreen(false)
                 .theme(Some(theme))
@@ -122,7 +124,17 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
         //     new_win = new_win.decorations(false);
         // }
 
-        new_win.build().unwrap();
+        let win = new_win.build().unwrap();
+
+        #[cfg(target_os = "macos")]
+        {
+            let _ = apply_vibrancy(
+                &win,
+                NSVisualEffectMaterial::HudWindow,
+                Some(NSVisualEffectState::Active),
+                Some(12.0),
+            );
+        }
     });
 
     Ok(window_label_clone)

@@ -23,7 +23,7 @@ import { once } from 'lodash'
 import { useCallback, useEffect } from 'react'
 import { toast } from 'zens'
 import { useGlobalKeyboard, useGlobalOSInfo } from '.'
-import __MF__ from '../context'
+import __MDVIEWY__ from '../context'
 import { isArray } from '../helper'
 import useExtensionsManagerStore from '../stores/useExtensionsManagerStore'
 import useThemeStore, { isBuiltInTheme } from '../stores/useThemeStore'
@@ -116,7 +116,7 @@ async function appWorkspaceSetup() {
   logger.debug('window.openedUrls', window.openedUrls)
 
   try {
-    const cacheStore = await new LazyStore('.markflowy_workspaces.dat')
+    const cacheStore = await new LazyStore('.mdviewy_workspaces.dat')
 
     const getOpenedCacheRes = await invoke<{ recent_workspaces: WorkspaceInfo[] }>(
       'get_opened_cache',
@@ -200,7 +200,7 @@ const listener = (event: MessageEvent) => {
 
   switch (key) {
     case 'registerTheme':
-      __MF__.theme.registerTheme(payload)
+      __MDVIEWY__.theme.registerTheme(payload)
       break
   }
 }

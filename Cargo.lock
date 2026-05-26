@@ -1240,7 +1240,7 @@ name = "download_npm"
 version = "0.0.1"
 dependencies = [
  "flate2",
- "mf-utils",
+ "mdviewy-utils",
  "reqwest",
  "serde_json",
  "tar",
@@ -3022,65 +3022,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "markflowy"
-version = "0.55.4"
-dependencies = [
- "anyhow",
- "arboard",
- "async-channel",
- "async-trait",
- "base64 0.21.7",
- "chrono",
- "dark-light",
- "dotenv",
- "downcast-rs",
- "download_npm",
- "etcetera",
- "font-kit",
- "futures",
- "futures-concurrency",
- "lazy_static",
- "lending-stream",
- "log",
- "mf-utils",
- "mf_file_search",
- "natural-sort-rs",
- "notify",
- "pin-project-lite",
- "rand 0.9.1",
- "regex",
- "rmp-serde",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-dialog",
- "tauri-plugin-http",
- "tauri-plugin-notification",
- "tauri-plugin-opener",
- "tauri-plugin-os",
- "tauri-plugin-shell",
- "tauri-plugin-single-instance",
- "tauri-plugin-store",
- "tauri-plugin-updater",
- "tauri-plugin-window-state",
- "tempfile",
- "thiserror 2.0.12",
- "tokio",
- "tokio-stream",
- "tracing",
- "tracing-subscriber",
- "tracing-test",
- "trash",
- "url",
- "urlencoding",
- "uuid",
- "window-vibrancy 0.5.2",
- "zhconv",
-]
-
-[[package]]
 name = "markup5ever"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3121,6 +3062,90 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2532096657941c2fea9c289d370a250971c689d4f143798ff67113ec042024a5"
 
 [[package]]
+name = "mdviewy"
+version = "0.55.4"
+dependencies = [
+ "anyhow",
+ "arboard",
+ "async-channel",
+ "async-trait",
+ "base64 0.21.7",
+ "chrono",
+ "dark-light",
+ "dotenv",
+ "downcast-rs",
+ "download_npm",
+ "etcetera",
+ "font-kit",
+ "futures",
+ "futures-concurrency",
+ "lazy_static",
+ "lending-stream",
+ "log",
+ "mdviewy-utils",
+ "mdviewy_file_search",
+ "natural-sort-rs",
+ "notify",
+ "pin-project-lite",
+ "rand 0.9.1",
+ "regex",
+ "rmp-serde",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-dialog",
+ "tauri-plugin-http",
+ "tauri-plugin-notification",
+ "tauri-plugin-opener",
+ "tauri-plugin-os",
+ "tauri-plugin-shell",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-store",
+ "tauri-plugin-updater",
+ "tauri-plugin-window-state",
+ "tempfile",
+ "thiserror 2.0.12",
+ "tokio",
+ "tokio-stream",
+ "tracing",
+ "tracing-subscriber",
+ "tracing-test",
+ "trash",
+ "url",
+ "urlencoding",
+ "uuid",
+ "window-vibrancy 0.5.2",
+ "zhconv",
+]
+
+[[package]]
+name = "mdviewy-utils"
+version = "0.0.1"
+dependencies = [
+ "fs_extra",
+ "regex",
+ "serde",
+]
+
+[[package]]
+name = "mdviewy_file_search"
+version = "0.0.1"
+dependencies = [
+ "clipboard",
+ "dirs 5.0.1",
+ "grep",
+ "ignore",
+ "num_cpus",
+ "regex",
+ "serde",
+ "tempfile",
+ "toml 0.8.23",
+ "uuid",
+]
+
+[[package]]
 name = "memchr"
 version = "2.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3142,31 +3167,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "488016bfae457b036d996092f6cb448677611ce4449e970ceaf42695203f218a"
 dependencies = [
  "autocfg",
-]
-
-[[package]]
-name = "mf-utils"
-version = "0.0.1"
-dependencies = [
- "fs_extra",
- "regex",
- "serde",
-]
-
-[[package]]
-name = "mf_file_search"
-version = "0.0.1"
-dependencies = [
- "clipboard",
- "dirs 5.0.1",
- "grep",
- "ignore",
- "num_cpus",
- "regex",
- "serde",
- "toml 0.8.23",
- "uuid",
- "walkdir",
 ]
 
 [[package]]

@@ -52,7 +52,7 @@ export default function Index({
 
   return (
     <>
-      <SeoHead title='MarkFlowy'>
+      <SeoHead title='mdviewy'>
         <meta name='robots' content='noodp' />
       </SeoHead>
 
@@ -101,7 +101,7 @@ export default function Index({
                   <MacButton yellow={true} />
                   <MacButton green={true} />
                 </MacButtons>
-                <MacTitle>MarkFlowy</MacTitle>
+                <MacTitle>mdviewy</MacTitle>
               </MacTitleBar>
               <EditorTabs>
                 <EditorTab
@@ -166,16 +166,16 @@ export default function Index({
         <Footer>
           <FooterContent>
             <FooterLogoContainer>
-              <FooterLogo src='/logo.svg' alt='MarkFlowy' />
-              <FooterAppName>MarkFlowy</FooterAppName>
+              <FooterLogo src='/logo.svg' alt='mdviewy' />
+              <FooterAppName>mdviewy</FooterAppName>
             </FooterLogoContainer>
             <FooterLinksRow>
-              <FooterLinkItem href='https://github.com/drl990114/MarkFlowy' target='_blank'>
+              <FooterLinkItem href='https://github.com/Supersynergy/mdviewy' target='_blank'>
                 GitHub
               </FooterLinkItem>
               <FooterLinkItem href='/docs'>Documentation</FooterLinkItem>
               <FooterLinkItem
-                href='https://github.com/drl990114/MarkFlowy/releases'
+                href='https://github.com/Supersynergy/mdviewy/releases'
                 target='_blank'
               >
                 Releases
@@ -653,7 +653,7 @@ const BOTS_ID = [49699333, 29139614, 41898282, 29791463]
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   let contributors: Contributor[] = []
   try {
-    const res = await fetch('https://api.github.com/repos/drl990114/MarkFlowy/contributors')
+    const res = await fetch('https://api.github.com/repos/Supersynergy/mdviewy/contributors')
     if (res.ok) {
       const data = await res.json()
       contributors = (Array.isArray(data) ? data : [])

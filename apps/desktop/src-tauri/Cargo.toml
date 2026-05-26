@@ -1,14 +1,14 @@
 [package]
-name = "markflowy"
+name = "mdviewy"
 version = "0.55.4"
 description = "A Markdown Editor App"
-authors = ["drl990114"]
+authors = ["Supersynergy"]
 license = " AGPL-3.0"
-repository = "https://github.com/drl990114/MarkFlowy"
+repository = "https://github.com/Supersynergy/mdviewy"
 edition = "2021"
 
 [lib]
-name = "markflowy"
+name = "mdviewy"
 crate-type = [
     "staticlib",
     "cdylib",
@@ -108,10 +108,10 @@ features = [
     "devtools",
 ]
 
-[dependencies.mf-utils]
+[dependencies.mdviewy-utils]
 path = "../../../crates/utils"
 
-[dependencies.mf_file_search]
+[dependencies.mdviewy_file_search]
 path = "../../../crates/file_search"
 
 [dependencies.download_npm]

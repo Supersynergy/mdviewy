@@ -69,11 +69,11 @@ pub_struct!(AppConf {
     upload_image_save_relative_path_rule: Option<String>,
 });
 
-pub const APP_CONF_PATH: &str = "markflowy.conf.json";
+pub const APP_CONF_PATH: &str = "mdviewy.conf.json";
 pub const STORE_KEY: &str = "app_config_v3";
 
 fn create_store(app: &AppHandle) -> Result<std::sync::Arc<Store<tauri::Wry>>, String> {
-    let store_path = "markflowy_store.bin";
+    let store_path = "mdviewy_store.bin";
 
     StoreBuilder::new(app.app_handle(), store_path)
         .build()
@@ -83,7 +83,7 @@ fn create_store(app: &AppHandle) -> Result<std::sync::Arc<Store<tauri::Wry>>, St
 pub fn app_root() -> PathBuf {
     let app_dir = APP_DIR.lock().unwrap();
     let home_dir = app_dir.get(&0).unwrap();
-    let legacy_path = home_dir.join(".markflowy");
+    let legacy_path = home_dir.join(".mdviewy");
 
     // If legacy config exists, keep using it for backward compatibility
     if exists(&legacy_path) {
@@ -101,8 +101,8 @@ pub fn app_root() -> PathBuf {
         // Use XDG paths on Linux/macOS with proper fallback
         match choose_app_strategy(AppStrategyArgs {
             top_level_domain: "com".to_string(),
-            author: "drl990114".to_string(),
-            app_name: "markflowy".to_string(),
+            author: "supersynergy".to_string(),
+            app_name: "mdviewy".to_string(),
         }) {
             Ok(strategy) => strategy.config_dir(),
             Err(_) => legacy_path, // Fallback to legacy path if something goes wrong
@@ -429,7 +429,7 @@ pub mod cmd {
         tauri::async_runtime::spawn(async move {
             let conf_win =
                 WebviewWindowBuilder::new(&app, "conf", WebviewUrl::App("./setting".into()))
-                    .title("markflowy setting")
+                    .title("mdviewy setting")
                     .resizable(true)
                     .fullscreen(false)
                     .theme(Some(theme))

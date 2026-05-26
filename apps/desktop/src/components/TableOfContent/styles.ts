@@ -1,4 +1,4 @@
-import { darken, ScThemeProps } from '@markflowy/theme'
+import { darken, ScThemeProps } from '@mdviewy/theme'
 import styled, { css } from 'styled-components'
 import type { ITocListProps } from './type'
 

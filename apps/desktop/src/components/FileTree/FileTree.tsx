@@ -23,12 +23,28 @@ export const fileTreeHandler: {
   updateTreeView: undefined,
 }
 
+const collectAllIds = (nodes: IFile[], acc: Record<string, boolean> = {}) => {
+  const stack = [...nodes]
+
+  while (stack.length > 0) {
+    const n = stack.pop()
+    if (!n) continue
+
+    if (n.kind === 'dir') {
+      acc[n.id] = true
+      if (n.children) stack.push(...n.children)
+    }
+  }
+
+  return acc
+}
+
 const FileTree: FC<FileTreeProps> = (props) => {
-  const { data, onSelect, dndRootElement } = props
+  const { data, sourceData = data, onSelect, dndRootElement, openAll } = props
   const { activeId, setFolderDataPure } = useEditorStore()
   const deferredActiveId = useDeferredValue(activeId)
   const { t } = useTranslation()
-  const tree = useMemo(() => new SimpleTree<IFile>(data), [data])
+  const sourceTree = useMemo(() => new SimpleTree<IFile>(sourceData ?? data), [sourceData, data])
 
   if (data === null) return null
 
@@ -72,14 +88,14 @@ const FileTree: FC<FileTreeProps> = (props) => {
       }).then((res) => {
         if (Array.isArray(res)) {
           res.forEach((moveFileInfo) => {
-            moveFileNode(tree, moveFileInfo)
+            moveFileNode(sourceTree, moveFileInfo)
           })
 
           const _dragIds = _dragNodes.map((node) => node.data.id)
           for (const id of _dragIds) {
-            tree.move({ id, parentId: args.parentId, index: args.index })
+            sourceTree.move({ id, parentId: args.parentId, index: args.index })
           }
-          setFolderDataPure(tree.data)
+          setFolderDataPure(sourceTree.data)
         }
       })
     }
@@ -96,12 +112,16 @@ const FileTree: FC<FileTreeProps> = (props) => {
           {...dimens}
           data={data}
           dndRootElement={dndRootElement}
-          openByDefault={false}
-          initialOpenState={{
-            [data[0]?.id]: true,
-          }}
+          openByDefault={!!openAll}
+          initialOpenState={
+            openAll
+              ? collectAllIds(data)
+              : {
+                  [data[0]?.id]: true,
+                }
+          }
           selection={deferredActiveId}
-          indent={16}
+          indent={openAll ? 10 : 16}
           disableMultiSelection
           onSelect={(node) => onSelect(node[0]?.data)}
           onMove={onMove}
@@ -116,7 +136,7 @@ const FileTree: FC<FileTreeProps> = (props) => {
                   handler: () => {
                     const data = { id: nanoid(), name: '', kind: 'pending_new_file' } as any
                     fileTreeHandler.rootTree?.open(workspaceRoot.id)
-                    tree.create({
+                    sourceTree.create({
                       parentId: workspaceRoot.id,
                       data,
                     })
@@ -125,7 +145,7 @@ const FileTree: FC<FileTreeProps> = (props) => {
                       index: 0,
                     })
 
-                    setFolderDataPure(tree.data)
+                    setFolderDataPure(sourceTree.data)
                   },
                 },
                 {
@@ -140,7 +160,7 @@ const FileTree: FC<FileTreeProps> = (props) => {
                     } as any
                     fileTreeHandler.rootTree?.open(workspaceRoot.id)
 
-                    tree.create({
+                    sourceTree.create({
                       parentId: workspaceRoot.id,
                       data,
                     })
@@ -150,7 +170,7 @@ const FileTree: FC<FileTreeProps> = (props) => {
                       type: 'internal',
                     })
 
-                    setFolderDataPure(tree.data)
+                    setFolderDataPure(sourceTree.data)
                   },
                 },
               )
@@ -177,7 +197,7 @@ const FileTree: FC<FileTreeProps> = (props) => {
             }
             return FileNode({
               ...props,
-              simpleTree: tree,
+              simpleTree: sourceTree,
               setFolderData: setFolderDataPure,
               isRoot,
             })
@@ -190,9 +210,11 @@ const FileTree: FC<FileTreeProps> = (props) => {
 
 interface FileTreeProps extends BaseComponentProps {
   data: IFile[]
+  sourceData?: IFile[] | null
   activeId?: string
   onSelect: (file: IFile) => void
   dndRootElement: Node
+  openAll?: boolean
 }
 
 export default memo(FileTree)

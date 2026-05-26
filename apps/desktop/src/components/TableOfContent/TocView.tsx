@@ -11,7 +11,9 @@ import { EditorViewType, extractMatches } from 'rme'
 import type { TocRef } from 'zens'
 import { IHeadingData } from 'zens/lib/TableOfContent/HeadingTree'
 import { sourceCodeCodemirrorViewMap } from '../EditorArea/TextEditor'
+import QuickSearchBar from '../QuickSearchBar'
 import SideBarHeader from '../SideBar/SideBarHeader'
+import CustomToc from './CustomToc'
 import { TocViewContainer } from './styles'
 
 type HeadingInfo = {
@@ -125,6 +127,8 @@ type TocViewProps = {
 export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
   const tocRef = useRef<TocRef>(null)
   const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null)
+  const activeHeadingIdRef = useRef<string | null>(null)
+  const [tocHeadings, setTocHeadings] = useState<IHeadingData[]>([])
   const wysiwygHeadingsRef = useRef<HeadingInfo[]>([])
   const sourceHeadingsRef = useRef<SourceHeadingInfo[]>([])
   const wysiwygScrollElRef = useRef<HTMLElement | null>(null)
@@ -185,7 +189,51 @@ export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
   }, [scheduleActiveHeadingUpdate])
 
   useEffect(() => {
+    activeHeadingIdRef.current = activeHeadingId
+  }, [activeHeadingId])
+
+  useEffect(() => {
     const addCommand = useCommandStore.getState().addCommand
+
+    const jumpRelative = (delta: 1 | -1) => {
+      const activeId = useEditorStore.getState().activeId
+      if (!activeId) return
+      const editorViewTypeMap = useEditorViewTypeStore.getState().editorViewTypeMap
+      const viewType = editorViewTypeMap.get(activeId)
+
+      if (viewType === EditorViewType.WYSIWYG) {
+        const heads = wysiwygHeadingsRef.current
+        if (!heads.length) return
+        const ed = useEditorStore.getState().getEditorDelegate(activeId)
+        const view = ed?.manager?.view
+        if (!view) return
+        const curId = activeHeadingIdRef.current
+        let idx = heads.findIndex((h) => h.id === curId)
+        if (idx < 0) idx = 0
+        const next = Math.min(Math.max(idx + delta, 0), heads.length - 1)
+        jumpToHeading(view, heads[next].pos, wysiwygScrollElRef.current)
+        return
+      }
+
+      if (viewType === EditorViewType.SOURCECODE) {
+        const heads = sourceHeadingsRef.current
+        if (!heads.length) return
+        const cm = sourceCodeCodemirrorViewMap.get(activeId)
+        if (!cm) return
+        const curId = activeHeadingIdRef.current
+        let idx = heads.findIndex((h) => h.id === curId)
+        if (idx < 0) idx = 0
+        const next = Math.min(Math.max(idx + delta, 0), heads.length - 1)
+        cm.cm.dispatch({
+          selection: { anchor: heads[next].pos, head: heads[next].pos },
+          scrollIntoView: true,
+        })
+        cm.cm.focus()
+      }
+    }
+
+    addCommand({ id: 'app_nextHeading', handler: () => jumpRelative(1) })
+    addCommand({ id: 'app_prevHeading', handler: () => jumpRelative(-1) })
     addCommand({
       id: 'app:toc_refresh',
       handler: () => {
@@ -237,6 +285,7 @@ export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
               }
             })
             tocRef.current?.refreshByHeadings({ newHeadings: headings })
+            setTocHeadings(headings)
             scheduleActiveHeadingUpdateRef.current()
           }, 0)
           return
@@ -264,6 +313,7 @@ export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
             })
 
             tocRef.current?.refreshByHeadings({ newHeadings: headings })
+            setTocHeadings(headings)
             scheduleActiveHeadingUpdateRef.current()
           }, 0)
           return
@@ -320,17 +370,21 @@ export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
   return (
     <TocViewContainer variant={variant}>
       <SideBarHeader name={t('sidebar.table_of_contents')} />
-      <div style={{ height: 'calc(100% - 40px)', boxSizing: 'border-box' }}>
-        <Toc
-          ref={tocRef}
-          containerEl={containerEl}
-          scrollEl={scrollEl}
-          variant={variant}
-          compact={false}
-          pinned
-          activeId={activeHeadingId ?? undefined}
-          toolbarFixed
-        />
+      <QuickSearchBar />
+      <div style={{ flex: 1, minHeight: 0, boxSizing: 'border-box' }}>
+        <CustomToc headings={tocHeadings} activeId={activeHeadingId} />
+        <div style={{ display: 'none' }}>
+          <Toc
+            ref={tocRef}
+            containerEl={containerEl}
+            scrollEl={scrollEl}
+            variant={variant}
+            compact={false}
+            pinned
+            activeId={activeHeadingId ?? undefined}
+            toolbarFixed
+          />
+        </div>
       </div>
     </TocViewContainer>
   )

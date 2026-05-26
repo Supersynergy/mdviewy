@@ -3803,9 +3803,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@markflowy/desktop@workspace:apps/desktop":
+"@mdviewy/desktop@workspace:apps/desktop":
   version: 0.0.0-use.local
-  resolution: "@markflowy/desktop@workspace:apps/desktop"
+  resolution: "@mdviewy/desktop@workspace:apps/desktop"
   dependencies:
     "@ai-sdk/deepseek": "npm:^1.0.28"
     "@ai-sdk/google": "npm:^2.0.32"
@@ -3818,8 +3818,8 @@ __metadata:
     "@emotion/is-prop-valid": "npm:^1.3.1"
     "@emotion/react": "npm:^11.13.3"
     "@emotion/styled": "npm:^11.13.0"
-    "@markflowy/theme": "workspace:*"
-    "@markflowy/types": "workspace:*"
+    "@mdviewy/theme": "workspace:*"
+    "@mdviewy/types": "workspace:*"
     "@popperjs/core": "npm:^2.11.8"
     "@sentry/react": "npm:^9.2.0"
     "@tanstack/react-query": "npm:^5.79.2"
@@ -3887,12 +3887,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@markflowy/runtime-api@workspace:packages/runtime-api":
+"@mdviewy/runtime-api@workspace:packages/runtime-api":
   version: 0.0.0-use.local
-  resolution: "@markflowy/runtime-api@workspace:packages/runtime-api"
+  resolution: "@mdviewy/runtime-api@workspace:packages/runtime-api"
   dependencies:
-    "@markflowy/theme": "workspace:*"
-    "@markflowy/types": "workspace:*"
+    "@mdviewy/theme": "workspace:*"
+    "@mdviewy/types": "workspace:*"
     "@rollup/plugin-node-resolve": "npm:15.3.0"
     "@rollup/plugin-terser": "npm:0.4.4"
     "@rollup/plugin-typescript": "npm:11.1.6"
@@ -3907,9 +3907,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@markflowy/theme@workspace:*, @markflowy/theme@workspace:packages/theme":
+"@mdviewy/theme@workspace:*, @mdviewy/theme@workspace:packages/theme":
   version: 0.0.0-use.local
-  resolution: "@markflowy/theme@workspace:packages/theme"
+  resolution: "@mdviewy/theme@workspace:packages/theme"
   dependencies:
     "@drl990114/codemirror-themes": "npm:^0.0.1"
     "@lezer/highlight": "npm:^1.0.0"
@@ -3933,19 +3933,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@markflowy/types@workspace:*, @markflowy/types@workspace:packages/types":
+"@mdviewy/types@workspace:*, @mdviewy/types@workspace:packages/types":
   version: 0.0.0-use.local
-  resolution: "@markflowy/types@workspace:packages/types"
+  resolution: "@mdviewy/types@workspace:packages/types"
   dependencies:
-    "@markflowy/theme": "workspace:*"
+    "@mdviewy/theme": "workspace:*"
     rimraf: "npm:^6.0.1"
     typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
-"@markflowy/web@workspace:apps/web":
+"@mdviewy/web@workspace:apps/web":
   version: 0.0.0-use.local
-  resolution: "@markflowy/web@workspace:apps/web"
+  resolution: "@mdviewy/web@workspace:apps/web"
   dependencies:
     "@mdx-js/mdx": "npm:^3.1.0"
     "@mdx-js/react": "npm:^3.1.0"
@@ -14570,42 +14570,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"markflowy-monorepo@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "markflowy-monorepo@workspace:."
-  dependencies:
-    "@alicloud/alimt20181012": "npm:^1.3.0"
-    "@alicloud/openapi-client": "npm:^0.4.13"
-    "@alicloud/tea-util": "npm:^1.4.10"
-    "@babel/core": "npm:^7.26.0"
-    "@babel/eslint-parser": "npm:^7.25.9"
-    "@babel/eslint-plugin": "npm:^7.25.9"
-    "@babel/plugin-proposal-class-properties": "npm:^7.18.6"
-    "@babel/plugin-proposal-decorators": "npm:^7.25.9"
-    "@babel/preset-env": "npm:^7.26.0"
-    "@babel/preset-react": "npm:^7.25.9"
-    "@babel/preset-typescript": "npm:^7.26.0"
-    "@halodong/eslint-config-react": "npm:^0.38.24"
-    "@rollup/plugin-node-resolve": "npm:15.3.0"
-    "@rollup/plugin-terser": "npm:0.4.4"
-    "@rollup/plugin-typescript": "npm:11.1.6"
-    "@rollup/plugin-url": "npm:^8.0.2"
-    babel: "npm:^6.23.0"
-    child_process: "npm:^1.0.2"
-    eslint: "npm:9.13.0"
-    fast-glob: "npm:^3.3.2"
-    postcss: "npm:^8.4.47"
-    postcss-import: "npm:^16.1.1"
-    postcss-nested: "npm:^7.0.2"
-    prettier: "npm:^3.3.3"
-    rimraf: "npm:^6.0.1"
-    rollup: "npm:4.24.3"
-    rollup-plugin-postcss: "npm:^4.0.2"
-    turbo: "npm:^2.2.3"
-    typescript: "npm:^5.7.3"
-  languageName: unknown
-  linkType: soft
-
 "match-sorter@npm:^6.2.0, match-sorter@npm:^6.3.1":
   version: 6.3.4
   resolution: "match-sorter@npm:6.3.4"
@@ -15010,6 +14974,42 @@ __metadata:
   checksum: 10/1720349d4a53e401aa993241368e35c0ad13d816ad0b28388928c58ca9faa0cf755fa45f18ccbf64f4ce54a845a50ddce5c84e4016897b513096a68dac4b0158
   languageName: node
   linkType: hard
+
+"mdviewy-monorepo@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "mdviewy-monorepo@workspace:."
+  dependencies:
+    "@alicloud/alimt20181012": "npm:^1.3.0"
+    "@alicloud/openapi-client": "npm:^0.4.13"
+    "@alicloud/tea-util": "npm:^1.4.10"
+    "@babel/core": "npm:^7.26.0"
+    "@babel/eslint-parser": "npm:^7.25.9"
+    "@babel/eslint-plugin": "npm:^7.25.9"
+    "@babel/plugin-proposal-class-properties": "npm:^7.18.6"
+    "@babel/plugin-proposal-decorators": "npm:^7.25.9"
+    "@babel/preset-env": "npm:^7.26.0"
+    "@babel/preset-react": "npm:^7.25.9"
+    "@babel/preset-typescript": "npm:^7.26.0"
+    "@halodong/eslint-config-react": "npm:^0.38.24"
+    "@rollup/plugin-node-resolve": "npm:15.3.0"
+    "@rollup/plugin-terser": "npm:0.4.4"
+    "@rollup/plugin-typescript": "npm:11.1.6"
+    "@rollup/plugin-url": "npm:^8.0.2"
+    babel: "npm:^6.23.0"
+    child_process: "npm:^1.0.2"
+    eslint: "npm:9.13.0"
+    fast-glob: "npm:^3.3.2"
+    postcss: "npm:^8.4.47"
+    postcss-import: "npm:^16.1.1"
+    postcss-nested: "npm:^7.0.2"
+    prettier: "npm:^3.3.3"
+    rimraf: "npm:^6.0.1"
+    rollup: "npm:4.24.3"
+    rollup-plugin-postcss: "npm:^4.0.2"
+    turbo: "npm:^2.2.3"
+    typescript: "npm:^5.7.3"
+  languageName: unknown
+  linkType: soft
 
 "mdx-bundler@npm:^10.1.1":
   version: 10.1.1

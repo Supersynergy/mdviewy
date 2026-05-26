@@ -1,8 +1,8 @@
-import type { MF_CONTEXT } from '@markflowy/types'
+import type { MDVIEWY_CONTEXT } from '@mdviewy/types'
 import * as theme from './theme'
 
-const __MF__: MF_CONTEXT = Object.freeze({
+const __MDVIEWY__: MDVIEWY_CONTEXT = Object.freeze({
   theme
 })
 
-export default __MF__
+export default __MDVIEWY__

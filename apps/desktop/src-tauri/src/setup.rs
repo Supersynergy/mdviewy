@@ -3,9 +3,10 @@ use tauri::{utils::config::WebviewUrl, App, AppHandle, Emitter, WebviewWindowBui
 
 #[cfg(target_os = "macos")]
 use tauri::TitleBarStyle;
+#[cfg(target_os = "macos")]
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
 pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn std::error::Error>> {
-
     // 首先检查是否已经存在窗口
     if let Some(existing_window) = window_manager::get_last_opened_window(&app_handle) {
         let script = format!("window.openedUrls = `{opened_urls}`; console.log(`[setup.rs] Updated openedUrls to: {opened_urls}`);");
@@ -28,7 +29,7 @@ pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn st
     .initialization_script(&format!(
         "console.log(`[setup.rs] window.openedUrls set to: {opened_urls}`)"
     ))
-    .title("MarkFlowy")
+    .title("mdviewy")
     .resizable(true)
     .fullscreen(false)
     .theme(Some(theme))
@@ -43,6 +44,16 @@ pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn st
 
     let window = main_win.build()?;
 
+    #[cfg(target_os = "macos")]
+    {
+        let _ = apply_vibrancy(
+            &window,
+            NSVisualEffectMaterial::HudWindow,
+            Some(NSVisualEffectState::Active),
+            Some(12.0),
+        );
+    }
+
     // 将初始窗口添加到全局窗口实例缓存中
     let window_label = window.label().to_string();
     let workspace_path = if !opened_urls.is_empty() {
@@ -53,10 +64,11 @@ pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn st
 
     // 存储窗口实例信息到全局缓存
     if !workspace_path.is_empty() {
-        use std::path::PathBuf;
         use crate::WINDOW_INSTANCES;
+        use std::path::PathBuf;
 
-        let mut instances = WINDOW_INSTANCES.lock()
+        let mut instances = WINDOW_INSTANCES
+            .lock()
             .map_err(|e| format!("Failed to lock window instances: {}", e))?;
         instances.insert(window_label, PathBuf::from(workspace_path));
     }

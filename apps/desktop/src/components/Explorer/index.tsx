@@ -8,10 +8,13 @@ import { homeDir } from '@tauri-apps/api/path'
 import { Popover } from 'antd'
 import classNames from 'classnames'
 import type { FC, MouseEventHandler } from 'react'
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import type { ListDataItem } from '../ui-v2/List'
+import FilterBar, { loadFilter } from './FilterBar'
+import { filterExplorerTree, type ExplorerFilter } from './filter'
+import FlatResults, { bumpFrecency } from './FlatResults'
 import { Container } from './styles'
 
 const RecentListBottom = styled.div`
@@ -53,14 +56,27 @@ const Explorer: FC<ExplorerProps> = (props) => {
   const { openFolderDialog, openFolder } = useOpen()
   const [dndRootElement, setDndRootElement] = useState<HTMLDivElement | null>(null)
   const [homePath, setHomePath] = useState<string>('')
+  const [filter, setFilter] = useState<ExplorerFilter>(() => loadFilter())
+  const deferredQuery = useDeferredValue(filter.query)
+  const deferredFilter = useMemo(
+    () => ({ ...filter, query: deferredQuery }),
+    [filter.scope, filter.customExt, filter.hideHidden, filter.flat, deferredQuery],
+  )
 
   useEffect(() => {
     homeDir().then(setHomePath)
   }, [])
 
+  const filteredData = useMemo(
+    () => filterExplorerTree(folderData, deferredFilter),
+    [folderData, deferredFilter],
+  )
+  const queryActive = deferredQuery.trim() !== ''
+  const renderFlatResults = queryActive || filter.flat
+
   const handleSelect = (item: IFile) => {
     if (item?.kind !== 'file') return
-
+    bumpFrecency(item.path || '')
     addOpenedFile(item.id)
     setActiveId(item.id)
   }
@@ -94,14 +110,27 @@ const Explorer: FC<ExplorerProps> = (props) => {
 
   return (
     <Container className={containerCLs} onContextMenu={handleContextMenu}>
+      {folderData && folderData.length > 0 && (
+        <FilterBar value={filter} onChange={setFilter} />
+      )}
       <div className='h-full w-full overflow-hidden' ref={(ref) => setDndRootElement(ref)}>
-        {folderData && folderData.length > 0 ? (
-          <FileTree
-            data={folderData}
-            activeId={activeId}
-            onSelect={handleSelect}
-            dndRootElement={dndRootElement as unknown as Node}
-          />
+        {filteredData && filteredData.length > 0 ? (
+          renderFlatResults ? (
+            <FlatResults
+              files={filteredData}
+              rootPath={folderData?.[0]?.path}
+              query={deferredQuery}
+              onOpen={handleSelect}
+            />
+          ) : (
+            <FileTree
+              data={filteredData}
+              sourceData={folderData}
+              activeId={activeId}
+              onSelect={handleSelect}
+              dndRootElement={dndRootElement as unknown as Node}
+            />
+          )
         ) : (
           <Empty />
         )}

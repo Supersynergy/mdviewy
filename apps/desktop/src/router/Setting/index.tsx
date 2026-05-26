@@ -112,7 +112,7 @@ function Setting() {
   }
 
   const handleOpenThemeStoreFile = () => {
-    openUrl('https://github.com/drl990114/MarkFlowy')
+    openUrl('https://github.com/Supersynergy/mdviewy')
   }
 
   const renderAction = () => {

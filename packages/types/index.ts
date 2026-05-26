@@ -1,6 +1,6 @@
-import type { MfTheme } from '@markflowy/theme'
+import type { MfTheme } from '@mdviewy/theme'
 
-export type MF_CONTEXT = {
+export type MDVIEWY_CONTEXT = {
   theme: {
     registerTheme: (theme: MfTheme) => void
   }

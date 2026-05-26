@@ -10,7 +10,7 @@ export default function Footer() {
       <LeftSection>
         <Brand href='/'>
           <Logo size={24} />
-          <AppName>MarkFlowy</AppName>
+          <AppName>mdviewy</AppName>
         </Brand>
         <CopyrightText>
           ©2023 - present . All rights reserved.
@@ -19,10 +19,10 @@ export default function Footer() {
 
       <RightSection>
         <Nav>
-          <FooterLink href='https://github.com/drl990114/MarkFlowy' target='_blank'>
+          <FooterLink href='https://github.com/Supersynergy/mdviewy' target='_blank'>
             GitHub
           </FooterLink>
-          <FooterLink href='https://github.com/drl990114/MarkFlowy/graphs/contributors' target='_blank'>
+          <FooterLink href='https://github.com/Supersynergy/mdviewy/graphs/contributors' target='_blank'>
             Contributors
           </FooterLink>
           <FooterLink href='https://vercel.com' target='_blank'>

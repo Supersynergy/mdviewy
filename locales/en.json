@@ -1,5 +1,5 @@
 {
-  "app_name": "MarkFlowy",
+  "app_name": "mdviewy",
   "common": {
     "none": "None",
     "name": "name",
@@ -102,7 +102,9 @@
   "explorer": {
     "collapse_folders": "Collapse folders",
     "refresh_folder_data": "Refresh Folder Data",
-    "focus_active_file": "Focus on the current file"
+    "focus_active_file": "Focus on the current file",
+    "emptyTitle": "No files to show",
+    "emptyHint": "Open a folder or clear the current filter."
   },
   "file": {
     "untitled": "untitled",
