@@ -1,12 +1,9 @@
-import { AppInfoDialog, SideBar } from '@/components'
-import CommandPalette from '@/components/CommandPalette'
 import EditorArea from '@/components/EditorArea'
 import { PageLayout } from '@/components/Layout'
+import SideBar from '@/components/SideBar'
 import RightBar from '@/components/SideBar/RightBar'
 import StatusBar from '@/components/StatusBar'
-import { WorkspaceDialog } from '@/components/WorkspaceDialog'
 import { useRefreshAIProvidersModels } from '@/extensions/ai/useAiChatStore'
-import { BookMarkDialog } from '@/extensions/bookmarks/BookMarkDialog'
 import useBookMarksStore from '@/extensions/bookmarks/useBookMarksStore'
 import { useCommandInit } from '@/hooks/useCommandInit'
 import { useExternalLinks } from '@/hooks/useExternalLinks'
@@ -15,7 +12,7 @@ import { useCommandStore } from '@/stores'
 import useLayoutStore from '@/stores/useLayoutStore'
 import { memo, useEffect, useRef } from 'react'
 import { Group, Panel, PanelImperativeHandle, useDefaultLayout } from 'react-resizable-panels'
-import { SettingDialog } from '../Setting/component/SettingDialog'
+import DeferredRootSurfaces from './DeferredRootSurfaces'
 import { StyleSeparator } from './styles'
 
 export const RESIZE_PANEL_STORAGE_KEY = 'root-resize-panel'
@@ -114,12 +111,7 @@ function Root() {
       </Group>
       <StatusBar />
 
-      {/* global dialogs */}
-      <AppInfoDialog />
-      <BookMarkDialog />
-      <SettingDialog />
-      <WorkspaceDialog />
-      <CommandPalette />
+      <DeferredRootSurfaces />
     </PageLayout>
   )
 }

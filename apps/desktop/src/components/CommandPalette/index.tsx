@@ -18,6 +18,16 @@ import {
 
 type Mode = 'all' | 'files' | 'content' | 'commands'
 
+export type CommandPaletteOpenRequest = {
+  mode: Mode
+  nonce: number
+}
+
+type CommandPaletteProps = {
+  openRequest?: CommandPaletteOpenRequest | null
+  onReady?: () => void
+}
+
 type Entry = {
   kind: 'file' | 'command' | 'recent' | 'content'
   id: string
@@ -57,7 +67,7 @@ const fuzzyScore = (text: string, q: string): number => {
 const isMode = (value: unknown): value is Mode =>
   value === 'all' || value === 'files' || value === 'content' || value === 'commands'
 
-const CommandPalette = memo(() => {
+const CommandPalette = memo(({ openRequest, onReady }: CommandPaletteProps) => {
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<Mode>('all')
   const [query, setQuery] = useState('')
@@ -75,6 +85,16 @@ const CommandPalette = memo(() => {
     setQuery('')
     setActiveIdx(0)
   }, [])
+
+  useEffect(() => {
+    onReady?.()
+  }, [onReady])
+
+  useEffect(() => {
+    if (!openRequest) return
+    setMode(openRequest.mode)
+    setOpen(true)
+  }, [openRequest])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

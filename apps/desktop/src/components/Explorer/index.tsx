@@ -1,4 +1,6 @@
-import { Empty, FileTree, List } from '@/components'
+import Empty from '@/components/Empty'
+import { FileTree } from '@/components/FileTree'
+import List from '@/components/ui-v2/List'
 import type { IFile } from '@/helper/filesys'
 import { useOpen } from '@/hooks'
 import { createNewWindow } from '@/services/windows'

@@ -1,4 +1,4 @@
-import { Explorer } from '@/components'
+import Explorer from '@/components/Explorer'
 import { RIGHTBARITEMKEYS } from '@/constants'
 import BookMarks from '@/extensions/bookmarks'
 import classNames from 'classnames'
