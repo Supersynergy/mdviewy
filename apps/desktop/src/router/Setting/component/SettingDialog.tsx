@@ -1,11 +1,11 @@
 import '@/antdStyles'
 import { EVENT } from '@/constants'
-import { Setting } from '@/router'
 import { useCommandStore } from '@/stores'
 import { memo, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { Dialog } from 'zens'
+import Setting from '..'
 
 const SettingDialogWrapper = styled(Dialog)`
   width: 86vw;

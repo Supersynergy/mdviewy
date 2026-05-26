@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { nanoid } from 'nanoid'
-import { delay } from 'lodash'
 import { PromiseStatus } from '@/types/global.d'
 
 const useAppTasksStore = create(
@@ -19,13 +18,13 @@ const useAppTasksStore = create(
         newTask.promise
           .then(() => {
             updateTask(newTask.id, { status: PromiseStatus.Resolved })
-            delay(() => {
+            globalThis.setTimeout(() => {
               deleteTask(newTask.id)
             }, 5000)
           })
           .catch(() => {
             updateTask(newTask.id, { status: PromiseStatus.Rejected })
-            delay(() => {
+            globalThis.setTimeout(() => {
               deleteTask(newTask.id)
             }, 5000)
           })

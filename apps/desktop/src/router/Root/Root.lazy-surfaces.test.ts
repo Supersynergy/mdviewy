@@ -28,4 +28,15 @@ describe('Root startup surfaces', () => {
     expect(source).toContain('openRequest')
     expect(source).toContain('onReady')
   })
+
+  it('keeps lazy settings off the broad router barrel', () => {
+    const currentDir = dirname(fileURLToPath(import.meta.url))
+    const source = readFileSync(join(currentDir, '../Setting/component/SettingDialog.tsx'), 'utf8')
+    const topLevelImports = source
+      .split('\n')
+      .filter((line) => /^import\s+/.test(line.trim()))
+      .join('\n')
+
+    expect(topLevelImports).not.toContain("from '@/router'")
+  })
 })

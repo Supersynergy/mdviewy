@@ -1,4 +1,4 @@
-import { Root } from '@/router'
+import Root from '@/router/Root'
 import { Route, Routes } from 'react-router'
 import { Notifications } from 'zens'
 import AppThemeProvider from './AppThemeProvider'

@@ -1,16 +1,14 @@
 import { aiGenerateTextRequest, aiStreamTextRequest } from '@/extensions/ai/api'
 import useAppSettingStore from '@/stores/useAppSettingStore'
-import { cloneDeep } from 'lodash'
 import { nanoid } from 'nanoid'
 import { useEffect } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import {
-  AIGenerateTextParams,
-  AIProviders,
   aiProviders,
   aiProviderSettingKeysMap,
 } from './aiProvidersService'
+import type { AIGenerateTextParams, AIProviders } from './aiProvidersService'
 
 export const defaultAiProviderModelsMap = {
   openai: ['gpt-3.5-turbo', 'gpt-4-32k', 'gpt-4'],
@@ -18,6 +16,15 @@ export const defaultAiProviderModelsMap = {
   ollama: ['llama3.3'],
   google: ['gemini-2.5-flash'],
 }
+
+const cloneDefaultAiProviderModelsMap = (): Record<AIProviders, string[]> =>
+  aiProviders.reduce(
+    (modelsMap, provider) => ({
+      ...modelsMap,
+      [provider]: [...defaultAiProviderModelsMap[provider]],
+    }),
+    {} as Record<AIProviders, string[]>,
+  )
 
 export type AISettingData = {
   apiBase: string
@@ -83,7 +90,7 @@ const useAiChatStoreV2 = create<AIStore>()(
         },
         {} as AIStore['aiProviderCurModel'],
       ),
-      aiProviderModelsMap: cloneDeep(defaultAiProviderModelsMap),
+      aiProviderModelsMap: cloneDefaultAiProviderModelsMap(),
 
       chatList: [],
 

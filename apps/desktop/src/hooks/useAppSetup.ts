@@ -19,7 +19,6 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { LazyStore } from '@tauri-apps/plugin-store'
-import { once } from 'lodash'
 import { useCallback, useEffect } from 'react'
 import { toast } from 'zens'
 import { useGlobalKeyboard, useGlobalOSInfo } from '.'
@@ -34,6 +33,15 @@ interface LocalTheme {
   name: string
   path: string
   css_content: string
+}
+
+const onceAsync = <T,>(fn: () => Promise<T>) => {
+  let promise: Promise<T> | undefined
+
+  return () => {
+    promise ??= fn()
+    return promise
+  }
 }
 
 async function appThemeExtensionsSetup(curTheme: string) {
@@ -210,7 +218,7 @@ const useMainStoreSetup = () => {
   useAiChatStore()
 }
 
-const appSetup = once(async function () {
+const appSetup = onceAsync(async function () {
   // CRITICAL PATH — minimum work to render the shell correctly.
   // Goal: first paint in <1s. Everything else is deferred to idle time.
   useMainStoreSetup()
