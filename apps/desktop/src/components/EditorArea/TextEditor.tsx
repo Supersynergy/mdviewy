@@ -1,4 +1,3 @@
-import '@/antdStyles'
 import { EVENT } from '@/constants'
 import { captureError } from '@/errorReporting'
 import { clipboardRead } from '@/helper/clipboard'

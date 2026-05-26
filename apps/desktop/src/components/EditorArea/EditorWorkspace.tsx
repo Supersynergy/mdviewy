@@ -1,4 +1,3 @@
-import { FindReplace } from '@/components/EditorArea/editorToolBar/FindReplace'
 import { PreviewToolbar } from '@/components/EditorArea/editorToolBar/PreviewToolbar/PreviewToolbar'
 import { SourceCodeToolbar } from '@/components/EditorArea/editorToolBar/SourceCodeToolbar/SourceCodeToolbar'
 import { WysiwygToolbar } from '@/components/EditorArea/editorToolBar/WysiwygToolbar'
@@ -7,6 +6,7 @@ import useAppSettingStore from '@/stores/useAppSettingStore'
 import useThemeStore from '@/stores/useThemeStore'
 import { useMemo } from 'react'
 import { ThemeProvider as EditorProvider } from 'rme'
+import DeferredEditorSurfaces from './DeferredEditorSurfaces'
 import Editor from './Editor'
 import EditorAreaTabs from './EditorAreaTabs'
 import { Container, EditorPanel } from './styles'
@@ -52,7 +52,7 @@ export default function EditorWorkspace({ opened, activeId }: EditorWorkspacePro
         <WysiwygToolbar />
         <SourceCodeToolbar />
         <PreviewToolbar />
-        <FindReplace />
+        <DeferredEditorSurfaces />
         <EditorPanel id='editor-panel'>
           {opened.map((id) => {
             return <Editor key={id} id={id} active={id === activeId} />

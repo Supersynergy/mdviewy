@@ -5,8 +5,9 @@ import { describe, expect, it } from 'vitest'
 
 describe('EditorArea startup boundary', () => {
   const currentDir = dirname(fileURLToPath(import.meta.url))
+  const readSource = (relativePath: string) => readFileSync(join(currentDir, relativePath), 'utf8')
   const topLevelImports = (relativePath: string) => {
-    const source = readFileSync(join(currentDir, relativePath), 'utf8')
+    const source = readSource(relativePath)
     return source
       .split('\n')
       .filter((line) => /^import\s+/.test(line.trim()))
@@ -27,5 +28,22 @@ describe('EditorArea startup boundary', () => {
 
     expect(imports).not.toContain("from 'html2canvas'")
     expect(imports).not.toContain("@sentry/react")
+  })
+
+  it('keeps optional find/replace UI and Ant Design styles out of the eager editor path', () => {
+    const workspaceImports = topLevelImports('EditorWorkspace.tsx')
+    const textEditorImports = topLevelImports('TextEditor.tsx')
+
+    expect(workspaceImports).not.toContain('FindReplace')
+    expect(workspaceImports).not.toContain('editorToolBar/FindReplace')
+    expect(textEditorImports).not.toContain("@/antdStyles")
+  })
+
+  it('keeps a lightweight find/replace command bridge before the lazy UI mounts', () => {
+    const source = readSource('DeferredEditorSurfaces.tsx')
+
+    expect(source).toContain("id: 'app_findReplaceEditor'")
+    expect(source).toContain('lazy(() =>')
+    expect(source).toContain('findReplaceVisible')
   })
 })

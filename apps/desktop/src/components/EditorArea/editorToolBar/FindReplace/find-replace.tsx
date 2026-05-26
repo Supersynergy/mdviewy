@@ -1,27 +1,58 @@
+import '@/antdStyles'
 import { useCommandStore, useEditorStore } from '@/stores'
 import type { FC } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { FindReplaceComponent } from './find-replace-component'
 
-function useFindReplaceOpen() {
+export interface FindReplaceOpenRequest {
+  nonce: number
+}
+
+interface FindReplaceProps {
+  openRequest?: FindReplaceOpenRequest | null
+  onReady?: () => void
+}
+
+function useFindReplaceOpen(openRequest?: FindReplaceOpenRequest | null, onReady?: () => void) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const { addCommand, execute } = useCommandStore()
-  
+
+  const openFindReplace = useCallback(() => {
+    setOpen((prev) => {
+      if (!prev) {
+        execute('app_stopFindEditor')
+      }
+      return true
+    })
+  }, [execute])
+
+  const toggleFindReplace = useCallback(() => {
+    setOpen((prev) => {
+      if (!prev) {
+        execute('app_stopFindEditor')
+      }
+      return !prev
+    })
+  }, [execute])
+
   useEffect(() => {
     addCommand({
       id: 'app_findReplaceEditor',
-      handler: () => {
-        setOpen((prev) => {
-          if (!prev) {
-            execute('app_stopFindEditor')
-          }
-          return !prev
-        })
-      }
+      handler: toggleFindReplace,
     })
-  }, [addCommand, execute])
+  }, [addCommand, toggleFindReplace])
+
+  useEffect(() => {
+    onReady?.()
+  }, [onReady])
+
+  useEffect(() => {
+    if (openRequest) {
+      openFindReplace()
+    }
+  }, [openFindReplace, openRequest])
 
   const focus = useCallback(() => {
     const input = ref.current?.querySelector('input')
@@ -56,8 +87,8 @@ const FindReplaceWrapper = styled.div`
   padding: 8px;
 `
 
-export const FindReplace: FC = () => {
-  const { open, ref, close } = useFindReplaceOpen()
+export const FindReplace: FC<FindReplaceProps> = ({ openRequest, onReady }) => {
+  const { open, ref, close } = useFindReplaceOpen(openRequest, onReady)
   const { editorCtxMap, activeId } = useEditorStore()
 
   const editorCtx = editorCtxMap.get(activeId ?? '')
