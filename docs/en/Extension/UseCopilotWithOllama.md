@@ -88,7 +88,7 @@ Copilot can work with any AI provider already supported by mdmaster. You need to
 ### Copilot's Trigger Mechanism
 
 Typically, after entering some text in a paragraph, mdmaster will take the characters around your cursor as context and have AI provide some suggestions. It looks something like this:
-![](https://raw.githubusercontent.com/Supersynergy/mdmaster/refs/heads/main/public/copilot.png)
+![](https://raw.githubusercontent.com/Supersynergy/mdviewy/refs/heads/main/public/copilot.png)
 
 ### Recommendations
 

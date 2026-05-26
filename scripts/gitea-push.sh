@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Push to git.marketdeck.io/Supersynergy/mdmaster
+# Push to git.marketdeck.io/Supersynergy/mdviewy
 # Token from macOS keychain (account=Supersynergy, service=git.marketdeck.io).
 # Repo MUST exist (token lacks write:user scope).
 set -euo pipefail
 HOST=git.marketdeck.io
 OWNER=Supersynergy
-REPO=mdmaster
+REPO=mdviewy
 T=$(security find-internet-password -s "$HOST" -a "$OWNER" -w)
 [ -n "$T" ] || { echo "no token in keychain"; exit 1; }
 

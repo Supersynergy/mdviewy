@@ -33,7 +33,7 @@ export default function HomeFooter() {
             @drl990114
           </FooterLink>
           {' and '}
-          <FooterLink inline href='https://github.com/Supersynergy/mdmaster/graphs/contributors'>
+          <FooterLink inline href='https://github.com/Supersynergy/mdviewy/graphs/contributors'>
             contributors
           </FooterLink>
           {'.'}

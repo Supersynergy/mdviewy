@@ -36,7 +36,7 @@ For some users who don't want to go through the complicated project startup step
 
 #### Fork
 
-Fork [mdmaster](https://github.com/Supersynergy/mdmaster) and `git clone`
+Fork [mdmaster](https://github.com/Supersynergy/mdviewy) and `git clone`
 
 #### Translation file
 
@@ -52,7 +52,7 @@ Modifying the existing language may not be particularly easy to find the corresp
 
 #### Fork
 
-Fork [mdmaster](https://github.com/Supersynergy/mdmaster) and `git clone`
+Fork [mdmaster](https://github.com/Supersynergy/mdviewy) and `git clone`
 
 #### Dependency installation
 

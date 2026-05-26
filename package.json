@@ -1,12 +1,12 @@
 {
-  "name": "mdmaster-monorepo",
+  "name": "mdviewy-monorepo",
   "version": "0.0.0",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://git.marketdeck.io/Supersynergy/mdmaster.git"
+    "url": "https://git.marketdeck.io/Supersynergy/mdviewy.git"
   },
-  "homepage": "https://git.marketdeck.io/Supersynergy/mdmaster",
+  "homepage": "https://git.marketdeck.io/Supersynergy/mdviewy",
   "workspaces": [
     "packages/*",
     "apps/*",
@@ -16,9 +16,9 @@
     "setup": "turbo postinstall",
     "yarn:id": "yarn install && yarn dedupe",
     "dev": "turbo dev",
-    "dev:desktop": "yarn workspace @mdmaster/desktop tauri:dev",
+    "dev:desktop": "yarn workspace @mdviewy/desktop tauri:dev",
     "build": "turbo build",
-    "build:desktop": "yarn build && yarn workspace @mdmaster/desktop tauri:build",
+    "build:desktop": "yarn build && yarn workspace @mdviewy/desktop tauri:build",
     "use-offline-bundle": "node scripts/use-offline-bundle.js",
     "delete": "turbo delete",
     "release": "node scripts/release.js",
@@ -26,7 +26,7 @@
     "release:minor": "yarn release --minor",
     "release:major": "yarn release --major",
     "test": "turbo test",
-    "updater": "yarn workspace @mdmaster/desktop updater",
+    "updater": "yarn workspace @mdviewy/desktop updater",
     "lint": "eslint --fix --ext .tsx ./",
     "translate:locals": "node --env-file=.env scripts/translate-locals.js",
     "translate:check": "node scripts/translate-check.js"

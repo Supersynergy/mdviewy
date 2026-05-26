@@ -36,7 +36,7 @@
 
 #### Fork
 
-Fork [mdmaster](https://github.com/Supersynergy/mdmaster) 并执行 `git clone`。
+Fork [mdmaster](https://github.com/Supersynergy/mdviewy) 并执行 `git clone`。
 
 #### 翻译文件
 
@@ -52,7 +52,7 @@ Fork [mdmaster](https://github.com/Supersynergy/mdmaster) 并执行 `git clone`�
 
 #### Fork
 
-Fork [mdmaster](https://github.com/Supersynergy/mdmaster) 并执行 `git clone`。
+Fork [mdmaster](https://github.com/Supersynergy/mdviewy) 并执行 `git clone`。
 
 #### 安装依赖
 

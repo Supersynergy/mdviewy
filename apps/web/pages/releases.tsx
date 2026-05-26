@@ -29,7 +29,7 @@ export default function Releases({ releases, sidebarPages }: ReleasesProps) {
           {' '}UpgradeLink download page{' '}
         </HighlightLink>
         or the
-        <HighlightLink href='https://github.com/Supersynergy/mdmaster/releases' target='_blank'>
+        <HighlightLink href='https://github.com/Supersynergy/mdviewy/releases' target='_blank'>
           {' '}GitHub Release{' '}
         </HighlightLink>
         .
@@ -45,7 +45,7 @@ export default function Releases({ releases, sidebarPages }: ReleasesProps) {
           {' '}UpgradeLink 下载页面{' '}
         </HighlightLink>
         或者{' '}
-        <HighlightLink href='https://github.com/Supersynergy/mdmaster/releases' target='_blank'>
+        <HighlightLink href='https://github.com/Supersynergy/mdviewy/releases' target='_blank'>
           {' '}GitHub Release{' '}
         </HighlightLink>
         下载。

@@ -28,12 +28,12 @@
 
     "baseUrl": ".",
     "paths": {
-      "@mdmaster/runtime-api": ["packages/runtime-api/src/index.ts"],
-      "@mdmaster/runtime-api/*": ["packages/runtime-api/src/*"],
-      "@mdmaster/theme": ["packages/theme/src/index.ts"],
-      "@mdmaster/theme/*": ["packages/theme/src/*"],
-      "@mdmaster/types": ["packages/types/index.ts"],
-      "@mdmaster/types/*": ["packages/types/*"]
+      "@mdviewy/runtime-api": ["packages/runtime-api/src/index.ts"],
+      "@mdviewy/runtime-api/*": ["packages/runtime-api/src/*"],
+      "@mdviewy/theme": ["packages/theme/src/index.ts"],
+      "@mdviewy/theme/*": ["packages/theme/src/*"],
+      "@mdviewy/types": ["packages/types/index.ts"],
+      "@mdviewy/types/*": ["packages/types/*"]
     }
   },
   "exclude": [

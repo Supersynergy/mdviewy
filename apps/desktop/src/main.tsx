@@ -8,7 +8,7 @@ window.__MDM_BOOT__ = performance.now()
   console.log(`[mdmaster.boot] ${label}: ${t.toFixed(1)}ms`)
 }
 
-import { lightTheme } from '@mdmaster/theme'
+import { lightTheme } from '@mdviewy/theme'
 import * as Sentry from '@sentry/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import 'antd/dist/antd.css'

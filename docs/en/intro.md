@@ -25,7 +25,7 @@ Available for Linux, macOS and Windows.
 > - Run `xattr -cr mdmaster.app` and open the app again
 > - Please make sure you download from `github releases` or [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA).
 
-You can download it from the [UpgradeLink download page](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) or [GitHub Release](https://github.com/Supersynergy/mdmaster/releases)
+You can download it from the [UpgradeLink download page](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) or [GitHub Release](https://github.com/Supersynergy/mdviewy/releases)
 
 ## Why
 
@@ -33,7 +33,7 @@ At present, I have used many Markdown applications, but I have not encountered o
 
 ## Contribute
 
-The current mdmaster is still in its infancy, and there may be some bad experiences or bugs, for which I am sorry. All partners who are interested or encounter usage problems are welcome to submit [issues](https://github.com/Supersynergy/mdmaster/issues/new) or [PR](https://github.com/Supersynergy/mdmaster/compare) to participate in this project.
+The current mdmaster is still in its infancy, and there may be some bad experiences or bugs, for which I am sorry. All partners who are interested or encounter usage problems are welcome to submit [issues](https://github.com/Supersynergy/mdviewy/issues/new) or [PR](https://github.com/Supersynergy/mdviewy/compare) to participate in this project.
 
 ### How to Contribute
 

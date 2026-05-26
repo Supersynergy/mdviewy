@@ -15,21 +15,21 @@
 
 <div align="center">
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/Supersynergy/mdmaster)](https://github.com/Supersynergy/mdmaster)
-[![G-Star](https://atomgit.com/Supersynergy/mdmaster/star/badge.svg)](https://atomgit.com/Supersynergy/mdmaster)
+[![GitHub Repo stars](https://img.shields.io/github/stars/Supersynergy/mdviewy)](https://github.com/Supersynergy/mdviewy)
+[![G-Star](https://atomgit.com/Supersynergy/mdviewy/star/badge.svg)](https://atomgit.com/Supersynergy/mdviewy)
 [![App Version][version-badge]][release]
 [![Downloads][downloads-badge]][release]
 <br/>
 [![Build Status][build-badge]][build]
 [![Code of Conduct][coc-badge]][coc]
 [![Commit Activity][commit-badge]][commit]
-[![issues-closed]](https://github.com/Supersynergy/mdmaster/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aclosed)
+[![issues-closed]](https://github.com/Supersynergy/mdviewy/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aclosed)
 <br/>
 [![PRs Welcome][prs-welcome-badge]][prs-welcome]
 [![TypeScript-version-icon]](https://www.typescriptlang.org/)
 [![Rust-version-icon]](https://www.rust-lang.org/)
 [![License][license-badge]][license]
-[![codefactor]](https://www.codefactor.io/repository/github/Supersynergy/mdmaster)
+[![codefactor]](https://www.codefactor.io/repository/github/Supersynergy/mdviewy)
 
 
 <br/>
@@ -74,7 +74,7 @@ Available for Linux, macOS and Windows.
 > - Run `xattr -cr mdmaster.app` and open the app again
 > - Please make sure you download from `github releases` or [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA).
 
-You can download it from the [UpgradeLink download page](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) or [GitHub Release](https://github.com/Supersynergy/mdmaster/releases)
+You can download it from the [UpgradeLink download page](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) or [GitHub Release](https://github.com/Supersynergy/mdviewy/releases)
 
 ## Why
 
@@ -86,7 +86,7 @@ mdmaster is a product, and also a testament to a life journey. Through continuou
 
 ## Contribute
 
-The current mdmaster is still in its infancy, and there may be some bad experiences or bugs, for which I am sorry. All partners who are interested or encounter usage problems are welcome to submit [issues](https://github.com/Supersynergy/mdmaster/issues/new) or [PR](https://github.com/Supersynergy/mdmaster/compare) to participate in this project.
+The current mdmaster is still in its infancy, and there may be some bad experiences or bugs, for which I am sorry. All partners who are interested or encounter usage problems are welcome to submit [issues](https://github.com/Supersynergy/mdviewy/issues/new) or [PR](https://github.com/Supersynergy/mdviewy/compare) to participate in this project.
 
 ### How to Contribute
 
@@ -231,23 +231,23 @@ The development of **mdmaster** cannot be separated from these contributors. The
 <!--/nrg.freeze-->
 
 <!-- badges -->
-[build-badge]: https://img.shields.io/github/actions/workflow/status/Supersynergy/mdmaster/nodejs.yml.svg?style=flat-square&labelColor=black
-[build]: https://github.com/Supersynergy/mdmaster/actions/workflows/nodejs.yml?labelColor=black
-[downloads-badge]:  https://img.shields.io/github/downloads/Supersynergy/mdmaster/total?label=downloads&style=flat-square&labelColor=black
+[build-badge]: https://img.shields.io/github/actions/workflow/status/Supersynergy/mdviewy/nodejs.yml.svg?style=flat-square&labelColor=black
+[build]: https://github.com/Supersynergy/mdviewy/actions/workflows/nodejs.yml?labelColor=black
+[downloads-badge]:  https://img.shields.io/github/downloads/Supersynergy/mdviewy/total?label=downloads&style=flat-square&labelColor=black
 [license-badge]: https://img.shields.io/badge/license-AGPL-purple.svg?style=flat-square&labelColor=black
 [license]: https://opensource.org/licenses/AGPL-3.0?labelColor=black
-[release]: https://github.com/Supersynergy/mdmaster/releases?labelColor=black
+[release]: https://github.com/Supersynergy/mdviewy/releases?labelColor=black
 [prs-welcome-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square&labelColor=black&color=%23dd5c13
-[prs-welcome]: https://github.com/Supersynergy/mdmaster/blob/main/CONTRIBUTING.md?labelColor=black
+[prs-welcome]: https://github.com/Supersynergy/mdviewy/blob/main/CONTRIBUTING.md?labelColor=black
 [coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square&labelColor=black
-[coc]: https://github.com/Supersynergy/mdmaster/blob/main/CODE_OF_CONDUCT.md?labelColor=black
-[commit-badge]: https://img.shields.io/github/commit-activity/m/Supersynergy/mdmaster?color=%23ff9900&style=flat-square&labelColor=black
-[commit]: https://github.com/Supersynergy/mdmaster?labelColor=black
-[version-badge]: https://img.shields.io/github/v/release/Supersynergy/mdmaster?color=%239accfe&label=version&style=flat-square&labelColor=black
+[coc]: https://github.com/Supersynergy/mdviewy/blob/main/CODE_OF_CONDUCT.md?labelColor=black
+[commit-badge]: https://img.shields.io/github/commit-activity/m/Supersynergy/mdviewy?color=%23ff9900&style=flat-square&labelColor=black
+[commit]: https://github.com/Supersynergy/mdviewy?labelColor=black
+[version-badge]: https://img.shields.io/github/v/release/Supersynergy/mdviewy?color=%239accfe&label=version&style=flat-square&labelColor=black
 [rust-version-icon]: https://img.shields.io/badge/Rust-1.85.0-dea584?style=flat-square&labelColor=black
-[typescript-version-icon]: https://img.shields.io/github/package-json/dependency-version/Supersynergy/mdmaster/dev/typescript?label=TypeScript&style=flat-square&labelColor=black
-[issues-closed]: https://img.shields.io/github/issues-closed/Supersynergy/mdmaster.svg?style=flat-square&labelColor=black
-[codefactor]: https://www.codefactor.io/repository/github/Supersynergy/mdmaster/badge/main?style=flat-square&labelColor=black
+[typescript-version-icon]: https://img.shields.io/github/package-json/dependency-version/Supersynergy/mdviewy/dev/typescript?label=TypeScript&style=flat-square&labelColor=black
+[issues-closed]: https://img.shields.io/github/issues-closed/Supersynergy/mdviewy.svg?style=flat-square&labelColor=black
+[codefactor]: https://www.codefactor.io/repository/github/Supersynergy/mdviewy/badge/main?style=flat-square&labelColor=black
 
 ## License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSupersynergy%2Fmdmaster.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSupersynergy%2Fmdmaster?ref=badge_large)
