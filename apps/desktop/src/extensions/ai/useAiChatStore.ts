@@ -1,4 +1,3 @@
-import { aiGenerateTextRequest, aiStreamTextRequest } from '@/extensions/ai/api'
 import useAppSettingStore from '@/stores/useAppSettingStore'
 import { nanoid } from 'nanoid'
 import { useEffect } from 'react'
@@ -7,8 +6,8 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import {
   aiProviders,
   aiProviderSettingKeysMap,
-} from './aiProvidersService'
-import type { AIGenerateTextParams, AIProviders } from './aiProvidersService'
+} from './aiProvidersConfig'
+import type { AIProviders } from './aiProvidersConfig'
 
 export const defaultAiProviderModelsMap = {
   openai: ['gpt-3.5-turbo', 'gpt-4-32k', 'gpt-4'],
@@ -143,20 +142,23 @@ const useAiChatStoreV2 = create<AIStore>()(
           chatList: [...state.chatList, aiMessage],
         }))
 
-        aiStreamTextRequest({
-          sdkProvider: aiProvider,
-          url: apiBase,
-          apiKey,
-          headers,
-          model: aiProviderCurModel[aiProvider],
-          messages: [{ role: 'user', content: question }],
-          abortSignal: abortController.signal,
-          onError: ({ error }: any) => {
-            const errorMessage = error?.message || String(error) || 'Unknown error occurred'
-            const state = get()
-            state.setChatStatus(aiMessageKey, 'error', errorMessage)
-          },
-        })
+        import('@/extensions/ai/api')
+          .then(({ aiStreamTextRequest }) =>
+            aiStreamTextRequest({
+              sdkProvider: aiProvider,
+              url: apiBase,
+              apiKey,
+              headers,
+              model: aiProviderCurModel[aiProvider],
+              messages: [{ role: 'user', content: question }],
+              abortSignal: abortController.signal,
+              onError: ({ error }: any) => {
+                const errorMessage = error?.message || String(error) || 'Unknown error occurred'
+                const state = get()
+                state.setChatStatus(aiMessageKey, 'error', errorMessage)
+              },
+            }),
+          )
           .then(async (result) => {
             const state = get()
             const curChat = state.chatList.find((message) => message.key === aiMessageKey)
@@ -247,6 +249,7 @@ const useAiChatStoreV2 = create<AIStore>()(
       getPostSummary: async (text: string, aiSettingData) => {
         const { aiProvider, aiProviderCurModel } = get()
         const { apiKey, apiBase, headers } = aiSettingData
+        const { aiGenerateTextRequest } = await import('@/extensions/ai/api')
 
         const res = await aiGenerateTextRequest({
           sdkProvider: aiProvider,
@@ -270,6 +273,7 @@ const useAiChatStoreV2 = create<AIStore>()(
       getPostTranslate: async (text: string, aiSettingData, targetLang: string) => {
         const { aiProvider, aiProviderCurModel } = get()
         const { apiKey, apiBase, headers } = aiSettingData
+        const { aiGenerateTextRequest } = await import('@/extensions/ai/api')
 
         const res = await aiGenerateTextRequest({
           sdkProvider: aiProvider,
@@ -408,7 +412,7 @@ interface AIStore {
   addChatAnswer: (key: string, answer: string) => void
   delChat: (key: string) => void
   cancelChatStream: (key: string) => void
-  setAiProvider: (provider: AIGenerateTextParams['sdkProvider']) => void
+  setAiProvider: (provider: AIProviders) => void
   setAiProviderCurModel: (model: string) => void
   setAiProviderModelsMap: (aiProviderModelsMap: AIStore['aiProviderModelsMap']) => void
 }

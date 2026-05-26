@@ -1,5 +1,4 @@
-import { AIGenerateTextParams } from '@/extensions/ai/aiProvidersService'
-import { aiGenerateTextRequest } from '@/extensions/ai/api'
+import type { AIGenerateTextParams } from '@/extensions/ai/aiProvidersConfig'
 import useAiChatStore, { getCurrentAISettingData } from '@/extensions/ai/useAiChatStore'
 import { sleep } from '@/helper'
 import { clipboardRead } from '@/helper/clipboard'
@@ -21,6 +20,11 @@ import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import type { CreateWysiwygDelegateOptions } from 'rme'
 
 type AIOptions = NonNullable<CreateWysiwygDelegateOptions['ai']>
+
+const aiGenerateTextRequest = async (params: AIGenerateTextParams) => {
+  const api = await import('@/extensions/ai/api')
+  return api.aiGenerateTextRequest(params)
+}
 
 /**
  * Get the file name without extension
