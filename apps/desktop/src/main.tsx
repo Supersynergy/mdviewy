@@ -9,7 +9,6 @@ window.__MDM_BOOT__ = performance.now()
 }
 
 import { lightTheme } from '@mdviewy/theme'
-import * as Sentry from '@sentry/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HoxRoot } from 'hox'
 import { enableMapSet } from 'immer'
@@ -18,14 +17,12 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import { Spinners } from 'zens'
 import App from './App'
+import { initErrorReporting } from './errorReporting'
 import './atom.css'
 import './normalize.css'
 import './remixicon-subset.css'
 
-Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_DSN,
-  integrations: [],
-})
+void initErrorReporting(import.meta.env.VITE_SENTRY_DSN)
 
 enableMapSet()
 

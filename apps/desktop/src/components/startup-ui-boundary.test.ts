@@ -52,6 +52,17 @@ describe('startup UI boundary', () => {
     expect(source).not.toContain('import "antd/dist/antd.css"')
   })
 
+  it('does not statically load error reporting in the app entrypoint', () => {
+    const source = readFileSync(join(currentDir, '../main.tsx'), 'utf8')
+    const imports = source
+      .split('\n')
+      .filter((line) => /^import\s+/.test(line.trim()))
+      .join('\n')
+
+    expect(imports).not.toContain('@sentry/react')
+    expect(source).not.toContain('Sentry.init(')
+  })
+
   it('does not top-level import bookmark UI into the startup sidebar', () => {
     const source = readComponent('SideBar/index.tsx')
     const imports = source
