@@ -4,7 +4,7 @@ version = "0.55.4"
 description = "A Markdown Editor App"
 authors = ["Supersynergy"]
 license = " AGPL-3.0"
-repository = "https://github.com/Supersynergy/mdmaster"
+repository = "https://github.com/Supersynergy/mdviewy"
 edition = "2021"
 
 [lib]

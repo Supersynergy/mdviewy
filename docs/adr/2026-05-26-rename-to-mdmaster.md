@@ -5,7 +5,7 @@ Date: 2026-05-26
 Decision:
 - Rename product, Tauri bundle, Rust app crate, npm workspace scope, docs links, Raycast command, and install script to `mdmaster`.
 - Use bundle identifier `com.supersynergy.mdmaster`.
-- Use GitHub repository target `Supersynergy/mdmaster`.
+- Use GitHub repository target `Supersynergy/mdviewy`.
 
 Rationale:
 - The project is now positioned as a fast native Markdown viewer/editor under the shorter `mdmaster` identity.

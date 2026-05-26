@@ -1,4 +1,4 @@
-import { lightTheme } from '@mdmaster/theme';
+import { lightTheme } from '@mdviewy/theme';
 import type { CSSProp } from 'styled-components';
 
 type ThemeType = typeof lightTheme.styledConstants;

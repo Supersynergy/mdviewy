@@ -25,7 +25,7 @@ sidebar_position: 1
 > - 运行 `xattr -cr mdmaster.app` 然后重新打开应用
 > - 请确保从 `github releases` 或 [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) 下载。
 
-你可以从 [UpgradeLink 下载页面](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) 或 [GitHub Release](https://github.com/Supersynergy/mdmaster/releases) 下载
+你可以从 [UpgradeLink 下载页面](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) 或 [GitHub Release](https://github.com/Supersynergy/mdviewy/releases) 下载
 
 ## 为什么
 
@@ -33,7 +33,7 @@ sidebar_position: 1
 
 ## 贡献
 
-目前的 mdmaster 还处于起步阶段，可能会有一些不好的体验或 bug，对此我深表歉意。所有感兴趣或遇到使用问题的伙伴都欢迎提交 [issues](https://github.com/Supersynergy/mdmaster/issues/new) 或 [PR](https://github.com/Supersynergy/mdmaster/compare) 来参与这个项目。
+目前的 mdmaster 还处于起步阶段，可能会有一些不好的体验或 bug，对此我深表歉意。所有感兴趣或遇到使用问题的伙伴都欢迎提交 [issues](https://github.com/Supersynergy/mdviewy/issues/new) 或 [PR](https://github.com/Supersynergy/mdviewy/compare) 来参与这个项目。
 
 ### 如何贡献
 

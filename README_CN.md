@@ -17,26 +17,26 @@
 
 <div align="center">
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/Supersynergy/mdmaster)](https://github.com/Supersynergy/mdmaster)
-[![G-Star](https://atomgit.com/Supersynergy/mdmaster/star/badge.svg)](https://atomgit.com/Supersynergy/mdmaster)
+[![GitHub Repo stars](https://img.shields.io/github/stars/Supersynergy/mdviewy)](https://github.com/Supersynergy/mdviewy)
+[![G-Star](https://atomgit.com/Supersynergy/mdviewy/star/badge.svg)](https://atomgit.com/Supersynergy/mdviewy)
 [![App Version][version-badge]][release]
 [![Downloads][downloads-badge]][release]
 <br/>
 [![Build Status][build-badge]][build]
 [![Code of Conduct][coc-badge]][coc]
 [![Commit Activity][commit-badge]][commit]
-[![issues-closed]](https://github.com/Supersynergy/mdmaster/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aclosed)
+[![issues-closed]](https://github.com/Supersynergy/mdviewy/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aclosed)
 <br/>
 [![PRs Welcome][prs-welcome-badge]][prs-welcome]
 [![TypeScript-version-icon]](https://www.typescriptlang.org/)
 [![Rust-version-icon]](https://www.rust-lang.org/)
 [![License][license-badge]][license]
-[![codefactor]](https://www.codefactor.io/repository/github/Supersynergy/mdmaster)
+[![codefactor]](https://www.codefactor.io/repository/github/Supersynergy/mdviewy)
 
 <br/>
 </div>
 
-<h4 align="center"> <a href="https://github.com/Supersynergy/mdmaster">English</a> | <strong>简体中文</strong> | <a href="./README_JA.md">日本語</a></h4>
+<h4 align="center"> <a href="https://github.com/Supersynergy/mdviewy">English</a> | <strong>简体中文</strong> | <a href="./README_JA.md">日本語</a></h4>
 
 <img src="./public/show-zh.png" alt="screenshot" />
 
@@ -67,7 +67,7 @@
 > - 执行 `xattr -cr mdmaster.app` 然后打开 app 即可
 > - 请确保下载来源: `github releases` 或 [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA).
 
-你可以通过 [UpgradeLink 下载页面](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) 或 [GitHub Release](https://github.com/Supersynergy/mdmaster/releases) 下载.
+你可以通过 [UpgradeLink 下载页面](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) 或 [GitHub Release](https://github.com/Supersynergy/mdviewy/releases) 下载.
 
 ## 为什么开发
 
@@ -79,7 +79,7 @@ mdmaster 是一个产品，也是一段人生旅程的见证。并在一路的�
 
 ## 参与
 
-目前 mdmaster 仍处于初级阶段，可能会有一些不好的体验或bug。欢迎所有感兴趣或遇到使用问题的合作伙伴提交[issue](https://github.com/Supersynergy/mdmaster/issues/new)或[PR](https://github.com/Supersynergy/mdmaster/compare)参与这个项目。
+目前 mdmaster 仍处于初级阶段，可能会有一些不好的体验或bug。欢迎所有感兴趣或遇到使用问题的合作伙伴提交[issue](https://github.com/Supersynergy/mdviewy/issues/new)或[PR](https://github.com/Supersynergy/mdviewy/compare)参与这个项目。
 
 ### 如何贡献
 
@@ -113,23 +113,23 @@ mdmaster 是完全永久开源的，如果你想支持 mdmaster，你可以`star
 - 感谢所有 mdmaster 依赖的库和开源项目。
 
 <!-- badges -->
-[build-badge]: https://img.shields.io/github/actions/workflow/status/Supersynergy/mdmaster/nodejs.yml.svg?style=flat-square&labelColor=black
-[build]: https://github.com/Supersynergy/mdmaster/actions/workflows/nodejs.yml?labelColor=black
-[downloads-badge]:  https://img.shields.io/github/downloads/Supersynergy/mdmaster/total?label=downloads&style=flat-square&labelColor=black
+[build-badge]: https://img.shields.io/github/actions/workflow/status/Supersynergy/mdviewy/nodejs.yml.svg?style=flat-square&labelColor=black
+[build]: https://github.com/Supersynergy/mdviewy/actions/workflows/nodejs.yml?labelColor=black
+[downloads-badge]:  https://img.shields.io/github/downloads/Supersynergy/mdviewy/total?label=downloads&style=flat-square&labelColor=black
 [license-badge]: https://img.shields.io/badge/license-AGPL-purple.svg?style=flat-square&labelColor=black
 [license]: https://opensource.org/licenses/AGPL-3.0?labelColor=black
-[release]: https://github.com/Supersynergy/mdmaster/releases?labelColor=black
+[release]: https://github.com/Supersynergy/mdviewy/releases?labelColor=black
 [prs-welcome-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square&labelColor=black&color=%23dd5c13
-[prs-welcome]: https://github.com/Supersynergy/mdmaster/blob/main/CONTRIBUTING.md?labelColor=black
+[prs-welcome]: https://github.com/Supersynergy/mdviewy/blob/main/CONTRIBUTING.md?labelColor=black
 [coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square&labelColor=black
-[coc]: https://github.com/Supersynergy/mdmaster/blob/main/CODE_OF_CONDUCT.md?labelColor=black
-[commit-badge]: https://img.shields.io/github/commit-activity/m/Supersynergy/mdmaster?color=%23ff9900&style=flat-square&labelColor=black
-[commit]: https://github.com/Supersynergy/mdmaster?labelColor=black
-[version-badge]: https://img.shields.io/github/v/release/Supersynergy/mdmaster?color=%239accfe&label=version&style=flat-square&labelColor=black
+[coc]: https://github.com/Supersynergy/mdviewy/blob/main/CODE_OF_CONDUCT.md?labelColor=black
+[commit-badge]: https://img.shields.io/github/commit-activity/m/Supersynergy/mdviewy?color=%23ff9900&style=flat-square&labelColor=black
+[commit]: https://github.com/Supersynergy/mdviewy?labelColor=black
+[version-badge]: https://img.shields.io/github/v/release/Supersynergy/mdviewy?color=%239accfe&label=version&style=flat-square&labelColor=black
 [rust-version-icon]: https://img.shields.io/badge/Rust-1.85.0-dea584?style=flat-square&labelColor=black
-[typescript-version-icon]: https://img.shields.io/github/package-json/dependency-version/Supersynergy/mdmaster/dev/typescript?label=TypeScript&style=flat-square&labelColor=black
-[issues-closed]: https://img.shields.io/github/issues-closed/Supersynergy/mdmaster.svg?style=flat-square&labelColor=black
-[codefactor]: https://www.codefactor.io/repository/github/Supersynergy/mdmaster/badge/main?style=flat-square&labelColor=black
+[typescript-version-icon]: https://img.shields.io/github/package-json/dependency-version/Supersynergy/mdviewy/dev/typescript?label=TypeScript&style=flat-square&labelColor=black
+[issues-closed]: https://img.shields.io/github/issues-closed/Supersynergy/mdviewy.svg?style=flat-square&labelColor=black
+[codefactor]: https://www.codefactor.io/repository/github/Supersynergy/mdviewy/badge/main?style=flat-square&labelColor=black
 
 ## License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSupersynergy%2Fmdmaster.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSupersynergy%2Fmdmaster?ref=badge_large)

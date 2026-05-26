@@ -19,10 +19,10 @@ export default function Footer() {
 
       <RightSection>
         <Nav>
-          <FooterLink href='https://github.com/Supersynergy/mdmaster' target='_blank'>
+          <FooterLink href='https://github.com/Supersynergy/mdviewy' target='_blank'>
             GitHub
           </FooterLink>
-          <FooterLink href='https://github.com/Supersynergy/mdmaster/graphs/contributors' target='_blank'>
+          <FooterLink href='https://github.com/Supersynergy/mdviewy/graphs/contributors' target='_blank'>
             Contributors
           </FooterLink>
           <FooterLink href='https://vercel.com' target='_blank'>

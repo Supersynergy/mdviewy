@@ -33,6 +33,6 @@ if [[ -x "$INSTALLED_APP/Contents/MacOS/mdmaster" ]]; then
 elif [[ -x "$PROJECT_APP/Contents/MacOS/mdmaster" ]]; then
   activate_or_launch "$PROJECT_APP"
 else
-  echo "mdmaster.app not found. Build it with: yarn workspace @mdmaster/desktop tauri:build"
+  echo "mdmaster.app not found. Build it with: yarn workspace @mdviewy/desktop tauri:build"
   exit 1
 fi

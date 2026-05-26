@@ -54,7 +54,7 @@ Features:
 
 - Added Traditional/Simplified Chinese toggle, accessible via “More” in the Editor toolbar.
 
-- New Theme Store allows submitting themes via PR. See [Custom Theme Documentation](https://github.com/Supersynergy/mdmaster/blob/main/docs/en/Extension/CustomTheme.md) for details.
+- New Theme Store allows submitting themes via PR. See [Custom Theme Documentation](https://github.com/Supersynergy/mdviewy/blob/main/docs/en/Extension/CustomTheme.md) for details.
 
 - Support importing local CSS files, which are loaded on application startup.
 
@@ -80,7 +80,7 @@ Fixes:
 
 - 支持繁简切换，在 Editor 工具栏的 “更多” 中使用。
 
-- 新增主题商店，可以通过 PR 来提交主题，详细操作请看：[Custom Theme Documentation](https://github.com/Supersynergy/mdmaster/blob/main/docs/zh/Extension/CustomTheme.md),
+- 新增主题商店，可以通过 PR 来提交主题，详细操作请看：[Custom Theme Documentation](https://github.com/Supersynergy/mdviewy/blob/main/docs/zh/Extension/CustomTheme.md),
 
 - 支持导入本地 CSS 文件，应用启动时会加载该文件。
 

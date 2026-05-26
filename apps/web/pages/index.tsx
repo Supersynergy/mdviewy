@@ -170,12 +170,12 @@ export default function Index({
               <FooterAppName>mdmaster</FooterAppName>
             </FooterLogoContainer>
             <FooterLinksRow>
-              <FooterLinkItem href='https://github.com/Supersynergy/mdmaster' target='_blank'>
+              <FooterLinkItem href='https://github.com/Supersynergy/mdviewy' target='_blank'>
                 GitHub
               </FooterLinkItem>
               <FooterLinkItem href='/docs'>Documentation</FooterLinkItem>
               <FooterLinkItem
-                href='https://github.com/Supersynergy/mdmaster/releases'
+                href='https://github.com/Supersynergy/mdviewy/releases'
                 target='_blank'
               >
                 Releases
@@ -653,7 +653,7 @@ const BOTS_ID = [49699333, 29139614, 41898282, 29791463]
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   let contributors: Contributor[] = []
   try {
-    const res = await fetch('https://api.github.com/repos/Supersynergy/mdmaster/contributors')
+    const res = await fetch('https://api.github.com/repos/Supersynergy/mdviewy/contributors')
     if (res.ok) {
       const data = await res.json()
       contributors = (Array.isArray(data) ? data : [])

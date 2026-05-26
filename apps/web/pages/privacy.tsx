@@ -108,7 +108,7 @@ const privacySections: PrivacySection[] = [
       {
         type: 'list',
         items: [
-          { text: 'Source code is available on <a href="https://github.com/Supersynergy/mdmaster" target="_blank" rel="noopener noreferrer">GitHub</a>', isHtml: true },
+          { text: 'Source code is available on <a href="https://github.com/Supersynergy/mdviewy" target="_blank" rel="noopener noreferrer">GitHub</a>', isHtml: true },
           'All data handling is transparent and auditable',
           'Community contributions are welcome and reviewed',
         ],
@@ -172,7 +172,7 @@ const privacySections: PrivacySection[] = [
       {
         type: 'list',
         items: [
-          { text: 'By visiting our GitHub repository: <a href="https://github.com/Supersynergy/mdmaster" target="_blank" rel="noopener noreferrer">https://github.com/Supersynergy/mdmaster</a>', isHtml: true },
+          { text: 'By visiting our GitHub repository: <a href="https://github.com/Supersynergy/mdviewy" target="_blank" rel="noopener noreferrer">https://github.com/Supersynergy/mdviewy</a>', isHtml: true },
           'By creating an issue on our GitHub issues page',
         ],
       },
