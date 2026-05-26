@@ -36,11 +36,11 @@ export function Support() {
   const { t } = useTranslation()
 
   const handleOpenGithubStar = () => {
-    openUrl('https://github.com/Supersynergy/mdviewy')
+    openUrl('https://github.com/Supersynergy/mdmaster')
   }
 
   const handleOpenGithubIssue = () => {
-    openUrl('https://github.com/Supersynergy/mdviewy/issues/new/choose')
+    openUrl('https://github.com/Supersynergy/mdmaster/issues/new/choose')
   }
 
   return (

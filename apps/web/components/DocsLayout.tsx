@@ -40,7 +40,7 @@ export default function DocsLayout({
 
   return (
     <Container>
-      <Head title={`mdviewy${title ? `: ${title}` : ''}`} description={description}>
+      <Head title={`mdmaster${title ? `: ${title}` : ''}`} description={description}>
         <meta name="robots" content="noodp" />
       </Head>
 

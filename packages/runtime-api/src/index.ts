@@ -1,4 +1,4 @@
-import type { MfTheme } from '@mdviewy/theme'
+import type { MfTheme } from '@mdmaster/theme'
 import communicate from './communicate'
 
 export function registerTheme(theme: MfTheme) {

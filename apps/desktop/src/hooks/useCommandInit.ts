@@ -71,11 +71,11 @@ export const useCommandInit = () => {
     })
     add({
       id: 'app_openGithub',
-      handler: () => window.open('https://github.com/Supersynergy/mdviewy', '_blank'),
+      handler: () => window.open('https://github.com/Supersynergy/mdmaster', '_blank'),
     })
     add({
       id: 'app_reportIssue',
-      handler: () => window.open('https://github.com/Supersynergy/mdviewy/issues/new', '_blank'),
+      handler: () => window.open('https://github.com/Supersynergy/mdmaster/issues/new', '_blank'),
     })
   }, [])
 }

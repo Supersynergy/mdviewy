@@ -2,8 +2,10 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
+#![allow(dead_code)]
 
 mod app;
+mod core_cmd;
 mod fc;
 mod font;
 mod menu;
@@ -20,11 +22,9 @@ use app::{
     bookmarks, conf, extensions, file_watcher, keybindings, opened_cache, process, themes,
     window_manager, workspace,
 };
-use dotenv;
 use lazy_static::lazy_static;
-use tauri::{Manager, Runtime, State};
+use tauri::{Manager, State};
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
-use tracing_subscriber;
 
 lazy_static! {
     /// FIXME Haven't found a better way to get the home dir yet, and we will optimize it later.
@@ -69,20 +69,22 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_single_instance::init(|app_handle: &tauri::AppHandle, args: Vec<String>, cwd: String| {
-            // 提取文件路径参数（args[0]是程序本身，args[1..]是传递的参数）
-            let opened_urls = if args.len() > 1 {
-                // 跳过程序本身，将其余参数用逗号连接
-                args[1..].join(",")
-            } else {
-                "".to_string()
-            };
-            
-            // 调用setup函数处理参数和窗口复用逻辑
-            if let Err(e) = crate::setup::init(app_handle.clone(), opened_urls) {
-                println!("单例参数处理失败: {:?}", e);
-            }
-        }))
+        .plugin(tauri_plugin_single_instance::init(
+            |app_handle: &tauri::AppHandle, args: Vec<String>, _cwd: String| {
+                // 提取文件路径参数（args[0]是程序本身，args[1..]是传递的参数）
+                let opened_urls = if args.len() > 1 {
+                    // 跳过程序本身，将其余参数用逗号连接
+                    args[1..].join(",")
+                } else {
+                    "".to_string()
+                };
+
+                // 调用setup函数处理参数和窗口复用逻辑
+                if let Err(e) = crate::setup::init(app_handle.clone(), opened_urls) {
+                    println!("单例参数处理失败: {:?}", e);
+                }
+            },
+        ))
         .invoke_handler(tauri::generate_handler![
             fc::cmd::open_folder,
             fc::cmd::open_folder_async,
@@ -141,8 +143,17 @@ pub fn run() {
             file_watcher::cmd::stop_all_file_watchers,
             app::clipboard::get_clipboard_html,
             app::clipboard::get_clipboard_text,
+            core_cmd::core_scan_folder,
+            core_cmd::core_extract_meta,
+            core_cmd::core_render_md,
+            core_cmd::core_watch_folder,
+            core_cmd::core_fts_index,
+            core_cmd::core_fts_search,
+            core_cmd::core_fts_delete,
         ])
         .setup(|app: &mut tauri::App| {
+            app.manage(core_cmd::CoreState::default());
+
             let home_dir_path = app.path().home_dir().expect("failed to get home dir");
             APP_DIR.lock().unwrap().insert(0, home_dir_path);
 
@@ -203,42 +214,39 @@ pub fn run() {
         .unwrap()
         .run(|app, event| {
             #[cfg(target_os = "macos")]
-            match event {
-                tauri::RunEvent::Opened { urls, .. } => {
-                    let opened_urls = app.try_state::<OpenedUrls>();
-                    if let Some(u) = opened_urls {
-                        u.0.lock().unwrap().replace(urls.clone());
-                    }
+            if let tauri::RunEvent::Opened { urls, .. } = event {
+                let opened_urls = app.try_state::<OpenedUrls>();
+                if let Some(u) = opened_urls {
+                    u.0.lock().unwrap().replace(urls.clone());
+                }
 
-                    let urls_str = urls
-                        .iter()
-                        .map(|u| {
-                            urlencoding::decode(u.as_str())
-                                .unwrap()
-                                .replace("\\", "\\\\")
-                        })
-                        .collect::<Vec<_>>()
-                        .join(",");
+                let urls_str = urls
+                    .iter()
+                    .map(|u| {
+                        urlencoding::decode(u.as_str())
+                            .unwrap()
+                            .replace("\\", "\\\\")
+                    })
+                    .collect::<Vec<_>>()
+                    .join(",");
 
-                    println!("Processed URLs string: {}", urls_str);
+                println!("Processed URLs string: {}", urls_str);
 
-                    if let Some(window) = window_manager::get_focused_window(app) {
+                if let Some(window) = window_manager::get_focused_window(app) {
+                    use tauri::Emitter;
+                    println!("Emitting to focused window: {}", window.label());
+                    let result = window.emit("opened-urls", urls_str.clone());
+                    println!("Emit result: {:?}", result);
+                } else {
+                    if let Some(window) = window_manager::get_last_opened_window(app) {
                         use tauri::Emitter;
-                        println!("Emitting to focused window: {}", window.label());
+                        println!("Emitting to last opened window: {}", window.label());
                         let result = window.emit("opened-urls", urls_str.clone());
                         println!("Emit result: {:?}", result);
                     } else {
-                        if let Some(window) = window_manager::get_last_opened_window(app) {
-                            use tauri::Emitter;
-                            println!("Emitting to last opened window: {}", window.label());
-                            let result = window.emit("opened-urls", urls_str.clone());
-                            println!("Emit result: {:?}", result);
-                        } else {
-                            println!("No window found to emit event");
-                        }
+                        println!("No window found to emit event");
                     }
                 }
-                _ => {}
             }
         });
 }

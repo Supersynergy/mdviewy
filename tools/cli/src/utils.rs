@@ -32,6 +32,5 @@ pub fn get_new_verion(old_version: String, major: bool, minor: bool, patch: bool
         }
     };
 
-    let version = format!("{old_major}.{old_minor}.{old_patch}");
-    return version;
+    format!("{old_major}.{old_minor}.{old_patch}")
 }

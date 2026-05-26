@@ -31,7 +31,12 @@ export default defineConfig({
     rollupOptions: {},
   },
   resolve: {
-    alias: [{ find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) }],
+    alias: [
+      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+      { find: '@mdmaster/runtime-api', replacement: fileURLToPath(new URL('../../packages/runtime-api/src/index.ts', import.meta.url)) },
+      { find: '@mdmaster/theme', replacement: fileURLToPath(new URL('../../packages/theme/src/index.ts', import.meta.url)) },
+      { find: '@mdmaster/types', replacement: fileURLToPath(new URL('../../packages/types/index.ts', import.meta.url)) },
+    ],
   },
   test: {
     environment: 'happy-dom',

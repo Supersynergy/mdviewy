@@ -83,7 +83,6 @@ impl OpenedCache {
                 println!("err: {:?}", err);
                 Self::default().write();
             });
-        } else {
         }
         self
     }

@@ -4,7 +4,7 @@ export const useMockFiles = () => {
   const { t } = useTranslation('common')
 
   const markdownContent = `
-##### ${t('mock.intro.title', 'Welcome to mdviewy!')}
+##### ${t('mock.intro.title', 'Welcome to mdmaster!')}
 
 - [x] 🧠 **${t('mock.intro.ai_label', 'AI-Powered:')}** ${t('mock.intro.ai_desc', 'Built-in translation, summary, and DeepSeek/ChatGPT support.')}
 - [x] ⚡ **${t('mock.intro.lightweight_label', 'Lightweight:')}** ${t('mock.intro.lightweight_desc', 'Tauri-based architecture, under 20MB.')}
@@ -20,7 +20,7 @@ ${t('mock.intro.footer', 'Enjoy experimenting with the editor!')}
 `
 
   const jsonContent = `{
-  "name": "mdviewy",
+  "name": "mdmaster",
   "version": "beta",
   "features": [
     "WYSIWYG",

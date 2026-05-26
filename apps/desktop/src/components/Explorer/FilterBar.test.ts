@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { loadFilter } from './FilterBar'
 
-const STORAGE_KEY = 'mdviewy.explorer.filter'
+const STORAGE_KEY = 'mdmaster.explorer.filter'
 
 describe('explorer filter persistence', () => {
   let store: Record<string, string>

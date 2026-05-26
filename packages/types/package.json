@@ -1,5 +1,5 @@
 {
-  "name": "@mdviewy/types",
+  "name": "@mdmaster/types",
   "version": "0.0.3",
   "types": "dist-types/index.d.ts",
   "scripts": {
@@ -9,7 +9,7 @@
     "prepublish": "yarn build"
   },
   "devDependencies": {
-    "@mdviewy/theme": "workspace:*",
+    "@mdmaster/theme": "workspace:*",
     "rimraf": "^6.0.1",
     "typescript": "^5.7.3"
   }

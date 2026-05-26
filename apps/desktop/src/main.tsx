@@ -1,4 +1,14 @@
-import { lightTheme } from '@mdviewy/theme'
+// Startup benchmark marker — printed to webview console + sent to Tauri stdout.
+declare global {
+  interface Window { __MDM_BOOT__?: number; openedUrls: string | null }
+}
+window.__MDM_BOOT__ = performance.now()
+;(window as any).__mdm_log_boot = (label: string) => {
+  const t = performance.now() - (window.__MDM_BOOT__ || 0)
+  console.log(`[mdmaster.boot] ${label}: ${t.toFixed(1)}ms`)
+}
+
+import { lightTheme } from '@mdmaster/theme'
 import * as Sentry from '@sentry/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import 'antd/dist/antd.css'
@@ -52,6 +62,7 @@ rootElement.addEventListener('drop', (event) => {
   event.preventDefault()
 })
 
+;(window as any).__mdm_log_boot('before-render')
 ReactDOM.createRoot(rootElement).render(
   <StrictMode>
     <HoxRoot>
@@ -63,3 +74,6 @@ ReactDOM.createRoot(rootElement).render(
     </HoxRoot>
   </StrictMode>,
 )
+requestAnimationFrame(() => {
+  ;(window as any).__mdm_log_boot('first-frame')
+})

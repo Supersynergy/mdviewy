@@ -5,7 +5,7 @@
   <img align="center" src="./public/logo.png" width="120" height="120" />
 </div>
 
-<h2 align="center"/>mdviewy <sup><em>beta</em></sup></h2>
+<h2 align="center"/>mdmaster <sup><em>beta</em></sup></h2>
 <div align='center'>
 <br>
 <em>Modern and intelligent Markdown editor.</em>
@@ -15,21 +15,21 @@
 
 <div align="center">
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/Supersynergy/mdviewy)](https://github.com/Supersynergy/mdviewy)
-[![G-Star](https://atomgit.com/Supersynergy/mdviewy/star/badge.svg)](https://atomgit.com/Supersynergy/mdviewy)
+[![GitHub Repo stars](https://img.shields.io/github/stars/Supersynergy/mdmaster)](https://github.com/Supersynergy/mdmaster)
+[![G-Star](https://atomgit.com/Supersynergy/mdmaster/star/badge.svg)](https://atomgit.com/Supersynergy/mdmaster)
 [![App Version][version-badge]][release]
 [![Downloads][downloads-badge]][release]
 <br/>
 [![Build Status][build-badge]][build]
 [![Code of Conduct][coc-badge]][coc]
 [![Commit Activity][commit-badge]][commit]
-[![issues-closed]](https://github.com/Supersynergy/mdviewy/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aclosed)
+[![issues-closed]](https://github.com/Supersynergy/mdmaster/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aclosed)
 <br/>
 [![PRs Welcome][prs-welcome-badge]][prs-welcome]
 [![TypeScript-version-icon]](https://www.typescriptlang.org/)
 [![Rust-version-icon]](https://www.rust-lang.org/)
 [![License][license-badge]][license]
-[![codefactor]](https://www.codefactor.io/repository/github/Supersynergy/mdviewy)
+[![codefactor]](https://www.codefactor.io/repository/github/Supersynergy/mdmaster)
 
 
 <br/>
@@ -39,17 +39,17 @@
 
 <img src="./public/show-en.png" alt="screenshot" />
 
-## mdviewy is in the reconstruction phase ⚠️
+## mdmaster is in the reconstruction phase ⚠️
 
-At present, mdviewy needs about 3 - 6 months to perform reconstruction, which will bring an exciting new version. If there is no major bug in the three months, the new version will not be released.
+At present, mdmaster needs about 3 - 6 months to perform reconstruction, which will bring an exciting new version. If there is no major bug in the three months, the new version will not be released.
 
 ## Features
 
 - **Built-in AI:** Currently supports Copilot, one-click export of dialogues, translation of articles to any language, and article summaries. It supports large models like `DeepSeek` and `Chatgpt`, making them your intelligent assistant.
 
-- **lightweight:** mdviewy is based on Tauri, boasting a size of less than 20MB and improved performance.
+- **lightweight:** mdmaster is based on Tauri, boasting a size of less than 20MB and improved performance.
 
-- **Multiple Editing Modes:** mdviewy uses Prosemirror as its core editor, offering high extensibility and a superior editing experience. It supports multiple editing modes, such as source code and wysiwyg.
+- **Multiple Editing Modes:** mdmaster uses Prosemirror as its core editor, offering high extensibility and a superior editing experience. It supports multiple editing modes, such as source code and wysiwyg.
 
 - **Editing Multiple File Types:** In addition to Markdown, it supports editing `JSON`, `TXT`, and other file types.
 
@@ -57,7 +57,7 @@ At present, mdviewy needs about 3 - 6 months to perform reconstruction, which wi
 
 - **Custom Keyboard Shortcuts:** Supports custom keyboard shortcuts to meet individual needs.
 
-- **Image Processing:** When pasting images into mdviewy, you can choose to paste them to a specified path or convert them to `base64`.
+- **Image Processing:** When pasting images into mdmaster, you can choose to paste them to a specified path or convert them to `base64`.
 
 - **File Management**: A powerful file tree that supports drag-and-drop movement, global search, and other common functions.
 
@@ -71,22 +71,22 @@ Available for Linux, macOS and Windows.
 > Because of Apple’s security policy restrictions on software without developer certification, the **macOS aarch64** version cannot be downloaded and used directly. You can ignore the limit by doing the following:
 > - Open your terminal
 > - Go to the `Applications` directory. .e.g `/Applications`.
-> - Run `xattr -cr mdviewy.app` and open the app again
+> - Run `xattr -cr mdmaster.app` and open the app again
 > - Please make sure you download from `github releases` or [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA).
 
-You can download it from the [UpgradeLink download page](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) or [GitHub Release](https://github.com/Supersynergy/mdviewy/releases)
+You can download it from the [UpgradeLink download page](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) or [GitHub Release](https://github.com/Supersynergy/mdmaster/releases)
 
 ## Why
 
-**Actually, the initial inspiration for mdviewy stemmed from a casual conversation with a friend a few years ago**. As developers, we shared many expectations for an ideal Markdown editor. After trying many existing applications, I felt they couldn't fully meet our comprehensive needs in terms of efficiency, aesthetics, lightweight design, and workflow integration. We envisioned our ideal editor together. Although we later went our separate ways and lost touch, that seed of desire to create something beautiful has always remained in my heart.
+**Actually, the initial inspiration for mdmaster stemmed from a casual conversation with a friend a few years ago**. As developers, we shared many expectations for an ideal Markdown editor. After trying many existing applications, I felt they couldn't fully meet our comprehensive needs in terms of efficiency, aesthetics, lightweight design, and workflow integration. We envisioned our ideal editor together. Although we later went our separate ways and lost touch, that seed of desire to create something beautiful has always remained in my heart.
 
-It was this initial aspiration that propelled me step by step to transform mdviewy from a concept into reality. I hope to create a lightweight, intelligent editor that not only handles content securely and reliably but also improves editing efficiency through AI.
+It was this initial aspiration that propelled me step by step to transform mdmaster from a concept into reality. I hope to create a lightweight, intelligent editor that not only handles content securely and reliably but also improves editing efficiency through AI.
 
-mdviewy is a product, and also a testament to a life journey. Through continuous learning and development, it has grown into my response to the concepts of **efficiency, intelligence, and lightweight**. I hope mdviewy will become a tool that everyone finds convenient and enjoyable, and I welcome everyone to experience it and provide valuable feedback.
+mdmaster is a product, and also a testament to a life journey. Through continuous learning and development, it has grown into my response to the concepts of **efficiency, intelligence, and lightweight**. I hope mdmaster will become a tool that everyone finds convenient and enjoyable, and I welcome everyone to experience it and provide valuable feedback.
 
 ## Contribute
 
-The current mdviewy is still in its infancy, and there may be some bad experiences or bugs, for which I am sorry. All partners who are interested or encounter usage problems are welcome to submit [issues](https://github.com/Supersynergy/mdviewy/issues/new) or [PR](https://github.com/Supersynergy/mdviewy/compare) to participate in this project.
+The current mdmaster is still in its infancy, and there may be some bad experiences or bugs, for which I am sorry. All partners who are interested or encounter usage problems are welcome to submit [issues](https://github.com/Supersynergy/mdmaster/issues/new) or [PR](https://github.com/Supersynergy/mdmaster/compare) to participate in this project.
 
 ### How to Contribute
 
@@ -94,7 +94,7 @@ You can read [CONTRIBUTING](./docs/en/Community/CONTRIBUTING.md) to know how to 
 
 ## Support
 
-mdviewy is completely and permanently open source, if you want to support mdviewy, you can `star` this project. For special support, please contact me via [email](mailto:drl990114@gmail.com).
+mdmaster is completely and permanently open source, if you want to support mdmaster, you can `star` this project. For special support, please contact me via [email](mailto:drl990114@gmail.com).
 <!-- 
 In addition, you can sponsor me through WeChat or Alipay, which will greatly encourage me. And it will also be used for the subsequent development of the project, such as expenses for servers, domains, etc
 
@@ -110,18 +110,18 @@ In addition, you can sponsor me through WeChat or Alipay, which will greatly enc
   <img height="54" alt="UpgradeLink" src="./public/sponsors/UpgradeLink_1.png" />
 </a>
 
-Thanks to [UpgradeLink](https://www.toolsetlink.com) for providing reliable installation and upgrade services, ensuring seamless software updates for mdviewy users.
+Thanks to [UpgradeLink](https://www.toolsetlink.com) for providing reliable installation and upgrade services, ensuring seamless software updates for mdmaster users.
 
 ## Special Thanks
 
 - [rino](https://github.com/ocavue/rino) by [ocavue](https://github.com/ocavue) - The initial version of the editor in this project was developed based on rino.
 - [remirror](https://remirror.io/) - A powerful ProseMirror-based rich text editor framework.
 - [tauri](https://tauri.app/) - Build smaller, faster, and more secure desktop apps with a web frontend.
-- And thanks to all the open source libraries and projects that mdviewy depends on.
+- And thanks to all the open source libraries and projects that mdmaster depends on.
 
 ## Contributors
 
-The development of **mdviewy** cannot be separated from these contributors. They have contributed a lot of abilities to **mdviewy**. Meanwhile, welcome to follow them! ❤️
+The development of **mdmaster** cannot be separated from these contributors. They have contributed a lot of abilities to **mdmaster**. Meanwhile, welcome to follow them! ❤️
 
 <!--nrg.freeze id="contributors"-->
 <!-- readme: contributors -start -->
@@ -231,23 +231,23 @@ The development of **mdviewy** cannot be separated from these contributors. They
 <!--/nrg.freeze-->
 
 <!-- badges -->
-[build-badge]: https://img.shields.io/github/actions/workflow/status/Supersynergy/mdviewy/nodejs.yml.svg?style=flat-square&labelColor=black
-[build]: https://github.com/Supersynergy/mdviewy/actions/workflows/nodejs.yml?labelColor=black
-[downloads-badge]:  https://img.shields.io/github/downloads/Supersynergy/mdviewy/total?label=downloads&style=flat-square&labelColor=black
+[build-badge]: https://img.shields.io/github/actions/workflow/status/Supersynergy/mdmaster/nodejs.yml.svg?style=flat-square&labelColor=black
+[build]: https://github.com/Supersynergy/mdmaster/actions/workflows/nodejs.yml?labelColor=black
+[downloads-badge]:  https://img.shields.io/github/downloads/Supersynergy/mdmaster/total?label=downloads&style=flat-square&labelColor=black
 [license-badge]: https://img.shields.io/badge/license-AGPL-purple.svg?style=flat-square&labelColor=black
 [license]: https://opensource.org/licenses/AGPL-3.0?labelColor=black
-[release]: https://github.com/Supersynergy/mdviewy/releases?labelColor=black
+[release]: https://github.com/Supersynergy/mdmaster/releases?labelColor=black
 [prs-welcome-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square&labelColor=black&color=%23dd5c13
-[prs-welcome]: https://github.com/Supersynergy/mdviewy/blob/main/CONTRIBUTING.md?labelColor=black
+[prs-welcome]: https://github.com/Supersynergy/mdmaster/blob/main/CONTRIBUTING.md?labelColor=black
 [coc-badge]: https://img.shields.io/badge/code%20of-conduct-ff69b4.svg?style=flat-square&labelColor=black
-[coc]: https://github.com/Supersynergy/mdviewy/blob/main/CODE_OF_CONDUCT.md?labelColor=black
-[commit-badge]: https://img.shields.io/github/commit-activity/m/Supersynergy/mdviewy?color=%23ff9900&style=flat-square&labelColor=black
-[commit]: https://github.com/Supersynergy/mdviewy?labelColor=black
-[version-badge]: https://img.shields.io/github/v/release/Supersynergy/mdviewy?color=%239accfe&label=version&style=flat-square&labelColor=black
+[coc]: https://github.com/Supersynergy/mdmaster/blob/main/CODE_OF_CONDUCT.md?labelColor=black
+[commit-badge]: https://img.shields.io/github/commit-activity/m/Supersynergy/mdmaster?color=%23ff9900&style=flat-square&labelColor=black
+[commit]: https://github.com/Supersynergy/mdmaster?labelColor=black
+[version-badge]: https://img.shields.io/github/v/release/Supersynergy/mdmaster?color=%239accfe&label=version&style=flat-square&labelColor=black
 [rust-version-icon]: https://img.shields.io/badge/Rust-1.85.0-dea584?style=flat-square&labelColor=black
-[typescript-version-icon]: https://img.shields.io/github/package-json/dependency-version/Supersynergy/mdviewy/dev/typescript?label=TypeScript&style=flat-square&labelColor=black
-[issues-closed]: https://img.shields.io/github/issues-closed/Supersynergy/mdviewy.svg?style=flat-square&labelColor=black
-[codefactor]: https://www.codefactor.io/repository/github/Supersynergy/mdviewy/badge/main?style=flat-square&labelColor=black
+[typescript-version-icon]: https://img.shields.io/github/package-json/dependency-version/Supersynergy/mdmaster/dev/typescript?label=TypeScript&style=flat-square&labelColor=black
+[issues-closed]: https://img.shields.io/github/issues-closed/Supersynergy/mdmaster.svg?style=flat-square&labelColor=black
+[codefactor]: https://www.codefactor.io/repository/github/Supersynergy/mdmaster/badge/main?style=flat-square&labelColor=black
 
 ## License
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSupersynergy%2Fmdviewy.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSupersynergy%2Fmdviewy?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSupersynergy%2Fmdmaster.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSupersynergy%2Fmdmaster?ref=badge_large)

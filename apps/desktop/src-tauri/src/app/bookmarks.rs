@@ -52,7 +52,6 @@ impl BookMarks {
             std::fs::write(path, v).unwrap_or_else(|_err| {
                 Self::default().write();
             });
-        } else {
         }
         self
     }

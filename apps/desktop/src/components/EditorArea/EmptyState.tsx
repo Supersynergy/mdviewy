@@ -23,7 +23,7 @@ const SUGGESTIONS: Suggestion[] = [
   { key: 'obsidian', label: 'Obsidian Vault', hint: 'Personal knowledge base', icon: 'ri-book-2-line', subpath: 'Obsidian' },
 ]
 
-const DISMISS_KEY = 'mdviewy.onboarding.dismissed'
+const DISMISS_KEY = 'mdmaster.onboarding.dismissed'
 
 export const EmptyState = memo(() => {
   const { t } = useTranslation()
@@ -72,7 +72,7 @@ export const EmptyState = memo(() => {
         <div className='logo-mark'>
           <span className='logo-glyph'>md</span>
         </div>
-        <h1 className='app-title'>mdviewy</h1>
+        <h1 className='app-title'>MDmaster</h1>
         <p className='tagline'>A calm place to read & write markdown.</p>
 
         <div className='primary-actions'>

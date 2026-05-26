@@ -1,0 +1,36 @@
+[package]
+name = "mdmaster-core"
+version = "0.1.0"
+edition = "2021"
+description = "MDmaster rust-side core — folder watcher, FTS, markdown render, frontmatter/TOC"
+license = "MIT"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+notify = "7"
+notify-debouncer-full = "0.4"
+ignore = "0.4.22"
+rayon = "1.10"
+crossbeam-channel = "0.5"
+parking_lot = "0.12"
+anyhow = "1"
+thiserror = "1"
+
+# Phase-2 modules (feature-gated to keep first build slim)
+comrak = { version = "0.30", optional = true }
+syntect = { version = "5.2", optional = true }
+pulldown-cmark = { version = "0.12", optional = true }
+gray_matter = { version = "0.2", optional = true }
+tantivy = { version = "0.22", optional = true }
+
+[features]
+default = ["watcher"]
+watcher = []
+render = ["dep:comrak", "dep:syntect"]
+frontmatter = ["dep:pulldown-cmark", "dep:gray_matter"]
+fts = ["dep:tantivy"]
+full = ["watcher", "render", "frontmatter", "fts"]
+
+[dev-dependencies]
+tempfile = "3"

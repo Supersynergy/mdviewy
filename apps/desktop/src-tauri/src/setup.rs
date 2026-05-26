@@ -1,5 +1,5 @@
 use crate::app::{conf::AppConf, window_manager};
-use tauri::{utils::config::WebviewUrl, App, AppHandle, Emitter, WebviewWindowBuilder};
+use tauri::{utils::config::WebviewUrl, AppHandle, Emitter, WebviewWindowBuilder};
 
 #[cfg(target_os = "macos")]
 use tauri::TitleBarStyle;
@@ -7,11 +7,23 @@ use tauri::TitleBarStyle;
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
 pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn std::error::Error>> {
+    let _setup_start = std::time::Instant::now();
+    eprintln!("[BOOT] setup::init start");
+
+    // JSON-escape so backticks / ${} / newlines in paths don't break the JS parse
+    // (Tauri #9690 / #10573: a malformed init_script silently aborts page init →
+    // blank webview).
+    let opened_urls_json =
+        serde_json::to_string(&opened_urls).unwrap_or_else(|_| "\"\"".to_string());
+
     // 首先检查是否已经存在窗口
     if let Some(existing_window) = window_manager::get_last_opened_window(&app_handle) {
-        let script = format!("window.openedUrls = `{opened_urls}`; console.log(`[setup.rs] Updated openedUrls to: {opened_urls}`);");
+        let script = format!(
+            "window.openedUrls = {0}; console.log('[setup.rs] Updated openedUrls to: ' + {0});",
+            opened_urls_json
+        );
         let _ = existing_window.eval(&script);
-        existing_window.emit("opened-urls", opened_urls.clone());
+        let _ = existing_window.emit("opened-urls", opened_urls.clone());
 
         // 确保窗口被聚焦
         let _ = existing_window.set_focus();
@@ -25,11 +37,12 @@ pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn st
         "main".to_string(),
         WebviewUrl::App("index.html".into()),
     )
-    .initialization_script(&format!("window.openedUrls = `{opened_urls}`"))
-    .initialization_script(&format!(
-        "console.log(`[setup.rs] window.openedUrls set to: {opened_urls}`)"
+    .initialization_script(format!("window.openedUrls = {};", opened_urls_json))
+    .initialization_script(format!(
+        "console.log('[setup.rs] window.openedUrls set to: ' + {});",
+        opened_urls_json
     ))
-    .title("mdviewy")
+    .title("MDmaster")
     .resizable(true)
     .fullscreen(false)
     .theme(Some(theme))
@@ -43,6 +56,10 @@ pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn st
     }
 
     let window = main_win.build()?;
+    eprintln!(
+        "[BOOT] window built at {}ms",
+        _setup_start.elapsed().as_millis()
+    );
 
     #[cfg(target_os = "macos")]
     {

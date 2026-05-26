@@ -24,7 +24,7 @@ const privacySections: PrivacySection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'mdviewy ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mdviewy application and services.',
+        text: 'mdmaster ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mdmaster application and services.',
       },
       {
         type: 'paragraph',
@@ -37,7 +37,7 @@ const privacySections: PrivacySection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'mdviewy is designed with privacy in mind. We do not collect or store:',
+        text: 'mdmaster is designed with privacy in mind. We do not collect or store:',
       },
       {
         type: 'list',
@@ -73,7 +73,7 @@ const privacySections: PrivacySection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'mdviewy offers optional AI-powered features that integrate with third-party AI providers:',
+        text: 'mdmaster offers optional AI-powered features that integrate with third-party AI providers:',
       },
       {
         type: 'list',
@@ -103,12 +103,12 @@ const privacySections: PrivacySection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'mdviewy is an open-source application. You can inspect our source code at any time to verify our privacy claims:',
+        text: 'mdmaster is an open-source application. You can inspect our source code at any time to verify our privacy claims:',
       },
       {
         type: 'list',
         items: [
-          { text: 'Source code is available on <a href="https://github.com/Supersynergy/mdviewy" target="_blank" rel="noopener noreferrer">GitHub</a>', isHtml: true },
+          { text: 'Source code is available on <a href="https://github.com/Supersynergy/mdmaster" target="_blank" rel="noopener noreferrer">GitHub</a>', isHtml: true },
           'All data handling is transparent and auditable',
           'Community contributions are welcome and reviewed',
         ],
@@ -172,7 +172,7 @@ const privacySections: PrivacySection[] = [
       {
         type: 'list',
         items: [
-          { text: 'By visiting our GitHub repository: <a href="https://github.com/Supersynergy/mdviewy" target="_blank" rel="noopener noreferrer">https://github.com/Supersynergy/mdviewy</a>', isHtml: true },
+          { text: 'By visiting our GitHub repository: <a href="https://github.com/Supersynergy/mdmaster" target="_blank" rel="noopener noreferrer">https://github.com/Supersynergy/mdmaster</a>', isHtml: true },
           'By creating an issue on our GitHub issues page',
         ],
       },
@@ -212,7 +212,7 @@ export default function PrivacyPage() {
 
   return (
     <>
-      <SeoHead title='Privacy Policy - mdviewy'>
+      <SeoHead title='Privacy Policy - mdmaster'>
         <meta name='robots' content='noodp' />
       </SeoHead>
 

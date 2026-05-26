@@ -82,7 +82,7 @@ const VirtualItems = styled.div`
   position: relative;
 `
 
-const FRECENCY_KEY = 'mdviewy.explorer.frecency'
+const FRECENCY_KEY = 'mdmaster.explorer.frecency'
 
 type FrecencyMap = Record<string, { count: number; last: number }>
 

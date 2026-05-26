@@ -8,7 +8,7 @@ let releasesCache: {
 } = {}
 
 export const getReleases = async (
-  repo = 'mdviewy'
+  repo = 'mdmaster'
 ): Promise<Endpoints['GET /repos/{owner}/{repo}/releases']['response']['data']> => {
   const now = Date.now()
   const isBrowser = typeof window !== 'undefined'

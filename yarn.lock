@@ -3803,9 +3803,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mdviewy/desktop@workspace:apps/desktop":
+"@mdmaster/desktop@workspace:apps/desktop":
   version: 0.0.0-use.local
-  resolution: "@mdviewy/desktop@workspace:apps/desktop"
+  resolution: "@mdmaster/desktop@workspace:apps/desktop"
   dependencies:
     "@ai-sdk/deepseek": "npm:^1.0.28"
     "@ai-sdk/google": "npm:^2.0.32"
@@ -3818,8 +3818,8 @@ __metadata:
     "@emotion/is-prop-valid": "npm:^1.3.1"
     "@emotion/react": "npm:^11.13.3"
     "@emotion/styled": "npm:^11.13.0"
-    "@mdviewy/theme": "workspace:*"
-    "@mdviewy/types": "workspace:*"
+    "@mdmaster/theme": "workspace:*"
+    "@mdmaster/types": "workspace:*"
     "@popperjs/core": "npm:^2.11.8"
     "@sentry/react": "npm:^9.2.0"
     "@tanstack/react-query": "npm:^5.79.2"
@@ -3887,12 +3887,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@mdviewy/runtime-api@workspace:packages/runtime-api":
+"@mdmaster/runtime-api@workspace:packages/runtime-api":
   version: 0.0.0-use.local
-  resolution: "@mdviewy/runtime-api@workspace:packages/runtime-api"
+  resolution: "@mdmaster/runtime-api@workspace:packages/runtime-api"
   dependencies:
-    "@mdviewy/theme": "workspace:*"
-    "@mdviewy/types": "workspace:*"
+    "@mdmaster/theme": "workspace:*"
+    "@mdmaster/types": "workspace:*"
     "@rollup/plugin-node-resolve": "npm:15.3.0"
     "@rollup/plugin-terser": "npm:0.4.4"
     "@rollup/plugin-typescript": "npm:11.1.6"
@@ -3907,9 +3907,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@mdviewy/theme@workspace:*, @mdviewy/theme@workspace:packages/theme":
+"@mdmaster/theme@workspace:*, @mdmaster/theme@workspace:packages/theme":
   version: 0.0.0-use.local
-  resolution: "@mdviewy/theme@workspace:packages/theme"
+  resolution: "@mdmaster/theme@workspace:packages/theme"
   dependencies:
     "@drl990114/codemirror-themes": "npm:^0.0.1"
     "@lezer/highlight": "npm:^1.0.0"
@@ -3933,19 +3933,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@mdviewy/types@workspace:*, @mdviewy/types@workspace:packages/types":
+"@mdmaster/types@workspace:*, @mdmaster/types@workspace:packages/types":
   version: 0.0.0-use.local
-  resolution: "@mdviewy/types@workspace:packages/types"
+  resolution: "@mdmaster/types@workspace:packages/types"
   dependencies:
-    "@mdviewy/theme": "workspace:*"
+    "@mdmaster/theme": "workspace:*"
     rimraf: "npm:^6.0.1"
     typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
-"@mdviewy/web@workspace:apps/web":
+"@mdmaster/web@workspace:apps/web":
   version: 0.0.0-use.local
-  resolution: "@mdviewy/web@workspace:apps/web"
+  resolution: "@mdmaster/web@workspace:apps/web"
   dependencies:
     "@mdx-js/mdx": "npm:^3.1.0"
     "@mdx-js/react": "npm:^3.1.0"
@@ -14947,37 +14947,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mdn-data@npm:2.0.14":
-  version: 2.0.14
-  resolution: "mdn-data@npm:2.0.14"
-  checksum: 10/64c629fcf14807e30d6dc79f97cbcafa16db066f53a294299f3932b3beb0eb0d1386d3a7fe408fc67348c449a4e0999360c894ba4c81eb209d7be4e36503de0e
-  languageName: node
-  linkType: hard
-
-"mdn-data@npm:2.0.28":
-  version: 2.0.28
-  resolution: "mdn-data@npm:2.0.28"
-  checksum: 10/aec475e0c078af00498ce2f9434d96a1fdebba9814d14b8f72cd6d5475293f4b3972d0538af2d5c5053d35e1b964af08b7d162b98e9846e9343990b75e4baef1
-  languageName: node
-  linkType: hard
-
-"mdn-data@npm:2.0.30":
-  version: 2.0.30
-  resolution: "mdn-data@npm:2.0.30"
-  checksum: 10/e4944322bf3e0461a2daa2aee7e14e208960a036289531e4ef009e53d32bd41528350c070c4a33be867980443fe4c0523518d99318423cffa7c825fe7b1154e2
-  languageName: node
-  linkType: hard
-
-"mdurl@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "mdurl@npm:2.0.0"
-  checksum: 10/1720349d4a53e401aa993241368e35c0ad13d816ad0b28388928c58ca9faa0cf755fa45f18ccbf64f4ce54a845a50ddce5c84e4016897b513096a68dac4b0158
-  languageName: node
-  linkType: hard
-
-"mdviewy-monorepo@workspace:.":
+"mdmaster-monorepo@workspace:.":
   version: 0.0.0-use.local
-  resolution: "mdviewy-monorepo@workspace:."
+  resolution: "mdmaster-monorepo@workspace:."
   dependencies:
     "@alicloud/alimt20181012": "npm:^1.3.0"
     "@alicloud/openapi-client": "npm:^0.4.13"
@@ -15010,6 +14982,34 @@ __metadata:
     typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
+
+"mdn-data@npm:2.0.14":
+  version: 2.0.14
+  resolution: "mdn-data@npm:2.0.14"
+  checksum: 10/64c629fcf14807e30d6dc79f97cbcafa16db066f53a294299f3932b3beb0eb0d1386d3a7fe408fc67348c449a4e0999360c894ba4c81eb209d7be4e36503de0e
+  languageName: node
+  linkType: hard
+
+"mdn-data@npm:2.0.28":
+  version: 2.0.28
+  resolution: "mdn-data@npm:2.0.28"
+  checksum: 10/aec475e0c078af00498ce2f9434d96a1fdebba9814d14b8f72cd6d5475293f4b3972d0538af2d5c5053d35e1b964af08b7d162b98e9846e9343990b75e4baef1
+  languageName: node
+  linkType: hard
+
+"mdn-data@npm:2.0.30":
+  version: 2.0.30
+  resolution: "mdn-data@npm:2.0.30"
+  checksum: 10/e4944322bf3e0461a2daa2aee7e14e208960a036289531e4ef009e53d32bd41528350c070c4a33be867980443fe4c0523518d99318423cffa7c825fe7b1154e2
+  languageName: node
+  linkType: hard
+
+"mdurl@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "mdurl@npm:2.0.0"
+  checksum: 10/1720349d4a53e401aa993241368e35c0ad13d816ad0b28388928c58ca9faa0cf755fa45f18ccbf64f4ce54a845a50ddce5c84e4016897b513096a68dac4b0158
+  languageName: node
+  linkType: hard
 
 "mdx-bundler@npm:^10.1.1":
   version: 10.1.1

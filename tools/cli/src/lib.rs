@@ -1,11 +1,11 @@
 use clap::{Parser, Subcommand};
 
-pub mod utils;
 mod release;
+pub mod utils;
 
 #[derive(Parser)]
 #[command(version)]
-#[command(about = "mdviewy Development Tool")]
+#[command(about = "mdmaster Development Tool")]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
@@ -21,8 +21,8 @@ pub fn run() {
 
     match &cli.command {
         Some(Commands::Release(name)) => {
-          release::main(name.major, name.minor, name.patch);
-        },
+            release::main(name.major, name.minor, name.patch);
+        }
         None => {}
     }
 }

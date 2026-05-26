@@ -104,9 +104,9 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
     tauri::async_runtime::spawn(async move {
         let mut new_win =
             WebviewWindowBuilder::new(&_app, window_label, WebviewUrl::App("index.html".into()))
-                .initialization_script(&format!("window.openedUrls = {escaped_urls}"))
-                .initialization_script(&format!("console.log('window.openedUrl:{}')", escaped_urls))
-                .title("mdviewy")
+                .initialization_script(format!("window.openedUrls = {escaped_urls}"))
+                .initialization_script(format!("console.log('window.openedUrl:{}')", escaped_urls))
+                .title("mdmaster")
                 .resizable(true)
                 .fullscreen(false)
                 .theme(Some(theme))

@@ -1,14 +1,11 @@
 use crate::app::conf::AppConf;
 use crate::app::keybindings::Keybindings;
 use crate::app::window_manager::get_focused_window;
-use tauri::menu::{
-    CheckMenuItem, CheckMenuItemBuilder, Menu, MenuEvent, MenuItem, MenuItemBuilder,
-    PredefinedMenuItem, Submenu,
-};
-use tauri::{App, AppHandle, Emitter, Manager};
+use tauri::menu::{Menu, MenuEvent, MenuItemBuilder, PredefinedMenuItem, Submenu};
+use tauri::{App, AppHandle, Emitter};
 
 pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
-    let app_conf = AppConf::read_with_app(&app.handle());
+    let _app_conf = AppConf::read_with_app(app.handle());
     let _keyboard_infos = Keybindings::read();
 
     // let is_dark = app_conf.clone().theme_check("dark");
@@ -38,18 +35,18 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
             println!("focused_window: {}", focused_window_label);
 
             // 发送菜单事件到焦点窗口
-            app.emit_to(&focused_window_label, "native:menu", menu_id)
+            app.emit_to(focused_window_label, "native:menu", menu_id)
                 .expect("failed to emit");
 
             // 处理特定的菜单事件
             match menu_id {
                 "About" => {
-                    app.emit_to(&focused_window_label, "app_about", {})
+                    app.emit_to(focused_window_label, "app_about", ())
                         .map_err(|err| println!("{:?}", err))
                         .ok();
                 }
                 "Settings" => {
-                    app.emit_to(&focused_window_label, "native:menu", "app_openSetting")
+                    app.emit_to(focused_window_label, "native:menu", "app_openSetting")
                         .map_err(|err| println!("{:?}", err))
                         .ok();
                 }
@@ -65,10 +62,10 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         &[
             &Submenu::with_items(
                 app,
-                "mdviewy",
+                "mdmaster",
                 true,
                 &[
-                    &MenuItemBuilder::new("About mdviewy")
+                    &MenuItemBuilder::new("About mdmaster")
                         .id("About")
                         .build(app)?,
                     &PredefinedMenuItem::separator(app)?,
@@ -81,7 +78,7 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                     &PredefinedMenuItem::hide_others(app, None)?,
                     &PredefinedMenuItem::show_all(app, None)?,
                     &PredefinedMenuItem::separator(app)?,
-                    &PredefinedMenuItem::quit(app, Some("Quit mdviewy"))?,
+                    &PredefinedMenuItem::quit(app, Some("Quit mdmaster"))?,
                 ],
             )?,
             &Submenu::with_items(
@@ -230,7 +227,7 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                 "Help",
                 true,
                 &[
-                    &MenuItemBuilder::new("mdviewy GitHub")
+                    &MenuItemBuilder::new("mdmaster GitHub")
                         .id("app_openGithub")
                         .build(app)?,
                     &MenuItemBuilder::new("Report Issue")
