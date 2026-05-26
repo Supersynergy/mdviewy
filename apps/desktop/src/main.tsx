@@ -16,11 +16,11 @@ import { enableMapSet } from 'immer'
 import { StrictMode, Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
-import 'remixicon/fonts/remixicon.css'
 import { Spinners } from 'zens'
 import App from './App'
 import './atom.css'
 import './normalize.css'
+import './remixicon-subset.css'
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,

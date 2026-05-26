@@ -159,7 +159,7 @@ const iconForFile = (name?: string) => {
   if (/\.(png|jpe?g|gif|webp|svg|bmp)$/.test(n)) return 'ri-image-line'
   if (/\.(json|jsonc)$/.test(n)) return 'ri-braces-line'
   if (/\.(js|jsx|ts|tsx|mjs)$/.test(n)) return 'ri-code-s-slash-line'
-  if (/\.(rs|toml|lock)$/.test(n)) return 'ri-rust-line'
+  if (/\.(rs|toml|lock)$/.test(n)) return 'ri-code-s-slash-line'
   if (/\.(py)$/.test(n)) return 'ri-file-code-line'
   if (/\.(yml|yaml|env|sh|zsh|fish)$/.test(n)) return 'ri-terminal-box-line'
   if (/\.(pdf)$/.test(n)) return 'ri-file-pdf-line'
