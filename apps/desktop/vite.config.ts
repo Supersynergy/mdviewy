@@ -37,6 +37,10 @@ export default defineConfig({
             return 'vendor-react'
           }
 
+          if (/[\\/]node_modules[\\/]lodash[\\/]/.test(id)) {
+            return 'vendor-lodash'
+          }
+
           if (/[\\/]node_modules[\\/](@tauri-apps)[\\/]/.test(id)) {
             return 'vendor-tauri'
           }

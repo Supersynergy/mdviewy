@@ -1,6 +1,6 @@
 import appSettingService from '@/services/app-setting'
+import { debounce } from '@/helper/timing'
 import useAppSettingStore from '@/stores/useAppSettingStore'
-import { debounce } from 'lodash'
 import { nanoid } from 'nanoid'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'

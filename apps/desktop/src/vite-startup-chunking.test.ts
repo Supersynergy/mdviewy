@@ -22,4 +22,8 @@ describe('vite startup chunking', () => {
     expect(source).not.toContain('vendor-ai')
     expect(source).not.toContain('vendor-ui')
   })
+
+  it('keeps transitive lodash out of monolithic feature chunks', () => {
+    expect(readViteConfig()).toContain('vendor-lodash')
+  })
 })

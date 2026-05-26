@@ -1,7 +1,7 @@
 import appSettingService from '@/services/app-setting'
+import { debounce } from '@/helper/timing'
 import useAppSettingStore from '@/stores/useAppSettingStore'
 import { Slider } from 'antd'
-import { debounce } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import type { SettingItemProps } from '.'
 import { SettingItemContainer } from './Container'
