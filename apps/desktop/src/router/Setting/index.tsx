@@ -1,6 +1,5 @@
 import Logo from '@/assets/logo.svg?react'
 import { MODAL_CONFIRM_ID } from '@/components/Modal'
-import { installUpdate } from '@/helper/updater'
 import type { SettingData } from '@/router/Setting/settingMap'
 import { getSettingMap } from '@/router/Setting/settingMap'
 import { appSettingStoreSetup } from '@/services/app-setting'
@@ -8,15 +7,12 @@ import useAppInfoStore from '@/stores/useAppInfoStore'
 import NiceModal from '@ebay/nice-modal-react'
 import { invoke } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import type { Update } from '@tauri-apps/plugin-updater'
-import { check } from '@tauri-apps/plugin-updater'
 import classNames from 'classnames'
 import type { ReactNode } from 'react'
-import { memo, useEffect, useState } from 'react'
+import { memo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, toast } from 'zens'
 import SettingGroup from './component/SettingGroup'
-import { CopilotSetting } from './CopilotSetting'
 import { ImageSetting } from './ImageSetting'
 import { KeyboardTable } from './KeyboardTable'
 import { Container } from './styles'
@@ -45,7 +41,6 @@ function Setting() {
   const [value, setValue] = useState(0)
   const { appInfo } = useAppInfoStore()
   const { t } = useTranslation()
-  const [update, setUpdate] = useState<Update | null>(null)
   const settingMap = getSettingMap()
 
   const handleResetConfiguration = () => {
@@ -65,7 +60,7 @@ function Setting() {
   }
 
   const settingDataGroupsKeys = Object.keys(settingMap).filter(
-    (key) => key !== 'i18nKey',
+    (key) => key !== 'i18nKey' && key !== 'ai' && key !== 'copilot',
   ) as (keyof typeof settingMap)[]
   const curGroupKey = settingDataGroupsKeys[value] as Exclude<
     keyof SettingData,
@@ -75,12 +70,6 @@ function Setting() {
   const curGroupKeys = Object.keys(curGroup).filter(
     (key) => key !== 'i18nKey' && key !== 'iconName' && key !== 'desc',
   ) as Exclude<keyof SettingData, 'i18nKey' | 'iconName' | 'desc'>[]
-
-  useEffect(() => {
-    check().then((u) => {
-      setUpdate(u)
-    })
-  }, [])
 
   const renderCurrentSettingData = () => {
     if (curGroupKey === 'keyboard') {
@@ -97,10 +86,6 @@ function Setting() {
 
     if (curGroupKey === 'support') {
       return <Support />
-    }
-
-    if (curGroupKey === 'copilot') {
-      return <CopilotSetting />
     }
 
     return curGroupKeys.map((key) => {
@@ -176,19 +161,6 @@ function Setting() {
           <span>
             {t('about.version')}: {appInfo.version}
           </span>
-          {update ? (
-            <Button
-              size='small'
-              btnType='primary'
-              onClick={() => {
-                installUpdate(update)
-                setUpdate(null)
-              }}
-            >
-              {t('about.install')}
-              {t('about.newVersion')}: {update.version}
-            </Button>
-          ) : null}
         </div>
       </div>
       <div id='detail'>

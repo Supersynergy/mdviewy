@@ -6,7 +6,6 @@ import { EditorViewType } from 'rme'
 import styled from 'styled-components'
 import { ToolbarSection, usePriorityHidden } from '../responsive'
 import { CommandButton } from './CommandButton'
-import { AIButton } from './components/AIButton'
 import { MenuButton } from './components/MenuButton'
 import { SmartActionsButton } from './components/SmartActionsButton'
 
@@ -69,7 +68,6 @@ export const WysiwygToolbar: FC = () => {
       >
         <MenuButton />
         <SmartActionsButton />
-        <AIButton />
       </ToolbarSection>
 
       <ToolbarSection

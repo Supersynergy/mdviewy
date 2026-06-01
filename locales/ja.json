@@ -224,6 +224,10 @@
         "md_default_mode": {
           "label": "Markdownデフォルトモード",
           "desc": "Markdownファイルを新規作成するときのデフォルト編集モードを設定します。"
+        },
+        "typewriter_scroll": {
+          "label": "タイプライタースクロール",
+          "desc": "入力中にカーソルをエディターの中央付近に保ちます。"
         }
       },
       "wysiwyg": {

@@ -181,6 +181,13 @@ export const GlobalStyles = createGlobalStyle`
     display: none;
   }
 
+  .markdown-body .cm-render-node-label,
+  .markdown-body .rme-table-body-selector,
+  .markdown-body .rme-table-row-selector,
+  .markdown-body .rme-table-column-selector {
+    display: none !important;
+  }
+
   .file-tree-row .row-actions,
   .heading-row .heading-actions,
   [data-hover-actions] {

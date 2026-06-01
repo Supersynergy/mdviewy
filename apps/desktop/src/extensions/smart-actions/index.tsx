@@ -43,6 +43,18 @@ const openInOsTerminal = async (dir: string) => {
   }
 }
 
+const openFolder = async (dir: string) => {
+  const isMac = navigator.platform.toLowerCase().includes('mac')
+  const isWin = navigator.platform.toLowerCase().includes('win')
+  if (isMac) {
+    await runShell('open', [dir])
+  } else if (isWin) {
+    await runShell('cmd', ['/c', 'start', '', dir])
+  } else {
+    await runShell('xdg-open', [dir])
+  }
+}
+
 const runShell = async (program: string, args: string[]) => {
   try {
     const cmd = Command.create(program, args)
@@ -129,6 +141,16 @@ const ACTION_GROUPS: ActionGroup[] = [
         disabled: (f) => !f.path,
       },
       {
+        icon: 'ri-folder-open-line',
+        label: 'Open containing folder',
+        run: async (f) => {
+          const dir = folderOf(f.path)
+          if (!dir) return
+          await openFolder(dir)
+        },
+        disabled: (f) => !f.path,
+      },
+      {
         icon: 'ri-terminal-box-line',
         label: 'Open Terminal here',
         hint: 'cd to folder',
@@ -152,7 +174,7 @@ const ACTION_GROUPS: ActionGroup[] = [
     ],
   },
   {
-    title: 'AI-first',
+    title: 'Assistant handoff',
     items: [
       {
         icon: 'ri-sparkling-2-line',

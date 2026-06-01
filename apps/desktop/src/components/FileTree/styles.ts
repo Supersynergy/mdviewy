@@ -30,9 +30,10 @@ export const NodeContainer = styled.div<NodeContainerProps>`
   transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
 
   &:hover {
-    background-color: ${(props) => props.theme.fileTreeSelectedBgColor};
+    background-color: ${(props) =>
+      props.selected ? props.theme.fileTreeSelectedBgColor : props.theme.hoverColor};
     color: ${(props) => props.theme.primaryFontColor};
-    transform: translateX(1px);
+    transform: ${(props) => (props.selected ? 'none' : 'translateX(1px)')};
   }
 
   .file-icon {

@@ -117,6 +117,18 @@ function TextEditor(props: TextEditorProps) {
     [updateEditorCounter],
   )
 
+  const refreshTocSoon = useCallback(() => {
+    const run = () => {
+      if (!active) return
+      if (useEditorStore.getState().activeId !== id) return
+      execute('app:toc_refresh')
+    }
+
+    run()
+    requestAnimationFrame(run)
+    ;[40, 120, 300].forEach((delay) => window.setTimeout(run, delay))
+  }, [active, execute, id])
+
   useMount(async () => {
     setEditorDelegate(id, delegate)
   })
@@ -163,13 +175,16 @@ function TextEditor(props: TextEditorProps) {
         updateEditorCounter(file.content)
       }
 
-      if (!cancelled) setStatus(TextEditorStatus.SUCCESS)
+      if (!cancelled) {
+        setStatus(TextEditorStatus.SUCCESS)
+        refreshTocSoon()
+      }
     }
     init()
     return () => {
       cancelled = true
     }
-  }, [delegate, curFile, setEditorDelegate, updateEditorCounter])
+  }, [delegate, curFile, refreshTocSoon, setEditorDelegate, updateEditorCounter])
 
   const saveHandler = useCallback(
     async (params: SaveHandlerParams = {}) => {
@@ -324,6 +339,7 @@ function TextEditor(props: TextEditorProps) {
       editorRef.current?.setContent(newContent)
       setContent(newContent)
       updateEditorCounter(newContent)
+      refreshTocSoon()
       
       // Set save state to unsaved after content change
       const { setIdStateMap } = useEditorStateStore.getState()
@@ -331,7 +347,7 @@ function TextEditor(props: TextEditorProps) {
         hasUnsavedChanges: true,
       })
     },
-    [active, id, updateEditorCounter],
+    [active, id, refreshTocSoon, updateEditorCounter],
   )
 
   const editorTypeSwitchingRef = useRef(false)
@@ -550,6 +566,7 @@ function TextEditor(props: TextEditorProps) {
       },
       onContextMounted: (context: EditorContext) => {
         setEditorCtx(id, context)
+        refreshTocSoon()
       },
       delegateOptions: createWysiwygDelegateOptions(curFile.id),
       wysiwygToolBarOptions: {
@@ -563,8 +580,44 @@ function TextEditor(props: TextEditorProps) {
         },
       },
     }),
-    [content, delegate, setEditorCtx, id, active, settingData, fileTypeConfig],
+    [content, delegate, setEditorCtx, id, active, settingData, fileTypeConfig, refreshTocSoon],
   )
+
+  const centerActiveCursor = useCallback(() => {
+    if (!settingData.editor_typewriter_scroll) return
+
+    requestAnimationFrame(() => {
+      const scrollEl = document.querySelector('#editor-panel') as HTMLElement | null
+      if (!scrollEl) return
+
+      let cursorTop: number | null = null
+
+      try {
+        if (editorRef.current?.getType?.() === EditorViewType.SOURCECODE) {
+          const codemirrorView = sourceCodeCodemirrorViewMap.get(id)
+          const cm = codemirrorView?.cm
+          const head = cm?.state?.selection?.main?.head
+          if (cm && typeof head === 'number') {
+            cursorTop = cm.coordsAtPos(head)?.top ?? null
+          }
+        } else {
+          const editorView = (delegate as any)?.manager?.view
+          const pos = editorView?.state?.selection?.from
+          if (typeof pos === 'number') {
+            cursorTop = editorView.coordsAtPos(pos)?.top ?? null
+          }
+        }
+      } catch {
+        cursorTop = null
+      }
+
+      if (cursorTop === null) return
+
+      const containerTop = scrollEl.getBoundingClientRect().top
+      const targetTop = scrollEl.scrollTop + cursorTop - containerTop - scrollEl.clientHeight * 0.45
+      scrollEl.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' })
+    })
+  }, [delegate, id, settingData.editor_typewriter_scroll])
 
   const handleChange: EditorChangeHandler = useCallback(
     (params) => {
@@ -573,6 +626,7 @@ function TextEditor(props: TextEditorProps) {
 
       if (!active) return
       editorContextRef.current = params
+      centerActiveCursor()
 
       if (tr?.docChanged && !tr.getMeta('APPLY_MARKS')) {
         const state = {
@@ -591,6 +645,7 @@ function TextEditor(props: TextEditorProps) {
     },
     [
       active,
+      centerActiveCursor,
       debounceRefreshToc,
       debounceSaveHandler,
       debounceUpdateEditorCounter,

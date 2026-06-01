@@ -22,24 +22,6 @@ const tocExtensionMeta = {
   ),
 }
 
-// Lazy: AI chat extension pulls in ant-design/x + sentry + xmarkdown (~MBs).
-// Defer until user opens the AI tab — keeps first paint <1s.
-const LazyAiPanel = lazy(async () => {
-  const mod = await import('@/extensions/ai')
-  const node = mod.default.components as React.ReactElement
-  return { default: () => node }
-})
-const aiExtensionMeta = {
-  title: RIGHTBARITEMKEYS.AI,
-  key: RIGHTBARITEMKEYS.AI,
-  icon: <i className='ri-quill-pen-ai-line icon-base' />,
-  components: (
-    <Suspense fallback={<div style={{ padding: 12, fontSize: 12, opacity: 0.6 }}>Loading AI…</div>}>
-      <LazyAiPanel />
-    </Suspense>
-  ),
-}
-
 function RightBar() {
   const [activeRightBarItemKey, setActiveRightBarItemKey] = useState<RIGHTBARITEMKEYS>(
     RIGHTBARITEMKEYS.TableOfContent,
@@ -48,7 +30,6 @@ function RightBar() {
   const rightBarDataSource: RightBarItem[] = [
     tocExtensionMeta,
     smartActionsExtension,
-    aiExtensionMeta,
   ]
 
   // Track which tabs have ever been activated. Only those get mounted —

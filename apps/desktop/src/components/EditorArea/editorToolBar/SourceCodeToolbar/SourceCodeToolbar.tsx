@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { EditorViewType } from 'rme'
 import styled from 'styled-components'
 import { ToolbarSection, usePriorityHidden } from '../responsive'
-import { AIButton } from '../WysiwygToolbar/components/AIButton'
 import { SmartActionsButton } from '../WysiwygToolbar/components/SmartActionsButton'
 import { CodeCommandButton } from './CodeCommandButton'
 import { SourceCodeMenuButton } from './SourceCodeMenuButton'
@@ -59,7 +58,6 @@ export const SourceCodeToolbar: FC = () => {
       <ToolbarSection id="common" registerWidth={registerItemWidth} hidden={hiddenIds.has('common')}>
         <SourceCodeMenuButton />
         <SmartActionsButton />
-        <AIButton />
       </ToolbarSection>
 
       <ToolbarSection id="history" registerWidth={registerItemWidth} hidden={hiddenIds.has('history')}>

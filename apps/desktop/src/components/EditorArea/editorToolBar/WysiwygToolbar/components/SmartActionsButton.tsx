@@ -26,6 +26,18 @@ const openInOsTerminal = async (dir: string) => {
   }
 }
 
+const openFolder = async (dir: string) => {
+  const isMac = navigator.platform.toLowerCase().includes('mac')
+  const isWin = navigator.platform.toLowerCase().includes('win')
+  if (isMac) {
+    await runShell('open', [dir])
+  } else if (isWin) {
+    await runShell('cmd', ['/c', 'start', '', dir])
+  } else {
+    await runShell('xdg-open', [dir])
+  }
+}
+
 const runShell = async (program: string, args: string[]) => {
   try {
     const cmd = Command.create(program, args)
@@ -96,6 +108,14 @@ export const SmartActionsButton = () => {
           handler: async () => {
             if (!path) return
             await revealItemInDir(path)
+          },
+        },
+        {
+          label: 'Open containing folder',
+          value: 'open-folder',
+          handler: async () => {
+            if (!dir) return
+            await openFolder(dir)
           },
         },
         {

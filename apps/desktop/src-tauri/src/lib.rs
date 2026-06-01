@@ -192,14 +192,13 @@ pub fn run() {
             menu::generate_menu(app).expect("failed to generate menu");
 
             // Deferred plugins: spawn after window has been built so the
-            // webview paints first. http/updater/notification/clipboard each
-            // add 10-25ms to the synchronous setup chain.
+            // webview paints first. Network updater is intentionally disabled
+            // until mdviewy owns a reliable release endpoint.
             let h = app.handle().clone();
             tauri::async_runtime::spawn(async move {
                 eprintln!("[BOOT] deferred plugins starting");
                 let t = std::time::Instant::now();
                 let _ = h.plugin(tauri_plugin_http::init());
-                let _ = h.plugin(tauri_plugin_updater::Builder::new().build());
                 let _ = h.plugin(tauri_plugin_clipboard_manager::init());
                 let _ = h.plugin(tauri_plugin_notification::init());
                 eprintln!(

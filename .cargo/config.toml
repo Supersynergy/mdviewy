@@ -1,0 +1,12 @@
+# Project-local cargo config — Mac arm64 startup tunings.
+# Apple ld (Xcode 16) is the only Mach-O linker; mold/lld don't apply.
+
+[target.aarch64-apple-darwin]
+rustflags = [
+  "-C", "link-arg=-Wl,-dead_strip",
+  "-C", "link-arg=-Wl,-no_compact_unwind",
+  "-C", "target-cpu=apple-m1",
+]
+
+[build]
+rustc-wrapper = "sccache"

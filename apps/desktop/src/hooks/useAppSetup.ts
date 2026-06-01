@@ -4,7 +4,6 @@ import { loadLocalThemeCss } from '@/helper/extensions'
 import { getFileObject, getFileObjectByPath, getSaveOpenedEditorEntries } from '@/helper/files'
 import { getFileNameFromPath, readDirectory } from '@/helper/filesys'
 import { logger } from '@/helper/logger'
-import { checkUpdate } from '@/helper/updater'
 import { i18nInit } from '@/i18n'
 import { appSettingStoreSetup } from '@/services/app-setting'
 import { checkUnsavedFiles } from '@/services/checkUnsavedFiles'
@@ -248,11 +247,6 @@ const appSetup = onceAsync(async function () {
 
   schedule(() => {
     appWorkspaceSetup().catch((e) => logger.error('appWorkspaceSetup deferred failed', e))
-  })
-
-  schedule(() => {
-    // Network call — never block startup on it.
-    checkUpdate({ install: settingData.auto_update })
   })
 
   // Pre-warm the WYSIWYG editor delegate during idle time. First md-file-open
