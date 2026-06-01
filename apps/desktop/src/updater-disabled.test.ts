@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -11,6 +11,12 @@ describe('disabled updater surface', () => {
     expect(read('apps/desktop/src/hooks/useAppSetup.ts')).not.toContain('checkUpdate')
     expect(read('apps/desktop/src/router/Setting/index.tsx')).not.toContain('plugin-updater')
     expect(read('apps/desktop/src/router/Setting/index.tsx')).not.toContain('installUpdate')
+  })
+
+  it('does not expose updater scripts or helper code', () => {
+    expect(read('package.json')).not.toContain('"updater"')
+    expect(read('apps/desktop/package.json')).not.toContain('"updater"')
+    expect(existsSync(join(repoRoot, 'apps/desktop/src/helper/updater.tsx'))).toBe(false)
   })
 
   it('does not register updater endpoints or the updater plugin', () => {

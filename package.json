@@ -26,7 +26,6 @@
     "release:minor": "yarn release --minor",
     "release:major": "yarn release --major",
     "test": "turbo test",
-    "updater": "yarn workspace @mdviewy/desktop updater",
     "lint": "eslint --fix --ext .tsx ./",
     "translate:locals": "node --env-file=.env scripts/translate-locals.js",
     "translate:check": "node scripts/translate-check.js"
