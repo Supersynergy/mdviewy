@@ -1,6 +1,6 @@
 {
   "name": "@mdviewy/desktop",
-  "version": "0.7.0",
+  "version": "0.80.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host",

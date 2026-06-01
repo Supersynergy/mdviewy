@@ -3242,7 +3242,7 @@ dependencies = [
 
 [[package]]
 name = "mdviewy"
-version = "0.55.4"
+version = "0.80.1"
 dependencies = [
  "anyhow",
  "arboard",
