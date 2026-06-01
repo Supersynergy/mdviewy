@@ -30,7 +30,7 @@
         "role": "Editor"
       }
     ],
-    "createUpdaterArtifacts": true,
+    "createUpdaterArtifacts": false,
     "category": "DeveloperTool",
     "icon": [
       "icons/32x32.png",

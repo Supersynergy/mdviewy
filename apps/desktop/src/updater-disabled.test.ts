@@ -16,6 +16,9 @@ describe('disabled updater surface', () => {
   it('does not register updater endpoints or the updater plugin', () => {
     expect(read('apps/desktop/src-tauri/tauri.conf.json')).not.toContain('api.upgrade.toolsetlink')
     expect(read('apps/desktop/src-tauri/tauri.conf.json')).not.toContain('"updater"')
+    expect(read('apps/desktop/src-tauri/tauri.conf.json')).toContain(
+      '"createUpdaterArtifacts": false',
+    )
     expect(read('apps/desktop/src-tauri/src/lib.rs')).not.toContain('tauri_plugin_updater')
     expect(read('apps/desktop/src-tauri/capabilities/main-capability.json')).not.toContain(
       'updater:default',
