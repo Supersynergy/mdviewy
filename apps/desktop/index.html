@@ -5,12 +5,24 @@
     <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MDviewy</title>
+    <style>
+      /* Pre-React skeleton: paints instantly before any JS executes.
+         Removed by main.tsx once React mounts. */
+      html, body { margin: 0; padding: 0; height: 100%; background: #fafafa; color: #1f2329; -webkit-font-smoothing: antialiased; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
+      body.dark { background: #1e1f22; color: #d8dade; }
+      #mdf-skeleton { position: fixed; inset: 0; display: flex; flex-direction: column; pointer-events: none; }
+      #mdf-skeleton .top { height: 28px; flex: 0 0 28px; }
+      #mdf-skeleton .body { flex: 1; display: flex; }
+      #mdf-skeleton .sidebar { width: 240px; border-right: 1px solid rgba(127,127,127,0.12); }
+      #mdf-skeleton .main { flex: 1; display: flex; align-items: center; justify-content: center; }
+      #mdf-skeleton .logo { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%); box-shadow: 0 6px 18px -8px rgba(99,102,241,0.45); animation: mdf-pulse 1.4s ease-in-out infinite; }
+      @keyframes mdf-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.55; transform: scale(0.92); } }
+      #root:not(:empty) ~ #mdf-skeleton { display: none; }
+    </style>
   </head>
-  <body class="dark">
+  <body>
     <div id="root"></div>
-    <script>
-      console.log('%cMDviewy Developer Console', 'color:#016ab3; font-size:40px; font-weight:bold;')
-    </script>
+    <div id="mdf-skeleton" aria-hidden="true"><div class="top"></div><div class="body"><div class="sidebar"></div><div class="main"><div class="logo"></div></div></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

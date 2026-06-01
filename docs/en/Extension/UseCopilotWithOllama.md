@@ -83,11 +83,11 @@ launchctl getenv OLLAMA_ORIGINS
 
 ## How to Use Copilot
 
-Copilot can work with any AI provider already supported by mdmaster. You need to configure it in the AI section of `Settings`, and make sure it works normally in AI chat. Then you can select the provider and model you configured in Copilot settings.
+Copilot can work with any AI provider already supported by mdviewy. You need to configure it in the AI section of `Settings`, and make sure it works normally in AI chat. Then you can select the provider and model you configured in Copilot settings.
 
 ### Copilot's Trigger Mechanism
 
-Typically, after entering some text in a paragraph, mdmaster will take the characters around your cursor as context and have AI provide some suggestions. It looks something like this:
+Typically, after entering some text in a paragraph, mdviewy will take the characters around your cursor as context and have AI provide some suggestions. It looks something like this:
 ![](https://raw.githubusercontent.com/Supersynergy/mdviewy/refs/heads/main/public/copilot.png)
 
 ### Recommendations

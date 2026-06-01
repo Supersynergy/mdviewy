@@ -1,5 +1,5 @@
 [package]
-name = "mdmaster_file_search"
+name = "mdviewy_file_search"
 version = "0.0.1"
 edition = "2021"
 description = "main rusl library"

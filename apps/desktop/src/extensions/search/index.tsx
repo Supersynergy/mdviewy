@@ -11,12 +11,9 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Input } from 'zens'
 import { SearchContainer, SearchInfoBox, SearchInput, SearchList } from './styles'
+import { countLiteralMatches, findLiteralMatchPositions } from './searchMatch'
 import type { SearchInfo } from './useSearchStore'
 import useSearchStore from './useSearchStore'
-
-const escapeRegExp = (string: string) => {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
 
 interface SearchMatchSnippetProps {
   content: string
@@ -30,18 +27,7 @@ const SearchMatchSnippet = memo(
     const prefixWindow = 10 // 前置字符减少，确保在窄屏下 active 项靠左显示
     const suffixWindow = 50 // 后置字符可以多一些
 
-    const getMatchPositions = (text: string, query: string) => {
-      if (!query) return []
-      const regex = new RegExp(escapeRegExp(query), caseSensitive ? 'g' : 'gi')
-      const positions: { start: number; end: number }[] = []
-      let match
-      while ((match = regex.exec(text)) !== null) {
-        positions.push({ start: match.index, end: regex.lastIndex })
-      }
-      return positions
-    }
-
-    const positions = getMatchPositions(content, keyword)
+    const positions = findLiteralMatchPositions(content, keyword, caseSensitive)
     const currentMatch = positions[matchIndexInLine]
 
     if (!currentMatch) return <span className="snippet-text">{content}</span>
@@ -52,22 +38,20 @@ const SearchMatchSnippet = memo(
     const snippet = content.slice(start, end)
 
     const renderSnippet = () => {
-      const regex = new RegExp(escapeRegExp(keyword), caseSensitive ? 'g' : 'gi')
       const result = []
       let lastIndex = 0
-      let match
 
-      while ((match = regex.exec(snippet)) !== null) {
-        result.push(snippet.slice(lastIndex, match.index))
+      findLiteralMatchPositions(snippet, keyword, caseSensitive).forEach((match) => {
+        result.push(snippet.slice(lastIndex, match.start))
 
-        const isCurrentMatch = match.index + start === currentMatch.start
+        const isCurrentMatch = match.start + start === currentMatch.start
         result.push(
-          <mark key={match.index} className={isCurrentMatch ? 'active' : ''}>
-            {match[0]}
+          <mark key={match.start} className={isCurrentMatch ? 'active' : ''}>
+            {snippet.slice(match.start, match.end)}
           </mark>,
         )
-        lastIndex = regex.lastIndex
-      }
+        lastIndex = match.end
+      })
       result.push(snippet.slice(lastIndex))
       return result
     }
@@ -92,10 +76,7 @@ const SearchView = memo(() => {
 
   const getMatchCount = useCallback(
     (text: string, keyword: string) => {
-      if (!keyword) return 0
-      const regex = new RegExp(escapeRegExp(keyword), caseSensitive ? 'g' : 'gi')
-      const matches = text.match(regex)
-      return matches ? matches.length : 0
+      return countLiteralMatches(text, keyword, caseSensitive)
     },
     [caseSensitive],
   )

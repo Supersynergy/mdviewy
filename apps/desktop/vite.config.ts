@@ -28,6 +28,10 @@ export default defineConfig({
   ],
   build: {
     minify: 'esbuild',
+    // Tauri 2 bundles assets statically; modern target = smaller transforms.
+    target: 'esnext',
+    cssCodeSplit: true,
+    reportCompressedSize: false,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -47,6 +51,10 @@ export default defineConfig({
         },
       },
     },
+  },
+  esbuild: {
+    legalComments: 'none',
+    drop: ['debugger'],
   },
   resolve: {
     alias: [

@@ -42,7 +42,7 @@ pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn st
         "console.log('[setup.rs] window.openedUrls set to: ' + {});",
         opened_urls_json
     ))
-    .title("MDmaster")
+    .title("MDviewy")
     .resizable(true)
     .fullscreen(false)
     .theme(Some(theme))
@@ -61,14 +61,19 @@ pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn st
         _setup_start.elapsed().as_millis()
     );
 
+    // Vibrancy is purely cosmetic and NSVisualEffectView attach is 8-15ms
+    // synchronous. Defer to next tick so the window paints first.
     #[cfg(target_os = "macos")]
     {
-        let _ = apply_vibrancy(
-            &window,
-            NSVisualEffectMaterial::HudWindow,
-            Some(NSVisualEffectState::Active),
-            Some(12.0),
-        );
+        let win_for_vib = window.clone();
+        tauri::async_runtime::spawn(async move {
+            let _ = apply_vibrancy(
+                &win_for_vib,
+                NSVisualEffectMaterial::HudWindow,
+                Some(NSVisualEffectState::Active),
+                Some(12.0),
+            );
+        });
     }
 
     // 将初始窗口添加到全局窗口实例缓存中

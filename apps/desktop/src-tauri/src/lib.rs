@@ -59,14 +59,12 @@ pub fn run() {
 
     tauri::Builder::default()
         .manage(OpenedUrls(Default::default()))
-        .plugin(tauri_plugin_http::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        // Pre-window plugins — only those needed before/during the first
+        // window build (path resolution, dialog, file/shell access).
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_single_instance::init(
@@ -192,6 +190,23 @@ pub fn run() {
 
             #[cfg(target_os = "macos")]
             menu::generate_menu(app).expect("failed to generate menu");
+
+            // Deferred plugins: spawn after window has been built so the
+            // webview paints first. http/updater/notification/clipboard each
+            // add 10-25ms to the synchronous setup chain.
+            let h = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                eprintln!("[BOOT] deferred plugins starting");
+                let t = std::time::Instant::now();
+                let _ = h.plugin(tauri_plugin_http::init());
+                let _ = h.plugin(tauri_plugin_updater::Builder::new().build());
+                let _ = h.plugin(tauri_plugin_clipboard_manager::init());
+                let _ = h.plugin(tauri_plugin_notification::init());
+                eprintln!(
+                    "[BOOT] deferred plugins done in {}ms",
+                    t.elapsed().as_millis()
+                );
+            });
 
             Ok(())
         })

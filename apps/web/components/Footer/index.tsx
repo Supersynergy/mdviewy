@@ -10,7 +10,7 @@ export default function Footer() {
       <LeftSection>
         <Brand href='/'>
           <Logo size={24} />
-          <AppName>mdmaster</AppName>
+          <AppName>mdviewy</AppName>
         </Brand>
         <CopyrightText>
           ©2023 - present . All rights reserved.

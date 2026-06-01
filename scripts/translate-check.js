@@ -1,8 +1,21 @@
 const fs = require('fs')
 const path = require('path')
 
-const langDir = path.join(__dirname, '../locales')
+const langDir = path.resolve(__dirname, '../locales')
 const baseFile = 'en.json'
+
+function getLocaleFilePath(file) {
+  if (path.basename(file) !== file || !file.endsWith('.json')) {
+    throw new Error(`Invalid locale file name: ${file}`)
+  }
+
+  const filePath = path.normalize(`${langDir}/${file}`)
+  if (!filePath.startsWith(`${langDir}${path.sep}`)) {
+    throw new Error(`Locale file escapes locale directory: ${file}`)
+  }
+
+  return filePath
+}
 
 function getAllKeys(obj, prefix = '') {
   let keys = new Set()
@@ -35,7 +48,7 @@ function compareKeys(baseKeys, targetKeys, langFile) {
 }
 
 function main() {
-  const baseFilePath = path.join(langDir, baseFile)
+  const baseFilePath = getLocaleFilePath(baseFile)
   const baseContent = JSON.parse(fs.readFileSync(baseFilePath, 'utf8'))
   const baseKeys = getAllKeys(baseContent)
 
@@ -45,7 +58,7 @@ function main() {
   files.forEach(file => {
     if (file !== baseFile && file.endsWith('.json')) {
       console.log(`\n检查 ${file}...`)
-      const filePath = path.join(langDir, file)
+      const filePath = getLocaleFilePath(file)
       const content = JSON.parse(fs.readFileSync(filePath, 'utf8'))
       const keys = getAllKeys(content)
 
@@ -65,5 +78,4 @@ function main() {
 }
 
 main()
-
 

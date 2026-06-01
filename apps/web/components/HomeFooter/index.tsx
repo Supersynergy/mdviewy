@@ -15,7 +15,7 @@ export default function HomeFooter() {
           <LogoContainer>
             <Logo size={40} />
           </LogoContainer>
-          <AppName>mdmaster</AppName>
+          <AppName>mdviewy</AppName>
         </LogoLink>
         <CopyrightText>Copyright © 2023-present drl990114</CopyrightText>
       </LeftSection>

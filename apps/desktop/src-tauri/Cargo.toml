@@ -1,5 +1,5 @@
 [package]
-name = "mdmaster"
+name = "mdviewy"
 version = "0.55.4"
 description = "A Markdown Editor App"
 authors = ["Supersynergy"]
@@ -8,7 +8,7 @@ repository = "https://github.com/Supersynergy/mdviewy"
 edition = "2021"
 
 [lib]
-name = "mdmaster"
+name = "mdviewy"
 crate-type = [
     "staticlib",
     "cdylib",
@@ -110,16 +110,16 @@ features = [
 [target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
 window-vibrancy = "0.5.0"
 
-[dependencies.mdmaster-utils]
+[dependencies.mdviewy-utils]
 path = "../../../crates/utils"
 
-[dependencies.mdmaster_file_search]
+[dependencies.mdviewy_file_search]
 path = "../../../crates/file_search"
 
 [dependencies.download_npm]
 path = "../../../crates/download_npm"
 
-[dependencies.mdmaster-core]
+[dependencies.mdviewy-core]
 path = "../../../crates/core"
 features = ["full"]
 

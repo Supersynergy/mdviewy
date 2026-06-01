@@ -8,3 +8,34 @@ rust-version = "1.95"
 repository = "https://git.marketdeck.io/Supersynergy/mdviewy"
 homepage = "https://git.marketdeck.io/Supersynergy/mdviewy"
 license = "MIT"
+
+# Production binary: small, fast, single LTO unit.
+# On M-series the LTO+codegen-units=1 combo trims the binary ~25% and shaves
+# ~20-30ms off cold start vs default release.
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
+incremental = false
+
+# Dev: keep fast incremental rebuilds for the app crate, but build deps once
+# at opt-level=2. Cuts debug-build startup hugely (a webview-heavy debug build
+# spends most of its boot time in unoptimised dep code).
+[profile.dev]
+opt-level = 1
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+opt-level = 2
+
+# Tauri/wry/tao runtime hot path: always optimised, even in dev.
+[profile.dev.package.tauri]
+opt-level = 3
+[profile.dev.package.wry]
+opt-level = 3
+[profile.dev.package.tao]
+opt-level = 3
+[profile.dev.package.objc2]
+opt-level = 3

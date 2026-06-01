@@ -11,11 +11,16 @@ import rem from '../utils/rem'
 
 interface PrivacySection {
   title: string
-  content: Array<{
-    type: 'paragraph' | 'list'
-    text?: string
-    items?: Array<string | { text: string; isHtml?: boolean }>
-  }>
+  content: Array<
+    | {
+        type: 'paragraph'
+        text: React.ReactNode
+      }
+    | {
+        type: 'list'
+        items: React.ReactNode[]
+      }
+  >
 }
 
 const privacySections: PrivacySection[] = [
@@ -24,7 +29,7 @@ const privacySections: PrivacySection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'mdmaster ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mdmaster application and services.',
+        text: 'mdviewy ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mdviewy application and services.',
       },
       {
         type: 'paragraph',
@@ -37,7 +42,7 @@ const privacySections: PrivacySection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'mdmaster is designed with privacy in mind. We do not collect or store:',
+        text: 'mdviewy is designed with privacy in mind. We do not collect or store:',
       },
       {
         type: 'list',
@@ -73,15 +78,23 @@ const privacySections: PrivacySection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'mdmaster offers optional AI-powered features that integrate with third-party AI providers:',
+        text: 'mdviewy offers optional AI-powered features that integrate with third-party AI providers:',
       },
       {
         type: 'list',
         items: [
-          { text: '<strong>OpenAI Integration:</strong> If you choose to use OpenAI features, your API key and requests are sent directly to OpenAI\'s servers. We do not intercept or store your API keys or AI requests.', isHtml: true },
-          { text: '<strong>DeepSeek Integration:</strong> Similar to OpenAI, your DeepSeek API key and requests are sent directly to DeepSeek\'s servers.', isHtml: true },
-          { text: '<strong>Ollama Integration:</strong> For local Ollama deployments, all AI processing happens on your local machine.', isHtml: true },
-          { text: '<strong>Google Gemini Integration:</strong> Your Gemini API key and requests are sent directly to Google\'s servers.', isHtml: true },
+          <>
+            <strong>OpenAI Integration:</strong> If you choose to use OpenAI features, your API key and requests are sent directly to OpenAI's servers. We do not intercept or store your API keys or AI requests.
+          </>,
+          <>
+            <strong>DeepSeek Integration:</strong> Similar to OpenAI, your DeepSeek API key and requests are sent directly to DeepSeek's servers.
+          </>,
+          <>
+            <strong>Ollama Integration:</strong> For local Ollama deployments, all AI processing happens on your local machine.
+          </>,
+          <>
+            <strong>Google Gemini Integration:</strong> Your Gemini API key and requests are sent directly to Google's servers.
+          </>,
         ],
       },
       {
@@ -91,9 +104,9 @@ const privacySections: PrivacySection[] = [
       {
         type: 'list',
         items: [
-          { text: '<a href="https://openai.com/privacy" target="_blank" rel="noopener noreferrer">OpenAI Privacy Policy</a>', isHtml: true },
-          { text: '<a href="https://www.deepseek.com/privacy" target="_blank" rel="noopener noreferrer">DeepSeek Privacy Policy</a>', isHtml: true },
-          { text: '<a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>', isHtml: true },
+          <a href="https://openai.com/privacy" target="_blank" rel="noopener noreferrer">OpenAI Privacy Policy</a>,
+          <a href="https://www.deepseek.com/privacy" target="_blank" rel="noopener noreferrer">DeepSeek Privacy Policy</a>,
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>,
         ],
       },
     ],
@@ -103,12 +116,14 @@ const privacySections: PrivacySection[] = [
     content: [
       {
         type: 'paragraph',
-        text: 'mdmaster is an open-source application. You can inspect our source code at any time to verify our privacy claims:',
+        text: 'mdviewy is an open-source application. You can inspect our source code at any time to verify our privacy claims:',
       },
       {
         type: 'list',
         items: [
-          { text: 'Source code is available on <a href="https://github.com/Supersynergy/mdviewy" target="_blank" rel="noopener noreferrer">GitHub</a>', isHtml: true },
+          <>
+            Source code is available on <a href="https://github.com/Supersynergy/mdviewy" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </>,
           'All data handling is transparent and auditable',
           'Community contributions are welcome and reviewed',
         ],
@@ -172,7 +187,9 @@ const privacySections: PrivacySection[] = [
       {
         type: 'list',
         items: [
-          { text: 'By visiting our GitHub repository: <a href="https://github.com/Supersynergy/mdviewy" target="_blank" rel="noopener noreferrer">https://github.com/Supersynergy/mdviewy</a>', isHtml: true },
+          <>
+            By visiting our GitHub repository: <a href="https://github.com/Supersynergy/mdviewy" target="_blank" rel="noopener noreferrer">https://github.com/Supersynergy/mdviewy</a>
+          </>,
           'By creating an issue on our GitHub issues page',
         ],
       },
@@ -181,24 +198,16 @@ const privacySections: PrivacySection[] = [
 ]
 
 function renderContentItem(item: PrivacySection['content'][number], index: number) {
-  if (item.type === 'paragraph' && item.text) {
-    return <Paragraph key={index} dangerouslySetInnerHTML={{ __html: item.text }} />
+  if (item.type === 'paragraph') {
+    return <Paragraph key={index}>{item.text}</Paragraph>
   }
 
-  if (item.type === 'list' && item.items) {
+  if (item.type === 'list') {
     return (
       <List key={index}>
-        {item.items.map((listItem, idx) => {
-          if (typeof listItem === 'string') {
-            return <ListItem key={idx}>{listItem}</ListItem>
-          }
-          return (
-            <ListItem
-              key={idx}
-              dangerouslySetInnerHTML={{ __html: listItem.text }}
-            />
-          )
-        })}
+        {item.items.map((listItem, idx) => (
+          <ListItem key={idx}>{listItem}</ListItem>
+        ))}
       </List>
     )
   }
@@ -212,7 +221,7 @@ export default function PrivacyPage() {
 
   return (
     <>
-      <SeoHead title='Privacy Policy - mdmaster'>
+      <SeoHead title='Privacy Policy - mdviewy'>
         <meta name='robots' content='noodp' />
       </SeoHead>
 

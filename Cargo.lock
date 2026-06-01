@@ -1329,7 +1329,7 @@ name = "download_npm"
 version = "0.0.1"
 dependencies = [
  "flate2",
- "mdmaster-utils",
+ "mdviewy-utils",
  "reqwest 0.12.28",
  "serde_json",
  "tar",
@@ -3291,7 +3291,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mdmaster"
+name = "mdviewy"
 version = "0.55.4"
 dependencies = [
  "anyhow",
@@ -3311,9 +3311,9 @@ dependencies = [
  "lazy_static",
  "lending-stream",
  "log",
- "mdmaster-core",
- "mdmaster-utils",
- "mdmaster_file_search",
+ "mdviewy-core",
+ "mdviewy-utils",
+ "mdviewy_file_search",
  "natural-sort-rs",
  "notify 6.1.1",
  "pin-project-lite",
@@ -3351,7 +3351,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mdmaster-core"
+name = "mdviewy-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -3373,7 +3373,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mdmaster-utils"
+name = "mdviewy-utils"
 version = "0.0.1"
 dependencies = [
  "fs_extra",
@@ -3382,7 +3382,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mdmaster_file_search"
+name = "mdviewy_file_search"
 version = "0.0.1"
 dependencies = [
  "arboard",

@@ -3,8 +3,7 @@ import { getFileTypeConfig, isTextfileType } from '@/helper/fileTypeHandler'
 import { isEmptyEditor } from '@/services/editor-file'
 import useEditorViewTypeStore from '@/stores/useEditorViewTypeStore'
 import useFileTypeConfigStore from '@/stores/useFileTypeConfigStore'
-import { memo } from 'react'
-import { useMount } from 'react-use'
+import { memo, useMemo } from 'react'
 import { EmptyState } from './EmptyState'
 import { PreviewContent } from './preview/PreviewContent'
 import TextEditor from './TextEditor'
@@ -15,15 +14,16 @@ function Editor(props: EditorProps) {
   const curFile = getFileObject(id)
 
   const { getFileTypeConfigById, setFileTypeConfig } = useFileTypeConfigStore()
-  const curFileTypeConfig = getFileTypeConfigById(id)
-
-  useMount(async () => {
-    const fileTypeConfig = await getFileTypeConfig(curFile)
-    if (fileTypeConfig) {
-      useEditorViewTypeStore.getState().setEditorViewType(curFile.id, fileTypeConfig.defaultMode)
-      setFileTypeConfig(curFile.id, fileTypeConfig)
-    }
-  })
+  // Compute config synchronously from extension. Was an async useMount that
+  // forced a `null` render until the next tick — instant file-open instead.
+  const curFileTypeConfig = useMemo(() => {
+    const cached = getFileTypeConfigById(id)
+    if (cached) return cached
+    const computed = getFileTypeConfig(curFile)
+    useEditorViewTypeStore.getState().setEditorViewType(curFile.id, computed.defaultMode)
+    setFileTypeConfig(curFile.id, computed)
+    return computed
+  }, [id, curFile, getFileTypeConfigById, setFileTypeConfig])
 
   if (isEmptyEditor(curFile.id)) {
     if (active) {

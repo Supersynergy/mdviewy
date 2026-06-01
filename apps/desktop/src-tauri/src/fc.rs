@@ -1,6 +1,6 @@
 use anyhow::Result as AnyResult;
 use chrono::{DateTime, Local};
-use mdmaster_utils::is_supported_file_name;
+use mdviewy_utils::is_supported_file_name;
 use natural_sort_rs::Natural;
 use serde::{Deserialize, Serialize};
 use std::fs;

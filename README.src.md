@@ -10,7 +10,7 @@
   <img align="center" src="./public/logo.png" width="120" height="120" />
 </div>
 
-<h2 align="center"/>mdmaster <sup><em>beta</em></sup></h2>
+<h2 align="center"/>mdviewy <sup><em>beta</em></sup></h2>
 <!--zh-->
 <div align='center'>
 <br>
@@ -48,19 +48,19 @@
 
 <img src="${screenshot}" alt="screenshot" />
 
-## ${en:'mdmaster is in the reconstruction phase ⚠️', zh:'mdmaster 目前处于 Beta 阶段 ⚠️', ja:'mdmaster はベータ版です ⚠️'}
+## ${en:'mdviewy is in the reconstruction phase ⚠️', zh:'mdviewy 目前处于 Beta 阶段 ⚠️', ja:'mdviewy はベータ版です ⚠️'}
 
-At present, mdmaster needs about 3 - 6 months to perform reconstruction, which will bring an exciting new version. If there is no major bug in the three months, the new version will not be released.<!--en-->
-目前 mdmaster 处于 beta 阶段，建议在有数据备份的情况下使用。<!--zh-->
-現在、mdmaster はベータ版であり、データのバックアップを取ることをお勧めします。<!--ja-->
+At present, mdviewy needs about 3 - 6 months to perform reconstruction, which will bring an exciting new version. If there is no major bug in the three months, the new version will not be released.<!--en-->
+目前 mdviewy 处于 beta 阶段，建议在有数据备份的情况下使用。<!--zh-->
+現在、mdviewy はベータ版であり、データのバックアップを取ることをお勧めします。<!--ja-->
 
 ## ${en:'Features', zh:'功能特性', ja:'機能'}
 
 - **Built-in AI:** Currently supports Copilot, one-click export of dialogues, translation of articles to any language, and article summaries. It supports large models like `DeepSeek` and `Chatgpt`, making them your intelligent assistant.<!--en-->
 <!--en-->
-- **lightweight:** mdmaster is based on Tauri, boasting a size of less than 20MB and improved performance.<!--en-->
+- **lightweight:** mdviewy is based on Tauri, boasting a size of less than 20MB and improved performance.<!--en-->
 <!--en-->
-- **Multiple Editing Modes:** mdmaster uses Prosemirror as its core editor, offering high extensibility and a superior editing experience. It supports multiple editing modes, such as source code and wysiwyg.<!--en-->
+- **Multiple Editing Modes:** mdviewy uses Prosemirror as its core editor, offering high extensibility and a superior editing experience. It supports multiple editing modes, such as source code and wysiwyg.<!--en-->
 <!--en-->
 - **Editing Multiple File Types:** In addition to Markdown, it supports editing `JSON`, `TXT`, and other file types.<!--en-->
 <!--en-->
@@ -68,25 +68,25 @@ At present, mdmaster needs about 3 - 6 months to perform reconstruction, which w
 <!--en-->
 - **Custom Keyboard Shortcuts:** Supports custom keyboard shortcuts to meet individual needs.<!--en-->
 <!--en-->
-- **Image Processing:** When pasting images into mdmaster, you can choose to paste them to a specified path or convert them to `base64`.<!--en-->
+- **Image Processing:** When pasting images into mdviewy, you can choose to paste them to a specified path or convert them to `base64`.<!--en-->
 <!--en-->
 - **File Management**: A powerful file tree that supports drag-and-drop movement, global search, and other common functions.<!--en-->
 <!--en-->
 - **Multi-language support:** Supports multiple languages ​​including Chinese, English, Spanish, Japanese, and French.<!--en-->
 - **内置 AI**：当前支持Copilot、一键导出对话、翻译文章到任何语言以及获取文章摘要，支持`DeepSeek`、`Chatgpt`等大模型让他们成为你的智能助手。<!--zh-->
-- **超轻量**：mdmaster 基于 tauri, 拥有小于 20MB 的体积和更好的性能。<!--zh-->
-- **多编辑模式**：mdmaster 使用 prosemirror 作为编辑器核心, 不仅扩展性高，编辑体验也很好。并支持多种编辑模式，如`source code`, `wysiwyg`。<!--zh-->
+- **超轻量**：mdviewy 基于 tauri, 拥有小于 20MB 的体积和更好的性能。<!--zh-->
+- **多编辑模式**：mdviewy 使用 prosemirror 作为编辑器核心, 不仅扩展性高，编辑体验也很好。并支持多种编辑模式，如`source code`, `wysiwyg`。<!--zh-->
 - **编辑多种文件**：除了 Markdown，还支持编辑 `json`、`txt` 等文件类型。<!--zh-->
 - **自定义主题**：支持自定义主题，并且你也可以与他人分享你的主题。<!--zh-->
 - **自定义快捷键**：支持自定义快捷键，满足个性化需求。<!--zh-->
-- **图片处理**：当你粘贴图片到 mdmaster，可以选择粘贴到指定的路径，或者转为 `base64`。<!--zh-->
+- **图片处理**：当你粘贴图片到 mdviewy，可以选择粘贴到指定的路径，或者转为 `base64`。<!--zh-->
 - **文件管理**：功能强大的文件树，支持拖拽移动、全局搜索等常用功能。<!--zh-->
 - **多语言支持**：支持中文、英文、西班牙语、日语、法语等多种语言。<!--zh-->
 - **AI搭載:** 現在はCopilot、ワンタッチで会話をエクスポートし、文章を任意の言語に翻訳し、記事の要約を取得することをサポートしており、「DeepSeek `」、「Chatgpt」などの大きなモデルをサポートして、彼らをスマートアシスタントにしています。<!--ja-->
 <!--ja-->
-- **軽量:** mdmasterはTauriをベースにしており、20MB未満のサイズと優れたパフォーマンスを誇ります。<!--ja-->
+- **軽量:** mdviewyはTauriをベースにしており、20MB未満のサイズと優れたパフォーマンスを誇ります。<!--ja-->
 <!--ja-->
-- **複数の編集モード:** mdmasterはProsemirrorをコアエディターとして採用し、高い拡張性と優れた編集エクスペリエンスを提供します。ソースコードやWYSIWYGなど、複数の編集モードをサポートしています。<!--ja-->
+- **複数の編集モード:** mdviewyはProsemirrorをコアエディターとして採用し、高い拡張性と優れた編集エクスペリエンスを提供します。ソースコードやWYSIWYGなど、複数の編集モードをサポートしています。<!--ja-->
 <!--ja-->
 - **複数ファイル形式の編集:** Markdownに加えて、`JSON`、`TXT`などのファイル形式の編集もサポートしています。<!--ja-->
 <!--ja-->
@@ -94,7 +94,7 @@ At present, mdmaster needs about 3 - 6 months to perform reconstruction, which w
 <!--ja-->
 - **カスタムキーボードショートカット:** 個々のニーズに合わせてカスタムキーボードショートカットを設定できます。<!--ja-->
 <!--ja-->
-- **画像処理:** mdmasterに画像を貼り付ける際、指定したパスに貼り付けるか、`base64`に変換するかを選択できます。<!--ja-->
+- **画像処理:** mdviewyに画像を貼り付ける際、指定したパスに貼り付けるか、`base64`に変換するかを選択できます。<!--ja-->
 <!--ja-->
 - **ファイル管理**: ドラッグアンドドロップによる移動、グローバル検索、その他の一般的な機能をサポートする強力なファイルツリー。<!--ja-->
 <!--ja-->
@@ -110,17 +110,17 @@ Linux、macOS、Windows向けに利用可能です。<!--ja-->
 > Because of Apple’s security policy restrictions on software without developer certification, the **macOS aarch64** version cannot be downloaded and used directly. You can ignore the limit by doing the following:<!--en-->
 > - Open your terminal<!--en-->
 > - Go to the `Applications` directory. .e.g `/Applications`.<!--en-->
-> - Run `xattr -cr mdmaster.app` and open the app again<!--en-->
+> - Run `xattr -cr mdviewy.app` and open the app again<!--en-->
 > - Please make sure you download from `github releases` or [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA).<!--en-->
 > 因为苹果安全策略对于没有开发者认证软件的限制，导致 **macOS aarch64** 版本无法直接安装. 你可以通过一下步骤忽略该限制:<!--zh-->
 > - 打开终端<!--zh-->
 > - 进入到 `应用` 的目录下. 例如 `/Applications`.<!--zh-->
-> - 执行 `xattr -cr mdmaster.app` 然后打开 app 即可<!--zh-->
+> - 执行 `xattr -cr mdviewy.app` 然后打开 app 即可<!--zh-->
 > - 请确保下载来源: `github releases` 或 [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA).<!--zh-->
 > Appleのセキュリティポリシーにより、開発者認証のないソフトウェアは**macOS aarch64**版を直接ダウンロードして使用できません。以下の手順で制限を回避できます。<!--ja-->
 > - terminal を開く<!--ja-->
 > - `Applications` ディレクトリに移動します。例: `/Applications`。<!--ja-->
-> - `xattr -cr mdmaster.app` を実行し、再度アプリを開きます。<!--ja-->
+> - `xattr -cr mdviewy.app` を実行し、再度アプリを開きます。<!--ja-->
 > - `github releases` または [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) からダウンロードしてください。<!--ja-->
 
 You can download it from the [UpgradeLink download page](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) or [GitHub Release](https://github.com/Supersynergy/mdviewy/releases)<!--en-->
@@ -129,23 +129,23 @@ You can download it from the [UpgradeLink download page](https://download.upgrad
 
 ## ${en:'Why', zh:'为什么开发', ja:'動機'}
 
-**Actually, the initial inspiration for mdmaster stemmed from a casual conversation with a friend a few years ago**. As developers, we shared many expectations for an ideal Markdown editor. After trying many existing applications, I felt they couldn't fully meet our comprehensive needs in terms of efficiency, aesthetics, lightweight design, and workflow integration. We envisioned our ideal editor together. Although we later went our separate ways and lost touch, that seed of desire to create something beautiful has always remained in my heart.<!--en-->
-其实，**创作 mdmaster 的最初灵感，源于几年前和一位朋友一次闲聊**，作为开发者，我们对一款理想 Markdown 编辑器有很多的期待。在尝试过许多现有应用后，我感到它们难以完全满足在高效、美观、轻量与工作流融合上的综合需求。我们共同畅想了一款理想中编辑器的模样。尽管后来我们各自奔赴不同的人生，联系渐少，但那颗渴望创造美好的种子，一直在我心里。<!--zh-->
-**実は、mdmasterの最初のインスピレーションは、数年前の友人との何気ない会話から生まれました**。開発者として、私たちは理想的なMarkdownエディタに多くの期待を抱いていました。既存のアプリケーションを数多く試した結果、効率性、美しさ、軽量設計、ワークフロー統合といった点で、私たちの包括的なニーズを完全に満たすことができないと感じました。そこで、私たちは一緒に理想のエディタを思い描きました。その後、別々の道を歩み、連絡も途絶えてしまいましたが、美しいものを作りたいという思いは、常に私の心の中にありました。<!--ja-->
+**Actually, the initial inspiration for mdviewy stemmed from a casual conversation with a friend a few years ago**. As developers, we shared many expectations for an ideal Markdown editor. After trying many existing applications, I felt they couldn't fully meet our comprehensive needs in terms of efficiency, aesthetics, lightweight design, and workflow integration. We envisioned our ideal editor together. Although we later went our separate ways and lost touch, that seed of desire to create something beautiful has always remained in my heart.<!--en-->
+其实，**创作 mdviewy 的最初灵感，源于几年前和一位朋友一次闲聊**，作为开发者，我们对一款理想 Markdown 编辑器有很多的期待。在尝试过许多现有应用后，我感到它们难以完全满足在高效、美观、轻量与工作流融合上的综合需求。我们共同畅想了一款理想中编辑器的模样。尽管后来我们各自奔赴不同的人生，联系渐少，但那颗渴望创造美好的种子，一直在我心里。<!--zh-->
+**実は、mdviewyの最初のインスピレーションは、数年前の友人との何気ない会話から生まれました**。開発者として、私たちは理想的なMarkdownエディタに多くの期待を抱いていました。既存のアプリケーションを数多く試した結果、効率性、美しさ、軽量設計、ワークフロー統合といった点で、私たちの包括的なニーズを完全に満たすことができないと感じました。そこで、私たちは一緒に理想のエディタを思い描きました。その後、別々の道を歩み、連絡も途絶えてしまいましたが、美しいものを作りたいという思いは、常に私の心の中にありました。<!--ja-->
 
-It was this initial aspiration that propelled me step by step to transform mdmaster from a concept into reality. I hope to create a lightweight, intelligent editor that not only handles content securely and reliably but also improves editing efficiency through AI.<!--en-->
-最初的念想，推动着我一步步将 mdmaster 从构想变为现实。我希望能打造一款轻量、智能的编辑器，让它不仅能安全可靠地处理内容，还能通过 AI 来提高编辑工作的效率。<!--zh-->
-この最初の思いが、mdmasterを構想から現実へと一歩一歩変えていく原動力となりました。コンテンツを安全かつ確実に処理するだけでなく、AIによって編集効率も向上させる、軽量でインテリジェントなエディタを作りたいと思っています。<!--ja-->
+It was this initial aspiration that propelled me step by step to transform mdviewy from a concept into reality. I hope to create a lightweight, intelligent editor that not only handles content securely and reliably but also improves editing efficiency through AI.<!--en-->
+最初的念想，推动着我一步步将 mdviewy 从构想变为现实。我希望能打造一款轻量、智能的编辑器，让它不仅能安全可靠地处理内容，还能通过 AI 来提高编辑工作的效率。<!--zh-->
+この最初の思いが、mdviewyを構想から現実へと一歩一歩変えていく原動力となりました。コンテンツを安全かつ確実に処理するだけでなく、AIによって編集効率も向上させる、軽量でインテリジェントなエディタを作りたいと思っています。<!--ja-->
 
-mdmaster is a product, and also a testament to a life journey. Through continuous learning and development, it has grown into my response to the concepts of **efficiency, intelligence, and lightweight**. I hope mdmaster will become a tool that everyone finds convenient and enjoyable, and I welcome everyone to experience it and provide valuable feedback.<!--en-->
-mdmaster 是一个产品，也是一段人生旅程的见证。并在一路的学习与构建中，成长为我对**高效、智能、轻量**这些理念的回应，希望 mdmaster 能成为一个让大家感到趁手和愉悦的工具，也欢迎大家能来体验，并提出宝贵的意见。<!--zh-->
-mdmasterは製品であると同時に、私の人生の証でもあります。継続的な学習と開発を通して、**効率性、インテリジェンス、軽量性**というコンセプトに対する私の答えへと成長しました。 mdmaster が皆様にとって便利で楽しいツールになることを願っています。皆様に mdmaster を体験していただき、貴重なフィードバックを提供していただければ幸いです。<!--ja-->
+mdviewy is a product, and also a testament to a life journey. Through continuous learning and development, it has grown into my response to the concepts of **efficiency, intelligence, and lightweight**. I hope mdviewy will become a tool that everyone finds convenient and enjoyable, and I welcome everyone to experience it and provide valuable feedback.<!--en-->
+mdviewy 是一个产品，也是一段人生旅程的见证。并在一路的学习与构建中，成长为我对**高效、智能、轻量**这些理念的回应，希望 mdviewy 能成为一个让大家感到趁手和愉悦的工具，也欢迎大家能来体验，并提出宝贵的意见。<!--zh-->
+mdviewyは製品であると同時に、私の人生の証でもあります。継続的な学習と開発を通して、**効率性、インテリジェンス、軽量性**というコンセプトに対する私の答えへと成長しました。 mdviewy が皆様にとって便利で楽しいツールになることを願っています。皆様に mdviewy を体験していただき、貴重なフィードバックを提供していただければ幸いです。<!--ja-->
 
 ## ${en:'Contribute', zh:'参与', ja:'Contribute'}
 
-The current mdmaster is still in its infancy, and there may be some bad experiences or bugs, for which I am sorry. All partners who are interested or encounter usage problems are welcome to submit [issues](https://github.com/Supersynergy/mdviewy/issues/new) or [PR](https://github.com/Supersynergy/mdviewy/compare) to participate in this project.<!--en-->
-目前 mdmaster 仍处于初级阶段，可能会有一些不好的体验或bug。欢迎所有感兴趣或遇到使用问题的合作伙伴提交[issue](https://github.com/Supersynergy/mdviewy/issues/new)或[PR](https://github.com/Supersynergy/mdviewy/compare)参与这个项目。<!--zh-->
-現在のmdmasterはまだ発展途上であり、悪い体験やバグがあるかもしれません。その点についてはお詫び申し上げます。興味のあるパートナーや使用上の問題に直面している方は、[issues](https://github.com/Supersynergy/mdviewy/issues/new)や[PR](https://github.com/Supersynergy/mdviewy/compare)を提出して、このプロジェクトに参加してください。<!--ja-->
+The current mdviewy is still in its infancy, and there may be some bad experiences or bugs, for which I am sorry. All partners who are interested or encounter usage problems are welcome to submit [issues](https://github.com/Supersynergy/mdviewy/issues/new) or [PR](https://github.com/Supersynergy/mdviewy/compare) to participate in this project.<!--en-->
+目前 mdviewy 仍处于初级阶段，可能会有一些不好的体验或bug。欢迎所有感兴趣或遇到使用问题的合作伙伴提交[issue](https://github.com/Supersynergy/mdviewy/issues/new)或[PR](https://github.com/Supersynergy/mdviewy/compare)参与这个项目。<!--zh-->
+現在のmdviewyはまだ発展途上であり、悪い体験やバグがあるかもしれません。その点についてはお詫び申し上げます。興味のあるパートナーや使用上の問題に直面している方は、[issues](https://github.com/Supersynergy/mdviewy/issues/new)や[PR](https://github.com/Supersynergy/mdviewy/compare)を提出して、このプロジェクトに参加してください。<!--ja-->
 
 ### ${en:'How to Contribute', zh:'如何贡献', ja:'How to Contribute'}
 
@@ -155,10 +155,10 @@ You can read [CONTRIBUTING](./docs/en/Community/CONTRIBUTING.md) to know how to 
 
 ## ${en:'Support', zh:'支持', ja:'サポート'}
 
-mdmaster is completely and permanently open source, if you want to support mdmaster, you can `star` this project. For special support, please contact me via [email](mailto:drl990114@gmail.com).<!--en-->
-mdmaster 是完全永久开源的，如果你想支持 mdmaster，你可以`star`这个项目。特殊赞助可以通过 [邮箱](mailto:drl990114@gmail.com) 联系我。<!--zh-->
+mdviewy is completely and permanently open source, if you want to support mdviewy, you can `star` this project. For special support, please contact me via [email](mailto:drl990114@gmail.com).<!--en-->
+mdviewy 是完全永久开源的，如果你想支持 mdviewy，你可以`star`这个项目。特殊赞助可以通过 [邮箱](mailto:drl990114@gmail.com) 联系我。<!--zh-->
 <!--ja-->
-mdmasterは完全にオープンソースであり、mdmasterをサポートしたい場合は、このプロジェクトに`star`を付けることができます。特別なサポートが必要な場合は、[email](mailto:drl990114@gmail.com)で私に連絡してください。<!--ja-->
+mdviewyは完全にオープンソースであり、mdviewyをサポートしたい場合は、このプロジェクトに`star`を付けることができます。特別なサポートが必要な場合は、[email](mailto:drl990114@gmail.com)で私に連絡してください。<!--ja-->
 <!--ja-->
 <!-- <!--en-->
 In addition, you can sponsor me through WeChat or Alipay, which will greatly encourage me. And it will also be used for the subsequent development of the project, such as expenses for servers, domains, etc<!--en-->
@@ -190,9 +190,9 @@ In addition, you can sponsor me through WeChat or Alipay, which will greatly enc
   <img height="54" alt="UpgradeLink" src="./public/sponsors/UpgradeLink_1.png" />
 </a>
 
-${en:'Thanks to [UpgradeLink](https://www.toolsetlink.com) for providing reliable installation and upgrade services, ensuring seamless software updates for mdmaster users.', zh:'感谢 [UpgradeLink](https://www.toolsetlink.com) 提供可靠的安装与升级服务，确保 mdmaster 用户获得无缝的软件更新体验。', ja:'[UpgradeLink](https://www.toolsetlink.com) が信頼性の高いインストールおよびアップグレードサービスを提供し、mdmaster ユーザーにシームレスなソフトウェアアップデートを保証してくれたことに感謝します。'}<!--en-->
-感谢 [UpgradeLink](https://www.toolsetlink.com) 提供可靠的安装与升级服务，确保 mdmaster 用户获得无缝的软件更新体验。<!--zh-->
-[UpgradeLink](https://www.toolsetlink.com) が信頼性の高いインストールおよびアップグレードサービスを提供し、mdmaster ユーザーにシームレスなソフトウェアアップデートを保証してくれたことに感謝します。<!--ja-->
+${en:'Thanks to [UpgradeLink](https://www.toolsetlink.com) for providing reliable installation and upgrade services, ensuring seamless software updates for mdviewy users.', zh:'感谢 [UpgradeLink](https://www.toolsetlink.com) 提供可靠的安装与升级服务，确保 mdviewy 用户获得无缝的软件更新体验。', ja:'[UpgradeLink](https://www.toolsetlink.com) が信頼性の高いインストールおよびアップグレードサービスを提供し、mdviewy ユーザーにシームレスなソフトウェアアップデートを保証してくれたことに感謝します。'}<!--en-->
+感谢 [UpgradeLink](https://www.toolsetlink.com) 提供可靠的安装与升级服务，确保 mdviewy 用户获得无缝的软件更新体验。<!--zh-->
+[UpgradeLink](https://www.toolsetlink.com) が信頼性の高いインストールおよびアップグレードサービスを提供し、mdviewy ユーザーにシームレスなソフトウェアアップデートを保証してくれたことに感謝します。<!--ja-->
 
 ## ${en:'Special Thanks', zh:'特别感谢', ja:'特別な感謝'}
 
@@ -205,14 +205,14 @@ ${en:'Thanks to [UpgradeLink](https://www.toolsetlink.com) for providing reliabl
 - [tauri](https://tauri.app/) - ${en:'Build smaller, faster, and more secure desktop apps with a web frontend.', zh:'使用 Web 前端构建更小、更快、更安全的桌面应用。', ja:'Webフロントエンドでより小さく、より速く、より安全なデスクトップアプリを構築。'}<!--en-->
 - [tauri](https://tauri.app/) - 使用 Web 前端构建更小、更快、更安全的桌面应用。<!--zh-->
 - [tauri](https://tauri.app/) - Webフロントエンドでより小さく、より速く、より安全なデスクトップアプリを構築。<!--ja-->
-- ${en:'And thanks to all the open source libraries and projects that mdmaster depends on.', zh:'感谢所有 mdmaster 依赖的库和开源项目。', ja:'そして、mdmaster が依存しているすべてのオープンソースライブラリとプロジェクトに感謝します。'}<!--en-->
-- 感谢所有 mdmaster 依赖的库和开源项目。<!--zh-->
-- そして、mdmaster が依存しているすべてのオープンソースライブラリとプロジェクトに感謝します。<!--ja-->
+- ${en:'And thanks to all the open source libraries and projects that mdviewy depends on.', zh:'感谢所有 mdviewy 依赖的库和开源项目。', ja:'そして、mdviewy が依存しているすべてのオープンソースライブラリとプロジェクトに感謝します。'}<!--en-->
+- 感谢所有 mdviewy 依赖的库和开源项目。<!--zh-->
+- そして、mdviewy が依存しているすべてのオープンソースライブラリとプロジェクトに感謝します。<!--ja-->
 
 ## Contributors<!--en--><!--ja-->
 <!--en--><!--ja-->
-The development of **mdmaster** cannot be separated from these contributors. They have contributed a lot of abilities to **mdmaster**. Meanwhile, welcome to follow them! ❤️<!--en-->
-**mdmaster** の開発は、これらの貢献者なしには成し得ませんでした。彼らは **mdmaster** に多くの能力を提供してくれました。ぜひ彼らをフォローしてください！ ❤️<!--ja-->
+The development of **mdviewy** cannot be separated from these contributors. They have contributed a lot of abilities to **mdviewy**. Meanwhile, welcome to follow them! ❤️<!--en-->
+**mdviewy** の開発は、これらの貢献者なしには成し得ませんでした。彼らは **mdviewy** に多くの能力を提供してくれました。ぜひ彼らをフォローしてください！ ❤️<!--ja-->
 <!--en--><!--ja-->
 <!--nrg.freeze id="contributors"--><!--en-->
 <!-- readme: contributors -start --><!--en-->
@@ -240,4 +240,4 @@ The development of **mdmaster** cannot be separated from these contributors. The
 [codefactor]: https://www.codefactor.io/repository/github/Supersynergy/mdviewy/badge/main?style=flat-square&labelColor=black
 
 ## License
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSupersynergy%2Fmdmaster.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSupersynergy%2Fmdmaster?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSupersynergy%2Fmdviewy.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FSupersynergy%2Fmdviewy?ref=badge_large)

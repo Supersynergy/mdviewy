@@ -88,12 +88,12 @@ impl AppExtensions {
 
     #[allow(non_snake_case)]
     pub async fn downloadBuiltInExtensions(self) -> Self {
-        if exists(&Self::dir_path().join("mdmaster-theme-template")) {
+        if exists(&Self::dir_path().join("mdviewy-theme-template")) {
             return self;
         }
 
         let _ = download_npm::download(
-            "mdmaster-theme-template",
+            "mdviewy-theme-template",
             download_npm::DownloadOptions {
                 untar: true,
                 dest_path: Self::dir_path().to_str().unwrap().to_string(),

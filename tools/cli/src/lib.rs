@@ -5,7 +5,7 @@ pub mod utils;
 
 #[derive(Parser)]
 #[command(version)]
-#[command(about = "mdmaster Development Tool")]
+#[command(about = "mdviewy Development Tool")]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,

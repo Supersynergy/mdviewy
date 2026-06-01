@@ -62,10 +62,10 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         &[
             &Submenu::with_items(
                 app,
-                "mdmaster",
+                "mdviewy",
                 true,
                 &[
-                    &MenuItemBuilder::new("About mdmaster")
+                    &MenuItemBuilder::new("About mdviewy")
                         .id("About")
                         .build(app)?,
                     &PredefinedMenuItem::separator(app)?,
@@ -78,7 +78,7 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                     &PredefinedMenuItem::hide_others(app, None)?,
                     &PredefinedMenuItem::show_all(app, None)?,
                     &PredefinedMenuItem::separator(app)?,
-                    &PredefinedMenuItem::quit(app, Some("Quit mdmaster"))?,
+                    &PredefinedMenuItem::quit(app, Some("Quit mdviewy"))?,
                 ],
             )?,
             &Submenu::with_items(
@@ -227,7 +227,7 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                 "Help",
                 true,
                 &[
-                    &MenuItemBuilder::new("mdmaster GitHub")
+                    &MenuItemBuilder::new("mdviewy GitHub")
                         .id("app_openGithub")
                         .build(app)?,
                     &MenuItemBuilder::new("Report Issue")

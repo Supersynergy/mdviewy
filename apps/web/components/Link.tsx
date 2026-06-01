@@ -25,7 +25,7 @@ export default function Link({
   target,
   ...rest
 }: LinkProps) {
-  let Child: keyof JSX.IntrinsicElements | React.ComponentType<any> = StyledLink;
+  let Child: React.ElementType<any> = StyledLink;
 
   if (inline) {
     Child = InlineLink;
@@ -41,7 +41,7 @@ export default function Link({
   return (
     <UnstyledLink passHref legacyBehavior {...rest}>
       <Child aria-label={ariaLabel} className={className} title={title} {...dataAttrs} target={target}>
-        {children}
+        {children as any}
       </Child>
     </UnstyledLink>
   );

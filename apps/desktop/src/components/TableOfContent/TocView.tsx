@@ -135,6 +135,11 @@ export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
   const [sourceScrollEl, setSourceScrollEl] = useState<HTMLElement | null>(null)
   const rafRef = useRef<number | null>(null)
   const scheduleActiveHeadingUpdateRef = useRef<() => void>(() => {})
+  // Track the active file. When it changes we wipe stale heading state and
+  // schedule a refresh — without this, switching files left the previous
+  // doc's TOC visible until the user scrolled or interacted.
+  const activeId = useEditorStore((s) => s.activeId)
+  const lastActiveIdRef = useRef<string | null | undefined>(undefined)
 
   const calculateActiveHeadingId = useCallback(() => {
     const activeId = useEditorStore.getState().activeId
@@ -343,6 +348,42 @@ export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
       scrollEl.removeEventListener('scroll', handleScroll)
     }
   }, [scheduleActiveHeadingUpdate])
+
+  // Hard reset + re-extract whenever the active file changes. Editors mount
+  // asynchronously, so we retry up to ~600ms until heading-extraction returns
+  // a non-empty result. Prevents the "TOC of previous doc" bug.
+  useEffect(() => {
+    if (lastActiveIdRef.current === activeId) return
+    lastActiveIdRef.current = activeId
+
+    // wipe stale state immediately
+    wysiwygHeadingsRef.current = []
+    sourceHeadingsRef.current = []
+    setTocHeadings([])
+    setActiveHeadingId(null)
+
+    if (!activeId) return
+
+    let cancelled = false
+    let attempts = 0
+    const tryRefresh = () => {
+      if (cancelled) return
+      const ed = useEditorStore.getState().getEditorDelegate(activeId)
+      const cmReady = sourceCodeCodemirrorViewMap.get(activeId)
+      const wysReady = ed?.manager?.view
+      if (wysReady || cmReady) {
+        useCommandStore.getState().execute('app:toc_refresh')
+        return
+      }
+      attempts += 1
+      if (attempts < 30) setTimeout(tryRefresh, 20)
+    }
+    tryRefresh()
+
+    return () => {
+      cancelled = true
+    }
+  }, [activeId])
 
   useEffect(() => {
     if (!sourceScrollEl) return

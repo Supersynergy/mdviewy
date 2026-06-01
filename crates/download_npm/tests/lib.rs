@@ -22,7 +22,7 @@ async fn test_download() {
 async fn test_download_untar() {
     const TEST_FOLDER: &str = "./tests/untar";
     let _ = download_npm::download(
-        "mdmaster-theme-template",
+        "mdviewy-theme-template",
         download_npm::DownloadOptions {
             dest_path: TEST_FOLDER.to_string(),
             untar: true,
@@ -32,11 +32,11 @@ async fn test_download_untar() {
 
     assert!(std::path::Path::new(TEST_FOLDER).exists());
     assert!(std::path::Path::new(TEST_FOLDER)
-        .join("mdmaster-theme-template")
+        .join("mdviewy-theme-template")
         .join("package.json")
         .exists());
     assert!(std::path::Path::new(TEST_FOLDER)
-        .join("mdmaster-theme-template")
+        .join("mdviewy-theme-template")
         .join("index.js")
         .exists());
 }

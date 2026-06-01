@@ -8,14 +8,12 @@ window.__MDM_BOOT__ = performance.now()
   console.log(`[mdviewy.boot] ${label}: ${t.toFixed(1)}ms`)
 }
 
-import { lightTheme } from '@mdviewy/theme'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HoxRoot } from 'hox'
 import { enableMapSet } from 'immer'
 import { StrictMode, Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
-import { Spinners } from 'zens'
 import App from './App'
 import { initErrorReporting } from './errorReporting'
 import './atom.css'
@@ -28,23 +26,35 @@ enableMapSet()
 
 const queryClient = new QueryClient()
 
+// Zero-dep Suspense fallback. The pre-React skeleton in index.html stays
+// visible until #root is non-empty, so this is only rendered if a suspense
+// boundary fires AFTER hydration — keep it lightweight and dependency-free.
+const FallbackSpinner = () => (
+  <div
+    style={{
+      height: '100vh',
+      width: '100vw',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <div
+      style={{
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        background:
+          'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+        animation: 'mdf-pulse 1.4s ease-in-out infinite',
+      }}
+    />
+  </div>
+)
+
 const Main = () => {
   return (
-    <Suspense
-      fallback={
-        <div
-          style={{
-            height: '100vh',
-            width: '100vw',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Spinners.BarLoader color={lightTheme.styledConstants.accentColor} width={200} />
-        </div>
-      }
-    >
+    <Suspense fallback={<FallbackSpinner />}>
       <App />
     </Suspense>
   )

@@ -69,11 +69,11 @@ pub_struct!(AppConf {
     upload_image_save_relative_path_rule: Option<String>,
 });
 
-pub const APP_CONF_PATH: &str = "mdmaster.conf.json";
+pub const APP_CONF_PATH: &str = "mdviewy.conf.json";
 pub const STORE_KEY: &str = "app_config_v3";
 
 fn create_store(app: &AppHandle) -> Result<std::sync::Arc<Store<tauri::Wry>>, String> {
-    let store_path = "mdmaster_store.bin";
+    let store_path = "mdviewy_store.bin";
 
     StoreBuilder::new(app.app_handle(), store_path)
         .build()
@@ -83,14 +83,19 @@ fn create_store(app: &AppHandle) -> Result<std::sync::Arc<Store<tauri::Wry>>, St
 pub fn app_root() -> PathBuf {
     let app_dir = APP_DIR.lock().unwrap();
     let home_dir = app_dir.get(&0).unwrap();
-    let legacy_path = home_dir.join(".mdmaster");
-    let pre_rename_path = home_dir.join(".mdviewy");
+    let legacy_path = home_dir.join(".mdviewy");
 
-    // One-shot migration from pre-rename `.mdviewy` → `.mdmaster`.
-    if !exists(&legacy_path) && exists(&pre_rename_path) {
-        if let Err(e) = std::fs::rename(&pre_rename_path, &legacy_path) {
-            eprintln!("[conf] migrate .mdviewy → .mdmaster failed: {e}");
-            return pre_rename_path;
+    // One-shot migration from any pre-rename dotdir → `.mdviewy`.
+    if !exists(&legacy_path) {
+        for old in [".mdmaster", ".mdflowy"] {
+            let p = home_dir.join(old);
+            if exists(&p) {
+                if let Err(e) = std::fs::rename(&p, &legacy_path) {
+                    eprintln!("[conf] migrate {old} → .mdviewy failed: {e}");
+                    return p;
+                }
+                break;
+            }
         }
     }
 
@@ -105,22 +110,25 @@ pub fn app_root() -> PathBuf {
         if let Ok(strategy) = choose_app_strategy(AppStrategyArgs {
             top_level_domain: "com".to_string(),
             author: "supersynergy".to_string(),
-            app_name: "mdmaster".to_string(),
+            app_name: "mdviewy".to_string(),
         }) {
             let new_xdg = strategy.config_dir();
             if !new_xdg.exists() {
-                if let Ok(old_strategy) = choose_app_strategy(AppStrategyArgs {
-                    top_level_domain: "com".to_string(),
-                    author: "supersynergy".to_string(),
-                    app_name: "mdviewy".to_string(),
-                }) {
-                    let old_xdg = old_strategy.config_dir();
-                    if old_xdg.exists() {
-                        if let Some(parent) = new_xdg.parent() {
-                            let _ = std::fs::create_dir_all(parent);
-                        }
-                        if let Err(e) = std::fs::rename(&old_xdg, &new_xdg) {
-                            eprintln!("[conf] migrate XDG mdviewy → mdmaster failed: {e}");
+                for old_name in ["mdmaster", "mdflowy"] {
+                    if let Ok(old_strategy) = choose_app_strategy(AppStrategyArgs {
+                        top_level_domain: "com".to_string(),
+                        author: "supersynergy".to_string(),
+                        app_name: old_name.to_string(),
+                    }) {
+                        let old_xdg = old_strategy.config_dir();
+                        if old_xdg.exists() {
+                            if let Some(parent) = new_xdg.parent() {
+                                let _ = std::fs::create_dir_all(parent);
+                            }
+                            if let Err(e) = std::fs::rename(&old_xdg, &new_xdg) {
+                                eprintln!("[conf] migrate XDG {old_name} → mdviewy failed: {e}");
+                            }
+                            break;
                         }
                     }
                 }
@@ -140,7 +148,7 @@ pub fn app_root() -> PathBuf {
         match choose_app_strategy(AppStrategyArgs {
             top_level_domain: "com".to_string(),
             author: "supersynergy".to_string(),
-            app_name: "mdmaster".to_string(),
+            app_name: "mdviewy".to_string(),
         }) {
             Ok(strategy) => strategy.config_dir(),
             Err(_) => legacy_path, // Fallback to legacy path if something goes wrong
@@ -464,7 +472,7 @@ pub mod cmd {
         tauri::async_runtime::spawn(async move {
             let conf_win =
                 WebviewWindowBuilder::new(&app, "conf", WebviewUrl::App("./setting".into()))
-                    .title("mdmaster setting")
+                    .title("mdviewy setting")
                     .resizable(true)
                     .fullscreen(false)
                     .theme(Some(theme))

@@ -6,7 +6,7 @@ import {
   type ExplorerFilter,
 } from './filter'
 
-const STORAGE_KEY = 'mdmaster.explorer.filter'
+const STORAGE_KEY = 'mdviewy.explorer.filter'
 const LEGACY_DEFAULT_FILTER: ExplorerFilter = {
   ...DEFAULT_EXPLORER_FILTER,
   scope: 'md',

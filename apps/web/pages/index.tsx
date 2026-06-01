@@ -52,7 +52,7 @@ export default function Index({
 
   return (
     <>
-      <SeoHead title='mdmaster'>
+      <SeoHead title='mdviewy'>
         <meta name='robots' content='noodp' />
       </SeoHead>
 
@@ -101,7 +101,7 @@ export default function Index({
                   <MacButton yellow={true} />
                   <MacButton green={true} />
                 </MacButtons>
-                <MacTitle>mdmaster</MacTitle>
+                <MacTitle>mdviewy</MacTitle>
               </MacTitleBar>
               <EditorTabs>
                 <EditorTab
@@ -166,8 +166,8 @@ export default function Index({
         <Footer>
           <FooterContent>
             <FooterLogoContainer>
-              <FooterLogo src='/logo.svg' alt='mdmaster' />
-              <FooterAppName>mdmaster</FooterAppName>
+              <FooterLogo src='/logo.svg' alt='mdviewy' />
+              <FooterAppName>mdviewy</FooterAppName>
             </FooterLogoContainer>
             <FooterLinksRow>
               <FooterLinkItem href='https://github.com/Supersynergy/mdviewy' target='_blank'>

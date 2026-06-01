@@ -130,31 +130,45 @@ function TextEditor(props: TextEditorProps) {
   })
 
   useLayoutEffect(() => {
+    let cancelled = false
     const init = async () => {
       const file = curFile
+      const t0 = import.meta.env.DEV ? performance.now() : 0
       if (file.path) {
-        const isExists = await invoke('file_exists', { filePath: file.path })
-        if (isExists) {
-          const res = await invoke<FileSysResult>('get_file_content', {
-            filePath: file.path,
-          })
-          if (res.code !== FileResultCode.Success) {
-            toast.error(res.content)
-            return
-          }
-          setContent(res.content)
-          updateEditorCounter(res.content)
-        } else {
-          return setStatus(TextEditorStatus.NOTEXIST)
+        // Single IPC roundtrip — `get_file_content` already returns NotFound
+        // for missing paths. Previously we did file_exists + get_file_content
+        // sequentially = 2× IPC latency per file open.
+        const res = await invoke<FileSysResult>('get_file_content', {
+          filePath: file.path,
+        })
+        if (cancelled) return
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.log(
+            `[mdviewy.open] ${file.name || file.path} ipc=${(performance.now() - t0).toFixed(1)}ms bytes=${res.content?.length ?? 0}`,
+          )
         }
+        if (res.code === FileResultCode.NotFound) {
+          setStatus(TextEditorStatus.NOTEXIST)
+          return
+        }
+        if (res.code !== FileResultCode.Success) {
+          toast.error(res.content)
+          return
+        }
+        setContent(res.content)
+        updateEditorCounter(res.content)
       } else if (file.content !== undefined) {
         setContent(file.content)
         updateEditorCounter(file.content)
       }
 
-      return setStatus(TextEditorStatus.SUCCESS)
+      if (!cancelled) setStatus(TextEditorStatus.SUCCESS)
     }
     init()
+    return () => {
+      cancelled = true
+    }
   }, [delegate, curFile, setEditorDelegate, updateEditorCounter])
 
   const saveHandler = useCallback(
@@ -590,8 +604,32 @@ function TextEditor(props: TextEditorProps) {
     return <WarningHeader>File is not exist</WarningHeader>
   }
 
+  // Instant feedback while we wait for the file IPC + initial editor parse.
+  // Previously returned `null` here → first file-open felt "stuck" for the
+  // duration of the read + WYSIWYG mount even though IPC was fast.
   if (typeof content !== 'string') {
-    return null
+    return (
+      <div
+        className='markdown-body'
+        style={{
+          padding: '24px 32px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          opacity: 0.55,
+          pointerEvents: 'none',
+        }}
+        aria-hidden='true'
+      >
+        <div style={{ height: 24, width: '60%', borderRadius: 6, background: 'currentColor', opacity: 0.15 }} />
+        <div style={{ height: 12, width: '90%', borderRadius: 4, background: 'currentColor', opacity: 0.1 }} />
+        <div style={{ height: 12, width: '85%', borderRadius: 4, background: 'currentColor', opacity: 0.1 }} />
+        <div style={{ height: 12, width: '70%', borderRadius: 4, background: 'currentColor', opacity: 0.1 }} />
+        <div style={{ height: 18, width: '40%', borderRadius: 5, background: 'currentColor', opacity: 0.12, marginTop: 12 }} />
+        <div style={{ height: 12, width: '95%', borderRadius: 4, background: 'currentColor', opacity: 0.1 }} />
+        <div style={{ height: 12, width: '88%', borderRadius: 4, background: 'currentColor', opacity: 0.1 }} />
+      </div>
+    )
   }
 
   const cls = classNames('markdown-body', {

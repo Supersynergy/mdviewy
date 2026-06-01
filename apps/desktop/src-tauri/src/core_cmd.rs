@@ -1,13 +1,13 @@
-//! Tauri command wrappers around `mdmaster-core`.
+//! Tauri command wrappers around `mdviewy-core`.
 
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use mdmaster_core::frontmatter::{self, FileMeta};
-use mdmaster_core::fts::{FtsIndex, SearchHit};
-use mdmaster_core::render::{self, RenderOpts, RenderOutput};
-use mdmaster_core::watcher::{self, ScanEntry};
+use mdviewy_core::frontmatter::{self, FileMeta};
+use mdviewy_core::fts::{FtsIndex, SearchHit};
+use mdviewy_core::render::{self, RenderOpts, RenderOutput};
+use mdviewy_core::watcher::{self, ScanEntry};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
 
@@ -71,7 +71,7 @@ pub fn core_watch_folder(
     let app_clone = app.clone();
     std::thread::spawn(move || {
         while let Ok(ev) = rx.recv_timeout(Duration::from_secs(60 * 60 * 24)) {
-            if let Err(e) = app_clone.emit("mdmaster://watch", ev) {
+            if let Err(e) = app_clone.emit("mdviewy://watch", ev) {
                 eprintln!("[core_watch_folder] emit failed: {e}");
             }
         }

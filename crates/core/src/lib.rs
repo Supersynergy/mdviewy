@@ -1,4 +1,4 @@
-//! MDmaster core — rust-side hot path.
+//! MDviewy core — rust-side hot path.
 //!
 //! Modules:
 //! - `watcher`  — notify+ignore incremental folder watcher (Phase-1, default)

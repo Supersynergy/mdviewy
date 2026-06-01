@@ -1,6 +1,5 @@
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useCallback, useRef, useState } from 'react'
 import styled from 'styled-components'
-import useResizeObserver from 'use-resize-observer'
 import mergeRefs from './merge-refs'
 
 type Props = {
@@ -40,8 +39,33 @@ const Container = styled.div`
     z-index: 1;
   }
 `
+
+function useElementSize() {
+  const [size, setSize] = useState({ width: 0, height: 0 })
+  const observerRef = useRef<ResizeObserver | null>(null)
+
+  const ref = useCallback((node: HTMLDivElement | null) => {
+    observerRef.current?.disconnect()
+
+    if (!node) {
+      observerRef.current = null
+      setSize({ width: 0, height: 0 })
+      return
+    }
+
+    const nextObserver = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      setSize({ width, height })
+    })
+    nextObserver.observe(node)
+    observerRef.current = nextObserver
+  }, [])
+
+  return { ref, ...size }
+}
+
 export const FillFlexParent = React.forwardRef(function FillFlexParent(props: Props, forwardRef) {
-  const { ref, width, height } = useResizeObserver()
+  const { ref, width, height } = useElementSize()
   return (
     <Container style={style} ref={mergeRefs(ref, forwardRef)}>
       {width && height ? props.children({ width, height }) : null}

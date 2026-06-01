@@ -27,8 +27,8 @@ const Playground = () => {
   return (
     <>
       <Head>
-        <title>Playground - mdmaster</title>
-        <meta name='description' content='Experiment with the RME editor in mdmaster playground' />
+        <title>Playground - mdviewy</title>
+        <meta name='description' content='Experiment with the RME editor in mdviewy playground' />
       </Head>
       <Nav
         showSideNav={false}

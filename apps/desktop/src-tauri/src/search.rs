@@ -6,7 +6,7 @@ pub struct SearchOptions {
 }
 
 pub mod cmd {
-    use mdmaster_file_search::{
+    use mdviewy_file_search::{
         manager,
         options::{ContentOptions, Options},
         search::Search,

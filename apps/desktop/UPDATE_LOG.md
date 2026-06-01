@@ -2,7 +2,7 @@
 
 ## v0.55.4
 
-I wrote an article on how to use Copilot and Ollama in mdmaster. If you encounter some problems, you may find solutions here, [Use Copilot with Ollama](https://www.mdmaster.cc/en/docs/Extension/UseCopilotWithOllama)。
+I wrote an article on how to use Copilot and Ollama in mdviewy. If you encounter some problems, you may find solutions here, [Use Copilot with Ollama](https://www.mdviewy.cc/en/docs/Extension/UseCopilotWithOllama)。
 
 Fixes:
 
@@ -12,7 +12,7 @@ Fixes:
 
 ---
 
-我写了一篇如何在 mdmaster 中使用 Copilot 和 Ollama，如果你遇到了一些问题，也许可以在这里找到解决方案, [如何Copilot 与 Ollama 配合使用](https://www.mdmaster.cc/zh/docs/Extension/UseCopilotWithOllama)。
+我写了一篇如何在 mdviewy 中使用 Copilot 和 Ollama，如果你遇到了一些问题，也许可以在这里找到解决方案, [如何Copilot 与 Ollama 配合使用](https://www.mdviewy.cc/zh/docs/Extension/UseCopilotWithOllama)。
 
 修复：
 
@@ -186,7 +186,7 @@ This update brings many new features and bug fixes：
 
 - AI conversation refactored to `stream` output with a more user-friendly interface and interaction.
 
-- Support for multiple system right-clicks to quickly open files with `mdmaster`.
+- Support for multiple system right-clicks to quickly open files with `mdviewy`.
 
 - Application configuration files no longer use explicit JSON file storage; instead, they use the application's data storage for improved security.
 
@@ -198,7 +198,7 @@ This update brings many new features and bug fixes：
 
 - `WYSIWYG` mode now supports parsing of Markdown reference syntax.
 
-- `WYSIWYG` mode supports drag-and-drop image upload, defaulting to storage in the application's `${mdmasterConfigPath}/assets/images` directory. The completed path can be viewed and modified in `Settings - Pictures`.
+- `WYSIWYG` mode supports drag-and-drop image upload, defaulting to storage in the application's `${mdviewyConfigPath}/assets/images` directory. The completed path can be viewed and modified in `Settings - Pictures`.
 
 - `Source code` mode supports `tab` key indentation.
 
@@ -224,7 +224,7 @@ This update brings many new features and bug fixes：
 
 - AI 对话重构，改为流式输出，界面与交互更友好。
 
-- 支持多次系统右键,使用 mdmaster 快速打开文件。
+- 支持多次系统右键,使用 mdviewy 快速打开文件。
 
 - 应用的配置文件不再使用显式的 json 文件储存，使用应用的数据存储，提高安全性。
 
@@ -236,7 +236,7 @@ This update brings many new features and bug fixes：
 
 - 所见即所得模式支持 Markdown 引用语法的解析。
 
-- 所见即所得模式支持图片的拖拽上传，默认将存放在应用的 `${mdmasterConfigPath}/assets/images` 目录。完成路径可以在 `设置 - 图片`中查看和修改。
+- 所见即所得模式支持图片的拖拽上传，默认将存放在应用的 `${mdviewyConfigPath}/assets/images` 目录。完成路径可以在 `设置 - 图片`中查看和修改。
 
 - 源代码模式支持 `tab` 键缩进。
 

@@ -1,7 +1,16 @@
 import useAppSettingStore from '@/stores/useAppSettingStore'
-import { extname } from '@tauri-apps/api/path'
 import type { EditorViewType } from 'rme'
 import { IFile } from './filesys'
+
+// Sync extname — was using @tauri-apps/api/path which does an IPC roundtrip
+// per file open just to parse the extension. Trivial string work, no need.
+function extname(p: string): string {
+  const last = p.lastIndexOf('.')
+  if (last < 0) return ''
+  const slash = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'))
+  if (last < slash) return ''
+  return p.slice(last + 1)
+}
 
 export type FileType = 'markdown' | 'image' | 'json' | 'text' | 'unsupported'
 
@@ -20,8 +29,8 @@ export const isTextfileType = (fileTypeConfig: FileTypeConfig): boolean => {
   return ['markdown', 'json', 'text'].includes(fileTypeConfig.type)
 }
 
-export async function getFileTypeConfig(file: IFile): Promise<FileTypeConfig> {
-  const ext = await extname(file.path || file.name || '')
+export function getFileTypeConfig(file: IFile): FileTypeConfig {
+  const ext = extname(file.path || file.name || '')
   const { settingData } = useAppSettingStore.getState()
 
   const markdownFileType: FileTypeConfig = {

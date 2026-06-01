@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "MDmaster",
+  "productName": "MDviewy",
   "version": "0.55.4",
-  "identifier": "com.supersynergy.mdmaster",
+  "identifier": "com.supersynergy.mdviewy",
   "build": {
     "beforeDevCommand": "yarn dev",
     "devUrl": "http://localhost:3000",
@@ -15,7 +15,7 @@
     "updater": {
       "endpoints": [
         "http://api.upgrade.toolsetlink.com/v1/tauri/upgrade?tauriKey=xpn68m4j5qU0Y1rfDYFHaA&versionName={{current_version}}&appointVersionName=&devModelKey=&devKey=&target={{target}}&arch={{arch}}",
-        "https://Supersynergy.github.io/mdmaster/install.json",
+        "https://Supersynergy.github.io/mdviewy/install.json",
         "https://github.com/Supersynergy/mdviewy/releases/latest/download/install.json"
       ],
       "dangerousInsecureTransportProtocol": true,

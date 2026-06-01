@@ -66,4 +66,4 @@ export const coreFtsDelete = (path: string) =>
 
 export const onCoreWatch = (
   handler: (ev: CoreWatchEvent) => void,
-): Promise<UnlistenFn> => listen<CoreWatchEvent>('mdmaster://watch', (e) => handler(e.payload))
+): Promise<UnlistenFn> => listen<CoreWatchEvent>('mdviewy://watch', (e) => handler(e.payload))

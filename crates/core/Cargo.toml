@@ -1,8 +1,8 @@
 [package]
-name = "mdmaster-core"
+name = "mdviewy-core"
 version = "0.1.0"
 edition = "2021"
-description = "MDmaster rust-side core — folder watcher, FTS, markdown render, frontmatter/TOC"
+description = "MDviewy rust-side core — folder watcher, FTS, markdown render, frontmatter/TOC"
 license = "MIT"
 
 [dependencies]

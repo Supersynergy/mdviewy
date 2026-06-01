@@ -124,7 +124,7 @@ async function appWorkspaceSetup() {
   logger.debug('window.openedUrls', window.openedUrls)
 
   try {
-    const cacheStore = await new LazyStore('.mdmaster_workspaces.dat')
+    const cacheStore = await new LazyStore('.mdviewy_workspaces.dat')
 
     const getOpenedCacheRes = await invoke<{ recent_workspaces: WorkspaceInfo[] }>(
       'get_opened_cache',
@@ -253,6 +253,24 @@ const appSetup = onceAsync(async function () {
   schedule(() => {
     // Network call — never block startup on it.
     checkUpdate({ install: settingData.auto_update })
+  })
+
+  // Pre-warm the WYSIWYG editor delegate during idle time. First md-file-open
+  // currently pays the full remirror manager init cost on the critical path;
+  // warming it here moves that cost to background time so the first real open
+  // is near-instant.
+  schedule(async () => {
+    try {
+      const [rme, opts] = await Promise.all([
+        import('rme'),
+        import('@/components/EditorArea/createWysiwygDelegateOptions'),
+      ])
+      // Create + discard. Internal caches (schemas, plugins, parsers) stay
+      // warm in remirror's module-level singletons.
+      rme.createWysiwygDelegate(opts.createWysiwygDelegateOptions())
+    } catch (e) {
+      logger.debug('editor pre-warm failed (non-fatal)', e)
+    }
   })
 
   return settingData

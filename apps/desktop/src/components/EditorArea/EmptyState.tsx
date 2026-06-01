@@ -23,7 +23,7 @@ const SUGGESTIONS: Suggestion[] = [
   { key: 'obsidian', label: 'Obsidian Vault', hint: 'Personal knowledge base', icon: 'ri-book-2-line', subpath: 'Obsidian' },
 ]
 
-const DISMISS_KEY = 'mdmaster.onboarding.dismissed'
+const DISMISS_KEY = 'mdviewy.onboarding.dismissed'
 
 export const EmptyState = memo(() => {
   const { t } = useTranslation()

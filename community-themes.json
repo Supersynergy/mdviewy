@@ -1,10 +1,10 @@
 [
   {
-    "name": "mdmaster Dark-",
+    "name": "mdviewy Dark-",
     "mode": ["dark"],
-    "description": "A dark theme for mdmaster",
-    "packageName": "mdmaster-theme-template",
-    "author": "mdmaster Team",
-    "repository": "https://github.com/mdmaster/custom-theme-template"
+    "description": "A dark theme for mdviewy",
+    "packageName": "mdviewy-theme-template",
+    "author": "mdviewy Team",
+    "repository": "https://github.com/mdviewy/custom-theme-template"
   }
 ]
