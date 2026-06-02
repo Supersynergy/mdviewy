@@ -182,10 +182,13 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   .markdown-body .cm-render-node-label,
+  .markdown-body .rme-block-handler,
+  .markdown-body .rme-draggable-handler,
   .markdown-body .rme-table-body-selector,
   .markdown-body .rme-table-row-selector,
   .markdown-body .rme-table-column-selector {
     display: none !important;
+    pointer-events: none !important;
   }
 
   .file-tree-row .row-actions,

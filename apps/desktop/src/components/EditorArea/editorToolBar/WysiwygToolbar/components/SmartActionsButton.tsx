@@ -2,6 +2,7 @@ import { MfIconLabelButton } from '@/components/ui-v2/Button/icon-label-button'
 import { showContextMenu } from '@/components/ui-v2/ContextMenu'
 import { getFileObject } from '@/helper/files'
 import {
+  buildAgentHandoffPrompt,
   buildAiContextPack,
   extractSmartReferences,
   fileNameOf,
@@ -73,7 +74,8 @@ export const SmartActionsButton = () => {
     const refs = extractSmartReferences(content, {
       currentDir: dir,
       workspaceRoot: useEditorStore.getState().getRootPath(),
-    }).slice(0, 8)
+      limit: 8,
+    })
 
     showContextMenu({
       x: rect.x,
@@ -209,6 +211,23 @@ export const SmartActionsButton = () => {
               `Read @${path} and propose 5 specific improvements. Format: file:line — issue — fix.`,
             )
             toast.success('Prompt copied')
+          },
+        },
+        {
+          label: 'Copy Codex handoff',
+          value: 'prompt-codex-handoff',
+          handler: async () => {
+            await writeText(
+              buildAgentHandoffPrompt(
+                {
+                  path,
+                  name: curFile.name || fileNameOf(path) || 'untitled',
+                  workspaceRoot: useEditorStore.getState().getRootPath(),
+                },
+                'codex',
+              ),
+            )
+            toast.success('Codex handoff copied')
           },
         },
         ...(refs.length ? [{ type: 'divider' as const }] : []),

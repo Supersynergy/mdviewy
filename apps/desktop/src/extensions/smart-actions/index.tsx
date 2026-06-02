@@ -2,6 +2,7 @@ import type { RightBarItem } from '@/components/SideBar'
 import { RIGHTBARITEMKEYS } from '@/constants'
 import { getFileObject } from '@/helper/files'
 import {
+  buildAgentHandoffPrompt,
   buildAiContextPack,
   extractSmartReferences,
   fileNameOf,
@@ -220,6 +221,42 @@ const ACTION_GROUPS: ActionGroup[] = [
           toast.success('Prompt copied')
         },
         disabled: (f) => !f.path,
+      },
+      {
+        icon: 'ri-sparkling-2-line',
+        label: 'Copy Claude handoff',
+        hint: 'AGENTS.md-aware task prompt',
+        run: async (f) => {
+          await writeText(
+            buildAgentHandoffPrompt(
+              {
+                path: f.path,
+                name: f.name,
+                workspaceRoot: useEditorStore.getState().getRootPath(),
+              },
+              'claude',
+            ),
+          )
+          toast.success('Claude handoff copied')
+        },
+      },
+      {
+        icon: 'ri-robot-2-line',
+        label: 'Copy Codex handoff',
+        hint: 'Clean-worktree implementation prompt',
+        run: async (f) => {
+          await writeText(
+            buildAgentHandoffPrompt(
+              {
+                path: f.path,
+                name: f.name,
+                workspaceRoot: useEditorStore.getState().getRootPath(),
+              },
+              'codex',
+            ),
+          )
+          toast.success('Codex handoff copied')
+        },
       },
       {
         icon: 'ri-file-copy-line',
@@ -465,7 +502,8 @@ const SmartActionsPanel = memo(() => {
       refs: extractSmartReferences(content, {
         currentDir: folderOf(f.path),
         workspaceRoot: useEditorStore.getState().getRootPath(),
-      }).slice(0, 10),
+        limit: 10,
+      }),
     }
   }, [activeId])
 

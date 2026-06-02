@@ -13,6 +13,8 @@ export interface SmartFileContext {
   workspaceRoot?: string
 }
 
+export type AgentHandoffTarget = 'claude' | 'codex' | 'review'
+
 const URL_RE = /https?:\/\/[^\s)\]>"']+/gi
 const QUOTED_ABS_PATH_RE = /["'`](\/(?:Users|Volumes|Applications|private|tmp|var|opt|usr|etc)\/[^"'`\n]+)["'`]/g
 const INLINE_ABS_PATH_RE = /(^|[\s([{<])((?:~|\.{1,2}|\/(?:Users|Volumes|Applications|private|tmp|var|opt|usr|etc))\/[^\s)\]>"'`]+)(?=$|[\s)\]}>.,;:!?])/gm
@@ -57,13 +59,30 @@ export const buildAiContextPack = (ctx: SmartFileContext, options: { hideCode?: 
     .join('\n')
 }
 
+export const buildAgentHandoffPrompt = (ctx: SmartFileContext, target: AgentHandoffTarget) => {
+  const mention = ctx.path ? `@${ctx.path}` : ctx.name
+  const workspace = ctx.workspaceRoot ? `Workspace: ${ctx.workspaceRoot}\n` : ''
+
+  if (target === 'claude') {
+    return `${workspace}Read ${mention}. Continue from the current repo state, respect AGENTS.md/CLAUDE.md, and implement the smallest verified fix. Report changed files and verification commands.`
+  }
+
+  if (target === 'review') {
+    return `${workspace}Review ${mention} in code-review mode. Lead with bugs, regressions, missing tests, and file:line references. Keep summary secondary.`
+  }
+
+  return `${workspace}In Codex, inspect ${mention}, make the focused code change, run the repo checks, and leave the worktree clean. Do not revert unrelated user changes.`
+}
+
 export const extractSmartReferences = (
   markdown: string,
-  context: { currentDir?: string; workspaceRoot?: string } = {},
+  context: { currentDir?: string; workspaceRoot?: string; limit?: number } = {},
 ): SmartReference[] => {
+  const limit = Math.max(1, Math.min(context.limit ?? 24, 50))
   const refs: SmartReference[] = []
 
   const add = (kind: SmartReferenceKind, raw: string) => {
+    if (refs.length >= limit) return
     const value = normalizeCandidate(raw, context)
     if (!value) return
     if (refs.some((ref) => ref.kind === kind && ref.value === value)) return
@@ -72,23 +91,27 @@ export const extractSmartReferences = (
 
   for (const match of markdown.matchAll(URL_RE)) {
     add('url', match[0])
+    if (refs.length >= limit) return refs
   }
 
   for (const match of markdown.matchAll(MARKDOWN_LINK_RE)) {
     const target = match[1]
     if (/^https?:\/\//i.test(target)) add('url', target)
     else add('path', target)
+    if (refs.length >= limit) return refs
   }
 
   for (const match of markdown.matchAll(QUOTED_ABS_PATH_RE)) {
     add('path', match[1])
+    if (refs.length >= limit) return refs
   }
 
   for (const match of markdown.matchAll(INLINE_ABS_PATH_RE)) {
     add('path', match[2])
+    if (refs.length >= limit) return refs
   }
 
-  return refs.slice(0, 24)
+  return refs
 }
 
 function normalizeCandidate(

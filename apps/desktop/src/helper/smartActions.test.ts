@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { buildAiContextPack, extractSmartReferences, stripCodeBlocks } from './smartActions'
+import {
+  buildAgentHandoffPrompt,
+  buildAiContextPack,
+  extractSmartReferences,
+  stripCodeBlocks,
+} from './smartActions'
 
 describe('smartActions helpers', () => {
   it('extracts urls and mac/local paths without duplicates', () => {
@@ -43,5 +48,23 @@ See [local](./docs/spec.md), "/Users/master/projects/mdviewy/README.md" and ./do
     expect(pack).toContain('Workspace: /Users/master/project')
     expect(pack).toContain('[code block hidden]')
     expect(pack).not.toContain('secretCode')
+  })
+
+  it('builds compact Claude/Codex handoff prompts and limits reference scans early', () => {
+    const ctx = {
+      path: '/Users/master/project/a.md',
+      name: 'a.md',
+      workspaceRoot: '/Users/master/project',
+    }
+
+    expect(buildAgentHandoffPrompt(ctx, 'claude')).toContain('respect AGENTS.md/CLAUDE.md')
+    expect(buildAgentHandoffPrompt(ctx, 'codex')).toContain('leave the worktree clean')
+    expect(buildAgentHandoffPrompt(ctx, 'review')).toContain('code-review mode')
+
+    const refs = extractSmartReferences('https://a.test/1 https://b.test/2 https://c.test/3', {
+      limit: 2,
+    })
+
+    expect(refs).toHaveLength(2)
   })
 })
