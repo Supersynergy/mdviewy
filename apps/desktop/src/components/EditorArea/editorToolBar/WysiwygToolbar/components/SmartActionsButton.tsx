@@ -1,18 +1,19 @@
 import { MfIconLabelButton } from '@/components/ui-v2/Button/icon-label-button'
 import { showContextMenu } from '@/components/ui-v2/ContextMenu'
 import { getFileObject } from '@/helper/files'
+import {
+  buildAiContextPack,
+  extractSmartReferences,
+  fileNameOf,
+  folderOf,
+  markdownLinkForPath,
+} from '@/helper/smartActions'
 import { useEditorStore } from '@/stores'
+import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
-import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { Command } from '@tauri-apps/plugin-shell'
 import { useCallback, useRef } from 'react'
 import { toast } from 'zens'
-
-const folderOf = (p?: string) => {
-  if (!p) return ''
-  const ix = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'))
-  return ix > 0 ? p.slice(0, ix) : p
-}
 
 const openInOsTerminal = async (dir: string) => {
   const isMac = navigator.platform.toLowerCase().includes('mac')
@@ -38,6 +39,14 @@ const openFolder = async (dir: string) => {
   }
 }
 
+const openPathOrUrl = async (value: string) => {
+  if (/^https?:\/\//i.test(value)) {
+    await openUrl(value)
+    return
+  }
+  await openFolder(value)
+}
+
 const runShell = async (program: string, args: string[]) => {
   try {
     const cmd = Command.create(program, args)
@@ -60,6 +69,11 @@ export const SmartActionsButton = () => {
     if (!rect || !curFile) return
     const path = curFile.path
     const dir = folderOf(path)
+    const content = activeId ? useEditorStore.getState().getEditorContent(activeId) : ''
+    const refs = extractSmartReferences(content, {
+      currentDir: dir,
+      workspaceRoot: useEditorStore.getState().getRootPath(),
+    }).slice(0, 8)
 
     showContextMenu({
       x: rect.x,
@@ -97,9 +111,49 @@ export const SmartActionsButton = () => {
           value: 'copy-md',
           handler: async () => {
             if (!path) return
-            const name = path.split(/[\\/]/).pop() || path
-            await writeText(`[${name}](${path})`)
+            await writeText(markdownLinkForPath(path, curFile.name))
             toast.success('Markdown link copied')
+          },
+        },
+        {
+          label: 'Copy full content',
+          value: 'copy-content',
+          handler: async () => {
+            await writeText(content)
+            toast.success('Content copied')
+          },
+        },
+        {
+          label: 'Copy AI context pack',
+          value: 'copy-ai-context',
+          handler: async () => {
+            await writeText(
+              buildAiContextPack({
+                path,
+                name: curFile.name || fileNameOf(path) || 'untitled',
+                content,
+                workspaceRoot: useEditorStore.getState().getRootPath(),
+              }),
+            )
+            toast.success('AI context copied')
+          },
+        },
+        {
+          label: 'Copy AI context without code blocks',
+          value: 'copy-ai-context-no-code',
+          handler: async () => {
+            await writeText(
+              buildAiContextPack(
+                {
+                  path,
+                  name: curFile.name || fileNameOf(path) || 'untitled',
+                  content,
+                  workspaceRoot: useEditorStore.getState().getRootPath(),
+                },
+                { hideCode: true },
+              ),
+            )
+            toast.success('AI context copied')
           },
         },
         {
@@ -157,9 +211,25 @@ export const SmartActionsButton = () => {
             toast.success('Prompt copied')
           },
         },
+        ...(refs.length ? [{ type: 'divider' as const }] : []),
+        ...refs.flatMap((smartRef, index) => [
+          {
+            label: `Open ${smartRef.kind}: ${smartRef.label}`,
+            value: `open-ref-${index}`,
+            handler: async () => openPathOrUrl(smartRef.value),
+          },
+          {
+            label: `Copy ${smartRef.kind}: ${smartRef.label}`,
+            value: `copy-ref-${index}`,
+            handler: async () => {
+              await writeText(smartRef.value)
+              toast.success(`${smartRef.kind === 'url' ? 'URL' : 'Path'} copied`)
+            },
+          },
+        ]),
       ],
     })
-  }, [curFile])
+  }, [activeId, curFile])
 
   if (!curFile) return null
 
@@ -170,7 +240,7 @@ export const SmartActionsButton = () => {
       iconRef={ref}
       icon={'ri-sparkling-2-line'}
       onClick={handleClick}
-      tooltipProps={{ title: 'Smart Actions — copy path, reveal, Claude/Codex' }}
+      tooltipProps={{ title: 'Smart Actions — paths, content, links, AI context' }}
       label={'Smart'}
     />
   )

@@ -90,9 +90,10 @@ type Props = {
   headings: IHeadingData[]
   activeId?: string | null
   filterQuery?: string
+  onSelectHeading?: (id: string) => void
 }
 
-const CustomToc = memo(({ headings, activeId, filterQuery }: Props) => {
+const CustomToc = memo(({ headings, activeId, filterQuery, onSelectHeading }: Props) => {
   const [flat, setFlat] = useState<FlatHeading[]>([])
   const wrapRef = useRef<HTMLDivElement>(null)
 
@@ -166,6 +167,7 @@ const CustomToc = memo(({ headings, activeId, filterQuery }: Props) => {
           $active={activeId === h.id}
           onClick={(e) => {
             e.preventDefault()
+            onSelectHeading?.(h.id)
             try {
               h.onClick?.(h.raw)
             } catch (err) {
@@ -178,6 +180,7 @@ const CustomToc = memo(({ headings, activeId, filterQuery }: Props) => {
             if (target) {
               target.scrollIntoView({ behavior: 'smooth', block: 'start' })
             }
+            window.setTimeout(() => onSelectHeading?.(h.id), 80)
           }}
         >
           <Chapter>{h.chapter}</Chapter>

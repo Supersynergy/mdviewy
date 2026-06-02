@@ -413,7 +413,15 @@ export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
       <SideBarHeader name={t('sidebar.table_of_contents')} />
       <QuickSearchBar />
       <div style={{ flex: 1, minHeight: 0, boxSizing: 'border-box' }}>
-        <CustomToc headings={tocHeadings} activeId={activeHeadingId} />
+        <CustomToc
+          headings={tocHeadings}
+          activeId={activeHeadingId}
+          onSelectHeading={(id) => {
+            activeHeadingIdRef.current = id
+            setActiveHeadingId(id)
+            window.setTimeout(() => scheduleActiveHeadingUpdateRef.current(), 120)
+          }}
+        />
         <div style={{ display: 'none' }}>
           <Toc
             ref={tocRef}

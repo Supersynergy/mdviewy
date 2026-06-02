@@ -1,9 +1,17 @@
 import type { RightBarItem } from '@/components/SideBar'
 import { RIGHTBARITEMKEYS } from '@/constants'
 import { getFileObject } from '@/helper/files'
+import {
+  buildAiContextPack,
+  extractSmartReferences,
+  fileNameOf,
+  folderOf,
+  markdownLinkForPath,
+  type SmartReference,
+} from '@/helper/smartActions'
 import { useEditorStore } from '@/stores'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
-import { revealItemInDir } from '@tauri-apps/plugin-opener'
+import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
 import { Command } from '@tauri-apps/plugin-shell'
 import { memo, useMemo } from 'react'
 import styled from 'styled-components'
@@ -17,17 +25,6 @@ type ActionItem = {
   hint?: string
   run: ActionFn
   disabled?: (file: { path?: string }) => boolean
-}
-
-const folderOf = (p?: string) => {
-  if (!p) return ''
-  const ix = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'))
-  return ix > 0 ? p.slice(0, ix) : p
-}
-
-const fileNameOf = (p?: string) => {
-  if (!p) return ''
-  return p.split(/[\\/]/).pop() || p
 }
 
 const openInOsTerminal = async (dir: string) => {
@@ -53,6 +50,14 @@ const openFolder = async (dir: string) => {
   } else {
     await runShell('xdg-open', [dir])
   }
+}
+
+const openPathOrUrl = async (value: string) => {
+  if (/^https?:\/\//i.test(value)) {
+    await openUrl(value)
+    return
+  }
+  await openFolder(value)
 }
 
 const runShell = async (program: string, args: string[]) => {
@@ -100,7 +105,7 @@ const ACTION_GROUPS: ActionGroup[] = [
         hint: '[name](path)',
         run: async (f) => {
           if (!f.path) return
-          await writeText(`[${fileNameOf(f.path)}](${f.path})`)
+          await writeText(markdownLinkForPath(f.path, f.name))
           toast.success('Markdown link copied')
         },
         disabled: (f) => !f.path,
@@ -217,6 +222,53 @@ const ACTION_GROUPS: ActionGroup[] = [
         disabled: (f) => !f.path,
       },
       {
+        icon: 'ri-file-copy-line',
+        label: 'Copy full content',
+        hint: 'Raw markdown body',
+        run: async (f) => {
+          const content = useEditorStore.getState().getEditorContent(f.id)
+          await writeText(content)
+          toast.success('Content copied')
+        },
+      },
+      {
+        icon: 'ri-chat-smile-ai-line',
+        label: 'Copy AI context pack',
+        hint: 'File metadata + markdown',
+        run: async (f) => {
+          const content = useEditorStore.getState().getEditorContent(f.id)
+          await writeText(
+            buildAiContextPack({
+              path: f.path,
+              name: f.name,
+              content,
+              workspaceRoot: useEditorStore.getState().getRootPath(),
+            }),
+          )
+          toast.success('AI context copied')
+        },
+      },
+      {
+        icon: 'ri-code-s-slash-line',
+        label: 'Copy AI context without code',
+        hint: 'Hides fenced code blocks',
+        run: async (f) => {
+          const content = useEditorStore.getState().getEditorContent(f.id)
+          await writeText(
+            buildAiContextPack(
+              {
+                path: f.path,
+                name: f.name,
+                content,
+                workspaceRoot: useEditorStore.getState().getRootPath(),
+              },
+              { hideCode: true },
+            ),
+          )
+          toast.success('AI context copied')
+        },
+      },
+      {
         icon: 'ri-quote-text',
         label: 'Copy "Summarize" prompt',
         run: async (f) => {
@@ -263,6 +315,35 @@ const FileCard = styled.div`
     opacity: 0.8;
   }
 
+  .path-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    opacity: 0;
+    transform: translateY(-2px);
+    transition: opacity 120ms ease, transform 120ms ease;
+  }
+
+  &:hover .path-actions,
+  &:focus-within .path-actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .path-actions button {
+    border: 1px solid ${(p) => p.theme.borderColor || 'rgba(127,127,127,0.18)'};
+    background: transparent;
+    color: ${(p) => p.theme.primaryFontColor};
+    border-radius: 6px;
+    padding: 4px 7px;
+    font-size: 0.68rem;
+    cursor: pointer;
+  }
+
+  .path-actions button:hover {
+    background: ${(p) => p.theme.hoverColor};
+  }
+
   .empty {
     color: ${(p) => p.theme.labelFontColor};
     opacity: 0.7;
@@ -278,6 +359,48 @@ const Group = styled.div`
     color: ${(p) => p.theme.labelFontColor};
     opacity: 0.75;
     margin: 4px 4px 6px;
+  }
+`
+
+const RefList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`
+
+const RefRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 0.76rem;
+
+  &:hover {
+    background: ${(p) => p.theme.hoverColor};
+  }
+
+  .ref-label {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  button {
+    border: 0;
+    background: transparent;
+    color: ${(p) => p.theme.accentColor};
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+
+  button:hover {
+    background: ${(p) => p.theme.bgColorSecondary};
   }
 `
 
@@ -331,11 +454,19 @@ const Row = styled.button<{ $disabled?: boolean }>`
 const SmartActionsPanel = memo(() => {
   const { activeId } = useEditorStore()
 
-  const file = useMemo(() => {
-    if (!activeId) return null
+  const { file, refs } = useMemo(() => {
+    if (!activeId) return { file: null, refs: [] }
     const f = getFileObject(activeId)
-    if (!f) return null
-    return { path: f.path, name: f.name || fileNameOf(f.path) || 'untitled', id: f.id }
+    if (!f) return { file: null, refs: [] }
+    const file = { path: f.path, name: f.name || fileNameOf(f.path) || 'untitled', id: f.id }
+    const content = useEditorStore.getState().getEditorContent(f.id)
+    return {
+      file,
+      refs: extractSmartReferences(content, {
+        currentDir: folderOf(f.path),
+        workspaceRoot: useEditorStore.getState().getRootPath(),
+      }).slice(0, 10),
+    }
   }, [activeId])
 
   return (
@@ -345,6 +476,34 @@ const SmartActionsPanel = memo(() => {
           <>
             <div className='name'>{file.name}</div>
             <div className='path'>{file.path || '(unsaved)'}</div>
+            {file.path && (
+              <div className='path-actions'>
+                <button
+                  type='button'
+                  onClick={async () => {
+                    await writeText(file.path || '')
+                    toast.success('Path copied')
+                  }}
+                >
+                  Copy path
+                </button>
+                <button
+                  type='button'
+                  onClick={() => file.path && revealItemInDir(file.path)}
+                >
+                  Reveal
+                </button>
+                <button
+                  type='button'
+                  onClick={() => {
+                    const dir = folderOf(file.path)
+                    if (dir) openFolder(dir)
+                  }}
+                >
+                  Open folder
+                </button>
+              </div>
+            )}
           </>
         ) : (
           <div className='empty'>Open a file to enable smart actions.</div>
@@ -374,6 +533,44 @@ const SmartActionsPanel = memo(() => {
           })}
         </Group>
       ))}
+
+      {file && (
+        <Group>
+          <div className='group-title'>Detected links & paths</div>
+          {refs.length ? (
+            <RefList>
+              {refs.map((ref: SmartReference) => (
+                <RefRow key={`${ref.kind}:${ref.value}`} title={ref.value}>
+                  <div className='ref-label'>
+                    {ref.kind === 'url' ? 'URL' : 'Path'} · {ref.label}
+                  </div>
+                  <button
+                    type='button'
+                    title='Open'
+                    onClick={() => openPathOrUrl(ref.value)}
+                  >
+                    <i className='ri-arrow-right-up-line' />
+                  </button>
+                  <button
+                    type='button'
+                    title='Copy'
+                    onClick={async () => {
+                      await writeText(ref.value)
+                      toast.success(ref.kind === 'url' ? 'URL copied' : 'Path copied')
+                    }}
+                  >
+                    <i className='ri-file-copy-line' />
+                  </button>
+                </RefRow>
+              ))}
+            </RefList>
+          ) : (
+            <FileCard>
+              <div className='empty'>No local paths or URLs detected in this file.</div>
+            </FileCard>
+          )}
+        </Group>
+      )}
     </Container>
   )
 })
