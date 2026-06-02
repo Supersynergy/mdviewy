@@ -181,6 +181,10 @@ export const GlobalStyles = createGlobalStyle`
     display: none;
   }
 
+  .cm-render-node-label,
+  .cm-render-node-label-icon,
+  .cm-render-node:hover .cm-render-node-label,
+  .node-enter .cm-render-node-label,
   .markdown-body .cm-render-node-label,
   .markdown-body .rme-block-handler,
   .markdown-body .rme-draggable-handler,

@@ -15,4 +15,13 @@ describe('RightBar startup boundary', () => {
     expect(topLevelImports).not.toContain('@/extensions/table-of-content')
     expect(topLevelImports).not.toContain('@/extensions/ai')
   })
+
+  it('refreshes the TOC when returning from another right-bar tab', () => {
+    const currentDir = dirname(fileURLToPath(import.meta.url))
+    const source = readFileSync(join(currentDir, 'RightBar.tsx'), 'utf8')
+
+    expect(source).toContain('RIGHTBARITEMKEYS.TableOfContent')
+    expect(source).toContain("execute('app:toc_refresh')")
+    expect(source).toContain('[0, 60, 180]')
+  })
 })

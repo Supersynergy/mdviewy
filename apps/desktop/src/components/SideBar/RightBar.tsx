@@ -1,5 +1,6 @@
 import { RIGHTBARITEMKEYS } from '@/constants'
 import smartActionsExtension from '@/extensions/smart-actions'
+import { useCommandStore } from '@/stores'
 import classNames from 'classnames'
 import { lazy, memo, Suspense, useState } from 'react'
 import { Tooltip } from 'zens'
@@ -23,6 +24,7 @@ const tocExtensionMeta = {
 }
 
 function RightBar() {
+  const execute = useCommandStore((s) => s.execute)
   const [activeRightBarItemKey, setActiveRightBarItemKey] = useState<RIGHTBARITEMKEYS>(
     RIGHTBARITEMKEYS.TableOfContent,
   )
@@ -60,6 +62,11 @@ function RightBar() {
                 next.add(item.key)
                 return next
               })
+              if (item.key === RIGHTBARITEMKEYS.TableOfContent) {
+                ;[0, 60, 180].forEach((delay) => {
+                  window.setTimeout(() => execute('app:toc_refresh'), delay)
+                })
+              }
             }
 
             return (
