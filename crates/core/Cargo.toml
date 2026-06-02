@@ -22,7 +22,7 @@ comrak = { version = "0.30", optional = true }
 syntect = { version = "5.2", optional = true }
 pulldown-cmark = { version = "0.12", optional = true }
 gray_matter = { version = "0.2", optional = true }
-tantivy = { version = "0.22", optional = true }
+tantivy = { version = "0.26", optional = true }
 
 [features]
 default = ["watcher"]

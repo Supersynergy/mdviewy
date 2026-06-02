@@ -53,7 +53,7 @@ pub fn run() {
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
 
     tracing_subscriber::fmt::init();
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
 
     let context = tauri::generate_context!();
 

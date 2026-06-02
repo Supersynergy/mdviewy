@@ -4,11 +4,20 @@
 
 ### Fixed
 
+- Made the default release check use cached `cargo audit --no-fetch --stale` advisories to avoid crates.io yanked-registry timeout noise.
+- Added a separate `just audit-online` recipe for deliberate live advisory refreshes.
+- Replaced the unmaintained direct `dotenv` dependency with maintained `dotenvy`.
+- Updated `tantivy` to reduce the RustSec warning surface in the direct FTS dependency chain.
+- Fixed the CLI Cargo manifest author metadata key so Cargo no longer reports it as unused.
 - Disabled RME's editor-internal hover chrome globally, including the left-side block handle and node labels such as `H1`, `H2`, and `H3`.
 - Refreshed the Table of Contents when returning from the Smart Actions right-bar tab, so heading clicks keep targeting the active Markdown file.
 
 ### Verified
 
+- `rust-modernize /Users/master/projects/mdviewy`
+- `cargo check -p mdviewy-core --features fts`
+- `just check` (12 nextest tests passed; cached `cargo audit` still reports 20 allowed transitive warnings)
+- `rescope record --duration 180s --interval 1s --cmd-regex 'cargo|rustc|clippy|nextest|audit|mdviewy' --show-command --limit 15`
 - `yarn workspace @mdviewy/desktop test`
 - `yarn workspace @mdviewy/desktop build`
 - `cargo check -p mdviewy`

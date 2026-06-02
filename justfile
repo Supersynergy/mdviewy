@@ -9,9 +9,15 @@ lint:
 test:
     cargo nextest run --workspace --all-features --no-tests pass
 
+audit:
+    cargo audit --no-fetch --stale
+
+audit-online:
+    cargo audit
+
 check:
     cargo fmt --all -- --check
     cargo check --workspace --all-targets --all-features
     cargo clippy --workspace --all-targets --all-features -- -D warnings
     cargo nextest run --workspace --all-features --no-tests pass
-    cargo audit
+    cargo audit --no-fetch --stale

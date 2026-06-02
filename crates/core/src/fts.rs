@@ -99,7 +99,7 @@ impl FtsIndex {
         let parser =
             QueryParser::for_index(&self.index, vec![self.f_title, self.f_tags, self.f_body]);
         let query = parser.parse_query(q)?;
-        let top = searcher.search(&query, &TopDocs::with_limit(limit))?;
+        let top = searcher.search(&query, &TopDocs::with_limit(limit).order_by_score())?;
         let mut hits = Vec::with_capacity(top.len());
         for (score, addr) in top {
             let doc: TantivyDocument = searcher.doc(addr)?;
