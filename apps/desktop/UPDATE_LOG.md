@@ -1,5 +1,29 @@
 # UPDATE LOG
 
+## v0.90.1
+
+Fixes:
+
+- Disabled RME editor-internal hover chrome globally, including the left-side block handle and node labels such as `H1`, `H2`, and `H3`.
+
+- Refreshed the Table of Contents when returning from the Smart Actions tab so clicks keep scrolling to the active Markdown file.
+
+## v0.90.0
+
+Features:
+
+- Added Smart Actions for local paths, URLs, Markdown links, wiki links, @-mentions, AI context packs, and Claude/Codex handoff prompts.
+
+- Added local path and URL detection with copy, reveal, open file, and open folder actions.
+
+Fixes:
+
+- Stabilized Table of Contents refresh when switching active Markdown files.
+
+- Disabled the updater endpoint and removed updater entry points from UI, scripts, Tauri config, and Rust setup.
+
+- Reduced startup and Smart Actions overhead with lazy boundaries and bounded reference extraction.
+
 ## v0.55.4
 
 I wrote an article on how to use Copilot and Ollama in mdviewy. If you encounter some problems, you may find solutions here, [Use Copilot with Ollama](https://www.mdviewy.cc/en/docs/Extension/UseCopilotWithOllama)。

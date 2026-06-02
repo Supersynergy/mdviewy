@@ -9,8 +9,9 @@ describe('GlobalStyles editor chrome overrides', () => {
     const source = readFileSync(join(currentDir, 'globalStyles.ts'), 'utf8')
 
     expect(source).toContain('.cm-render-node:hover .cm-render-node-label')
-    expect(source).toContain('.markdown-body .rme-block-handler')
-    expect(source).toContain('.markdown-body .rme-draggable-handler')
+    expect(source).toContain('.rme-block-handler,')
+    expect(source).toContain('.rme-draggable-handler,')
+    expect(source).toContain('.rme-block-handler *')
     expect(source).toContain('pointer-events: none !important;')
   })
 })
