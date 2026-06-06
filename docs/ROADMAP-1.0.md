@@ -31,10 +31,11 @@ Functionally close. The gap to 1.0 is **trust + distribution + narrative + brand
     `syntect`, `serde_json`, `parking_lot`, `thiserror`; `mfdev`: `anyhow`,
     `log`, `env_logger`, `os_pipe`). Verify each (machete has macro/feature
     false-positives) then trim. — **Phase 3/2**
-  - `osv-scanner`: **41 vulns across ~22 transitive npm deps** (incl. `vitest`
-    3.0.7 = CVSS 9.8 dev-only, plus `undici`/`uuid`/`xml2js`/`postcss`/`tar`/
-    `prismjs`/`lodash`). Fix via yarn upgrades + `resolutions`, then re-run
-    `just security`. — **Phase 2 blocker for a clean release**
+  - `osv-scanner`: ✅ **resolved** — 41 → 0 actionable npm vulns (35 patched via
+    `resolutions` + `uuid`/`tar`/`vitest` major bumps, all test-verified). The 6
+    remaining have no released upstream fix (lodash/-es, `@ai-sdk/provider-utils`)
+    and are tracked in `osv-scanner.toml` with a 2026-09-06 review date.
+    `just security` passes clean.
   - Frontend carries 5 AI-SDK libs (`@ai-sdk/{deepseek,google,openai}` + `ai` +
     `ollama-ai-provider-v2`) and 3 markdown renderers (`rme`, `react-markdown`,
     `@ant-design/x-markdown`) — review for overlap (judgment, not auto-delete).

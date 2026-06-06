@@ -26,10 +26,12 @@ check:
 lean:
     cargo machete || true
 
-# Security gate — secret scan (working tree) + OSS vuln scan of the lockfiles.
+# Security gate — secret scan (working tree) + npm vuln scan.
+# Rust advisories are covered by `cargo audit` in `check`/`audit`, so osv here
+# scans only the npm lockfile to avoid duplicate ignore-list maintenance.
 security:
     gitleaks dir . -c .gitleaks.toml --redact --no-banner
-    osv-scanner --lockfile Cargo.lock --lockfile yarn.lock
+    osv-scanner --config osv-scanner.toml --lockfile yarn.lock
 
 # Full CI gate: type/lint/test + audit.
 ci: check

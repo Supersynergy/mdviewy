@@ -13,7 +13,8 @@
 
 ### Security
 
-- Patched 10 transitive npm advisories (41 → 31 OSV findings) via root `resolutions`: `postcss` 8.5.10, `prismjs` 1.30.0, `xml2js` 0.5.0, `react-router` 7.15.0 — all same-major, verified no test breakage. Remaining 31 require major-version bumps (`uuid`, `undici`, `tar`, `tmp`, `vitest`, `js-cookie`, `json-bigint`, `ip-address`, `@octokit/*`) and are owner-judgment; tracked in `docs/ROADMAP-1.0.md`.
+- Cleared all fixable npm advisories: OSV **41 → 0 actionable** (35 vulnerabilities patched). Same-major via root `resolutions` (`postcss` 8.5.10, `prismjs` 1.30.0, `xml2js` 0.5.0, `react-router` 7.15.0, `@octokit/*`, `ip-address` 10, `js-cookie` 3, `json-bigint` 1, `tmp` 0.2.6, `undici` 6.24, `serialize-javascript` 7.0.5) plus major bumps (`uuid` 11, `tar` 7) and a direct `vitest` 3 → 4 upgrade — each verified with `yarn install` + desktop `vitest` (67/67) + `vite build`.
+- Added `osv-scanner.toml` documenting the 6 remaining advisories that have **no released upstream fix** (`@ai-sdk/provider-utils` ReDoS; lodash/-es prototype-pollution/template — fix version unreleased, transitive/build-only), each with a reason and a 2026-09-06 review date. Scoped `just security`'s OSV scan to the npm lockfile (Rust advisories stay with `cargo audit`). `just security` now passes clean.
 
 ### Changed
 

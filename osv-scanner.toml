@@ -1,0 +1,24 @@
+# Tracked-and-accepted OSV findings with NO released upstream fix as of 2026-06-06.
+# Each entry has a review date (ignoreUntil) so it resurfaces — not a permanent mute.
+# Everything with a published patch was already fixed via package.json `resolutions`
+# (osv went 41 -> 6). Re-review on the date below or whenever an upstream fix ships.
+
+[[IgnoredVulns]]
+id = "GHSA-866g-f22w-33x8"
+ignoreUntil = 2026-09-06
+reason = "@ai-sdk/provider-utils ReDoS — transitive under the AI SDK, no patched version published yet."
+
+[[IgnoredVulns]]
+id = "GHSA-f23m-r3pf-42rh"
+ignoreUntil = 2026-09-06
+reason = "lodash/-es prototype pollution in _.unset — fix version (4.18.0) is unreleased; lodash is transitive/build-only (first-party lodash usage already removed)."
+
+[[IgnoredVulns]]
+id = "GHSA-r5fr-rjxr-66jc"
+ignoreUntil = 2026-09-06
+reason = "lodash/-es code injection via _.template — fix version unreleased; app does not call _.template on untrusted input."
+
+[[IgnoredVulns]]
+id = "GHSA-xxjr-mmjv-4gpg"
+ignoreUntil = 2026-09-06
+reason = "lodash-es prototype pollution in _.unset/_.omit — fix version unreleased; transitive/build-only."
