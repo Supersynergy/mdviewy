@@ -1,0 +1,24 @@
+# Secret-scan config for `just security`.
+# Extends gitleaks' default rules but skips generated/build/vendor trees so the
+# scan is fast and deterministic (it covers source, not node_modules/target).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Skip generated, build, and vendor artifacts"
+paths = [
+  '''node_modules/''',
+  '''target/''',
+  '''dist/''',
+  '''dist-types/''',
+  '''\.next/''',
+  '''\.turbo/''',
+  '''\.git/''',
+  '''(^|/)(yarn\.lock|Cargo\.lock|package-lock\.json|pnpm-lock\.yaml)$''',
+]
+# Public, non-secret identifiers that the entropy rule flags as generic-api-key.
+# `appKey=xpn68m4j5qU0Y1rfDYFHaA` is the UpgradeLink *public download* key that
+# ships in client-side download URLs (also published in the README) — not a credential.
+regexes = [
+  '''xpn68m4j5qU0Y1rfDYFHaA''',
+]

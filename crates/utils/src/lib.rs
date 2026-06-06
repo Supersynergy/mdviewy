@@ -79,6 +79,34 @@ mod tests {
     }
 
     #[test]
+    fn test_get_file_type_edges() {
+        use super::{get_file_type, FileType};
+        // case-insensitive extension matching
+        assert_eq!(get_file_type("README.MD"), FileType::Markdown);
+        assert_eq!(get_file_type("note.Markdown"), FileType::Markdown);
+        assert_eq!(get_file_type("PHOTO.PNG"), FileType::Image);
+        assert_eq!(get_file_type("data.JSON"), FileType::Json);
+        assert_eq!(get_file_type("log.TXT"), FileType::Txt);
+        // non-file-ish / edge inputs must not misclassify
+        assert_eq!(get_file_type(""), FileType::Unknown);
+        assert_eq!(get_file_type("foo-bar-baz"), FileType::Unknown);
+        assert_eq!(get_file_type(".gitignore"), FileType::Unknown);
+        assert_eq!(get_file_type("archive.tar.gz"), FileType::Unknown);
+        // extension must be a suffix, not a substring
+        assert_eq!(get_file_type("md.notes"), FileType::Unknown);
+    }
+
+    #[test]
+    fn test_is_supported_file_name() {
+        assert!(super::is_supported_file_name("a.md"));
+        assert!(super::is_supported_file_name("a.json"));
+        assert!(super::is_supported_file_name("a.txt"));
+        assert!(super::is_supported_file_name("a.png"));
+        assert!(!super::is_supported_file_name("a.exe"));
+        assert!(!super::is_supported_file_name(""));
+    }
+
+    #[test]
     fn test_get_relative_path() {
         let path = std::path::Path::new("/a/b/c/d");
         let base_path = std::path::Path::new("/a/b");

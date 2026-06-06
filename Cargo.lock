@@ -1162,15 +1162,6 @@ dependencies = [
 
 [[package]]
 name = "dirs"
-version = "5.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44c45a9d03d6676652bcb5e724c7e988de1acad23a711b5217ab9cbecbec2225"
-dependencies = [
- "dirs-sys 0.4.1",
-]
-
-[[package]]
-name = "dirs"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3e8aa94d75141228480295a7d0e7feb620b1a5ad9f12bc40be62411e38cce4e"
@@ -1187,18 +1178,6 @@ dependencies = [
  "libc",
  "redox_users 0.4.6",
  "winapi",
-]
-
-[[package]]
-name = "dirs-sys"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "520f05a5cbd335fae5a99ff7a6ab8627577660ee5cfd6a94a6a929b52ff0321c"
-dependencies = [
- "libc",
- "option-ext",
- "redox_users 0.4.6",
- "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -1321,7 +1300,6 @@ name = "download_npm"
 version = "0.0.1"
 dependencies = [
  "flate2",
- "mdviewy-utils",
  "reqwest 0.12.28",
  "serde_json",
  "tar",
@@ -1466,29 +1444,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.117",
-]
-
-[[package]]
-name = "env_filter"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32e90c2accc4b07a8456ea0debdc2e7587bdd890680d71173a15d4ae604f6eef"
-dependencies = [
- "log",
- "regex",
-]
-
-[[package]]
-name = "env_logger"
-version = "0.11.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0621c04f2196ac3f488dd583365b9c09be011a4ab8b9f37248ffcc8f6198b56a"
-dependencies = [
- "anstream",
- "anstyle",
- "env_filter",
- "jiff",
- "log",
 ]
 
 [[package]]
@@ -2907,30 +2862,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "jiff"
-version = "0.2.27"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "392c70591e8749fe235ddaf513e6f58b26bce3dcc16524cecc8936f75afa161e"
-dependencies = [
- "jiff-static",
- "log",
- "portable-atomic",
- "portable-atomic-util",
- "serde_core",
-]
-
-[[package]]
-name = "jiff-static"
-version = "0.2.27"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47b605b0c050d845fc355bb11eb3f9a8deddc218ea60c76e61aa1f2adfb2c96a"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.117",
-]
-
-[[package]]
 name = "jni"
 version = "0.21.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3316,15 +3247,12 @@ dependencies = [
  "ignore",
  "notify 7.0.0",
  "notify-debouncer-full",
- "parking_lot",
  "pulldown-cmark",
  "rayon",
  "serde",
- "serde_json",
  "syntect",
  "tantivy",
  "tempfile",
- "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -3332,7 +3260,6 @@ name = "mdviewy-utils"
 version = "0.0.1"
 dependencies = [
  "fs_extra",
- "regex",
  "serde",
 ]
 
@@ -3341,14 +3268,12 @@ name = "mdviewy_file_search"
 version = "0.0.1"
 dependencies = [
  "arboard",
- "dirs 5.0.1",
  "grep",
  "ignore",
  "num_cpus",
  "regex",
  "serde",
  "tempfile",
- "toml 0.8.23",
  "uuid",
 ]
 
@@ -3389,11 +3314,7 @@ dependencies = [
 name = "mfdev"
 version = "3.0.0"
 dependencies = [
- "anyhow",
  "clap",
- "env_logger",
- "log",
- "os_pipe",
  "serde",
  "serde_json",
  "toml 0.8.23",
@@ -4425,21 +4346,6 @@ dependencies = [
  "pin-project-lite",
  "rustix",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "portable-atomic"
-version = "1.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c33a9471896f1c69cecef8d20cbe2f7accd12527ce60845ff44c153bb2a21b49"
-
-[[package]]
-name = "portable-atomic-util"
-version = "0.2.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2a106d1259c23fac8e543272398ae0e3c0b8d33c88ed73d0cc71b0f1d902618"
-dependencies = [
- "portable-atomic",
 ]
 
 [[package]]

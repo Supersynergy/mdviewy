@@ -4,9 +4,9 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://git.marketdeck.io/Supersynergy/mdviewy.git"
+    "url": "https://github.com/Supersynergy/mdviewy.git"
   },
-  "homepage": "https://git.marketdeck.io/Supersynergy/mdviewy",
+  "homepage": "https://github.com/Supersynergy/mdviewy",
   "workspaces": [
     "packages/*",
     "apps/*",
@@ -63,5 +63,11 @@
   "packageManager": "yarn@4.8.0",
   "dependencies": {
     "turbo": "2.9.14"
+  },
+  "resolutions": {
+    "postcss": "8.5.10",
+    "prismjs": "1.30.0",
+    "xml2js": "0.5.0",
+    "react-router": "7.15.0"
   }
 }

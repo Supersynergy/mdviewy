@@ -5,6 +5,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Backdrop,
+  CloseButton,
   Empty,
   FooterHint,
   Item,
@@ -251,9 +252,13 @@ const CommandPalette = memo(({ openRequest, onReady }: CommandPaletteProps) => {
     return out.sort((a, b) => b.score - a.score).slice(0, 80)
   }, [open, mode, query, opened, commands, addOpenedFile, setActiveId, contentMatches])
 
+  const activeResetKey = `${mode}\u0000${query}`
+
   useEffect(() => {
-    setActiveIdx(0)
-  }, [query, mode])
+    if (activeResetKey) {
+      setActiveIdx(0)
+    }
+  }, [activeResetKey])
 
   useEffect(() => {
     const el = listRef.current?.querySelector(`[data-idx="${activeIdx}"]`) as HTMLElement | null
@@ -296,13 +301,19 @@ const CommandPalette = memo(({ openRequest, onReady }: CommandPaletteProps) => {
 
   return (
     <Backdrop onClick={close}>
-      <Panel onClick={(e) => e.stopPropagation()}>
+      <Panel
+        role='dialog'
+        aria-modal='true'
+        aria-label='Command palette'
+        onClick={(e) => e.stopPropagation()}
+      >
         <SearchInput>
-          <i className='ri-search-2-line' />
+          <i aria-hidden='true' className='ri-search-2-line' />
           <input
             ref={inputRef}
             value={query}
             placeholder={placeholder}
+            aria-label='Command palette search'
             autoComplete='off'
             autoCorrect='off'
             autoCapitalize='off'
@@ -312,22 +323,50 @@ const CommandPalette = memo(({ openRequest, onReady }: CommandPaletteProps) => {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
           />
+          <CloseButton type='button' aria-label='Close command palette' onClick={close}>
+            <i aria-hidden='true' className='ri-close-line' />
+          </CloseButton>
         </SearchInput>
         <ModeBar>
-          <ModePill $active={mode === 'all'} onClick={() => setMode('all')}>
-            <i className='ri-apps-2-line' /> All
+          <ModePill
+            type='button'
+            $active={mode === 'all'}
+            aria-pressed={mode === 'all'}
+            onClick={() => setMode('all')}
+          >
+            <i aria-hidden='true' className='ri-apps-2-line' /> All
           </ModePill>
-          <ModePill $active={mode === 'files'} onClick={() => setMode('files')}>
-            <i className='ri-file-list-2-line' /> Files
+          <ModePill
+            type='button'
+            $active={mode === 'files'}
+            aria-pressed={mode === 'files'}
+            onClick={() => setMode('files')}
+          >
+            <i aria-hidden='true' className='ri-file-list-2-line' /> Files
           </ModePill>
-          <ModePill $active={mode === 'content'} onClick={() => setMode('content')}>
-            <i className='ri-text' /> Content {contentLoading ? '...' : ''}
+          <ModePill
+            type='button'
+            $active={mode === 'content'}
+            aria-pressed={mode === 'content'}
+            onClick={() => setMode('content')}
+          >
+            <i aria-hidden='true' className='ri-text' /> Content {contentLoading ? '...' : ''}
           </ModePill>
-          <ModePill $active={mode === 'commands'} onClick={() => setMode('commands')}>
-            <i className='ri-terminal-line' /> Commands
+          <ModePill
+            type='button'
+            $active={mode === 'commands'}
+            aria-pressed={mode === 'commands'}
+            onClick={() => setMode('commands')}
+          >
+            <i aria-hidden='true' className='ri-terminal-line' /> Commands
           </ModePill>
         </ModeBar>
-        <div ref={listRef} style={{ maxHeight: 380, overflow: 'auto' }}>
+        <div
+          ref={listRef}
+          role='listbox'
+          aria-label='Command palette results'
+          style={{ maxHeight: 380, overflow: 'auto' }}
+        >
           {entries.length === 0 ? (
             <Empty>
               {query.trim().length === 0
@@ -340,6 +379,9 @@ const CommandPalette = memo(({ openRequest, onReady }: CommandPaletteProps) => {
             entries.map((ent, i) => (
               <Item
                 key={`${ent.kind}:${ent.id}`}
+                type='button'
+                role='option'
+                aria-selected={i === activeIdx}
                 data-idx={i}
                 $active={i === activeIdx}
                 onMouseEnter={() => setActiveIdx(i)}
@@ -349,6 +391,7 @@ const CommandPalette = memo(({ openRequest, onReady }: CommandPaletteProps) => {
                 }}
               >
                 <i
+                  aria-hidden='true'
                   className={
                     ent.kind === 'file'
                       ? 'ri-file-list-2-line'

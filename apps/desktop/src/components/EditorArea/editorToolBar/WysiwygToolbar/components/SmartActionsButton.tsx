@@ -242,7 +242,9 @@ export const SmartActionsButton = () => {
             value: `copy-ref-${index}`,
             handler: async () => {
               await writeText(smartRef.value)
-              toast.success(`${smartRef.kind === 'url' ? 'URL' : 'Path'} copied`)
+              toast.success(
+                `${smartRef.kind === 'path' ? 'Path' : smartRef.kind === 'github' ? 'GitHub repo' : 'URL'} copied`,
+              )
             },
           },
         ]),

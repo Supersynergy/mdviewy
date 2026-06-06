@@ -5,6 +5,9 @@ target
 
 .DS_Store
 
+# local debug tooling
+.debugmaster
+
 # dependencies
 node_modules
 /.pnp

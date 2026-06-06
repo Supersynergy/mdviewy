@@ -61,6 +61,25 @@ export const SearchInput = styled.div`
   }
 `
 
+export const CloseButton = styled.button`
+  border: 0;
+  background: transparent;
+  color: ${(p) => p.theme.labelFontColor};
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+
+  &:hover {
+    color: ${(p) => p.theme.primaryFontColor};
+    background: ${(p) => p.theme.hoverColor};
+  }
+`
+
 export const ModeBar = styled.div`
   display: flex;
   gap: 4px;
@@ -125,14 +144,19 @@ export const FooterHint = styled.div`
   }
 `
 
-export const Item = styled.div<{ $active?: boolean }>`
+export const Item = styled.button<{ $active?: boolean }>`
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 8px 14px;
+  width: 100%;
+  border: 0;
+  background: transparent;
   cursor: pointer;
   font-size: 0.9rem;
   color: ${(p) => p.theme.primaryFontColor};
+  font-family: inherit;
+  text-align: left;
   transition: background-color 100ms ease;
 
   i {

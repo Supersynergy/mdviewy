@@ -39,9 +39,9 @@
 
 <img src="./public/home-en1.png" alt="screenshot" />
 
-## mdviewy はベータ版です ⚠️
+## ステータス
 
-現在、mdviewy はベータ版であり、データのバックアップを取ることをお勧めします。
+mdviewy は 1.0 リリースに向けて活発に開発中で、現在も利用可能です。1.0 までのロードマップは `docs/ROADMAP-1.0.md` を参照してください。
 
 ## 機能
 

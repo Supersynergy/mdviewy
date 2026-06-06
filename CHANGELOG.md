@@ -1,5 +1,41 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added a premium brand/logo + mascot concept set in `docs/brand/concepts-2026-06/` (3 abstract marks, 3 mascots — koala/tarsier/loris, and a recommended macOS app-icon tile), generated as self-contained SVGs plus `png/` previews. Recommended v1.0 direction: tarsier app icon + caret mark for small sizes.
+- Added `docs/ROADMAP-1.0.md` — masterplan to 1.0 GA (6 phases: truth/naming, signing/distribution, security, tests, brand, release-eng) with per-phase gates and a critical path.
+- Applied the new tarsier app icon across all `apps/desktop/src-tauri/icons/*` (png/icns/ico + Square/Store tiles) and `public/logo.png`.
+- Added `docs/SIGNING.md` (Apple Developer ID + notarization and Windows Authenticode steps — the #1 GA blocker) and ADR `docs/adr/2026-06-05-security-posture-1.0.md` (CSP plan, assetProtocol rationale, audit policy).
+- Added Rust edge tests for file-type detection (case-insensitive, dotfiles, suffix-not-substring) in `mdviewy-utils`.
+- Wired lean + security gates into `justfile`: `just lean` (cargo-machete unused-dep scan), `just security` (gitleaks secret scan + osv-scanner lockfile vuln scan), `just ci` (= check), `just pre-pr` (check + lean + security). Added `.gitleaks.toml` (skips build/vendor trees; allowlists the public UpgradeLink download key).
+
+### Security
+
+- Patched 10 transitive npm advisories (41 → 31 OSV findings) via root `resolutions`: `postcss` 8.5.10, `prismjs` 1.30.0, `xml2js` 0.5.0, `react-router` 7.15.0 — all same-major, verified no test breakage. Remaining 31 require major-version bumps (`uuid`, `undici`, `tar`, `tmp`, `vitest`, `js-cookie`, `json-bigint`, `ip-address`, `@octokit/*`) and are owner-judgment; tracked in `docs/ROADMAP-1.0.md`.
+
+### Changed
+
+- Trimmed 11 genuinely-unused Rust dependencies across 5 crates (verified by grep + `cargo check --all-features`): `mfdev` (anyhow/env_logger/log/os_pipe), `mdviewy-core` (serde_json/parking_lot/thiserror), `download_npm` (mdviewy-utils), `file_search` (dirs/toml), `mdviewy-utils` (regex). Added `cargo-machete` ignores for the two false-positives (`syntect` feature-gated, `log` macro-only) so `just lean` is clean.
+- Removed the inherited "reconstruction phase / 3-6 months / will not be released" notice from `README.md`, `README.src.md`, `README_CN.md`, `README_JA.md`; replaced with a Status section linking the roadmap.
+- Unified the product name to lowercase `mdviewy` everywhere user/tooling-visible (Tauri `productName`, window title, `APP_NAME`, locale `app_name`, HTML title, empty-state title, crate metadata).
+- Pointed all package/manifest metadata at the canonical GitHub home (`package.json`, `Cargo.toml`); recorded the name + repo-home decision in ADR `docs/adr/2026-06-05-canonical-name-and-repo-home.md`.
+
+### Fixed
+
+- Made Table of Contents heading jumps deterministic after right-panel/menu switching by aligning against the active editor scroll container instead of mixing smooth fallbacks.
+- Added inline hover actions for local paths and GitHub `owner/repo` mentions: open, open containing folder, copy path, open GitHub, copy URL, and copy Markdown link.
+- Made the left inline path hover button resolve real directories via `is_dir` so folder references open as folders directly, with a folder icon and `Open folder` label.
+- Converted shared toolbar icon controls from clickable glyphs into semantic buttons, improving CuaDriver, keyboard, and screen-reader automation.
+- Added explicit Command Palette dialog, search, close, mode, and result semantics so automation no longer has to target static icon/text nodes.
+
+### Verified
+
+- `yarn workspace @mdviewy/desktop test`
+- `yarn workspace @mdviewy/desktop build`
+- CuaDriver AX smoke test against the Tauri dev app: unbounded AX snapshot returned 927 elements in under 1s, opened Search via `Open command palette`, verified `Command palette search` and `Close command palette`, then closed the overlay via AXPress.
+
 ## 0.90.1 - 2026-06-02
 
 ### Fixed

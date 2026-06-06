@@ -55,8 +55,12 @@ export const EditorModeBtn = memo(() => {
 
   return (
     <Tooltip title={isWys ? 'Switch to Source (Cmd+Shift+M)' : 'Switch to Pretty (Cmd+Shift+M)'}>
-      <Btn onClick={toggle}>
-        <i className={isWys ? 'ri-quill-pen-line' : 'ri-code-s-slash-line'} />
+      <Btn
+        type='button'
+        aria-label={isWys ? 'Switch to source editor' : 'Switch to pretty editor'}
+        onClick={toggle}
+      >
+        <i aria-hidden='true' className={isWys ? 'ri-quill-pen-line' : 'ri-code-s-slash-line'} />
         {isWys ? 'Pretty' : 'Source'}
         <kbd>Cmd+Shift+M</kbd>
       </Btn>

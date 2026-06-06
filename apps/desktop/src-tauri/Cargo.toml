@@ -166,3 +166,7 @@ features = ["serde"]
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-single-instance = "2"
+
+# `log` is used via the `log::` macros; cargo-machete's import scan misses it.
+[package.metadata.cargo-machete]
+ignored = ["log"]

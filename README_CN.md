@@ -40,9 +40,9 @@
 
 <img src="./public/show-zh.png" alt="screenshot" />
 
-## mdviewy 目前处于 Beta 阶段 ⚠️
+## 状态
 
-目前 mdviewy 处于 beta 阶段，建议在有数据备份的情况下使用。
+mdviewy 正在积极开发，目标是 1.0 正式版，现在即可使用。1.0 路线见 `docs/ROADMAP-1.0.md`。
 
 ## 功能特性
 

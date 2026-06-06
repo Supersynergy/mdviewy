@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Mdviewy caret document mark</title>
+  <desc id="desc">Minimal markdown caret with a page-fold shape, optimized for small sizes.</desc>
+  <defs>
+    <linearGradient id="ink" x1="104" y1="76" x2="408" y2="436" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0E2F36"/>
+      <stop offset="1" stop-color="#1F8A81"/>
+    </linearGradient>
+  </defs>
+  <rect x="48" y="48" width="416" height="416" rx="96" fill="#F7FBFA"/>
+  <path fill="url(#ink)" d="M156 166c0-20 16-36 36-36h112c10 0 20 4 27 11l61 61c7 7 11 17 11 27v117c0 20-16 36-36 36H192c-20 0-36-16-36-36V166Zm156 8v48c0 13 11 24 24 24h48l-72-72Z"/>
+  <path fill="#F7FBFA" d="m188 202 38-38 116 116-116 116-38-38 78-78-78-78Z"/>
+  <path fill="#BFEDE6" d="M327 180v42c0 6 5 11 11 11h42l-53-53Z"/>
+</svg>

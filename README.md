@@ -39,9 +39,9 @@
 
 <img src="./public/show-en.png" alt="screenshot" />
 
-## mdviewy is in the reconstruction phase ⚠️
+## Status
 
-At present, mdviewy needs about 3 - 6 months to perform reconstruction, which will bring an exciting new version. If there is no major bug in the three months, the new version will not be released.
+mdviewy is actively developed toward its **1.0** release and is usable today. See [`docs/ROADMAP-1.0.md`](./docs/ROADMAP-1.0.md) for the road to 1.0 and [`CHANGELOG.md`](./CHANGELOG.md) for recent changes.
 
 ## Features
 

@@ -42,7 +42,7 @@ pub fn init(app_handle: AppHandle, opened_urls: String) -> Result<(), Box<dyn st
         "console.log('[setup.rs] window.openedUrls set to: ' + {});",
         opened_urls_json
     ))
-    .title("MDviewy")
+    .title("mdviewy")
     .resizable(true)
     .fullscreen(false)
     .theme(Some(theme))

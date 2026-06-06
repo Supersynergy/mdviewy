@@ -62,26 +62,57 @@ const jumpToHeading = (
   const selection = TextSelection.create(tr.doc, headingPos + 1)
   tr.setSelection(selection)
 
-  dispatch(tr.scrollIntoView())
-
+  dispatch(tr)
   editorView.focus()
 
-  const { from } = editorView.state.selection
-  const coords = editorView.coordsAtPos(from)
+  const align = () => {
+    const { from } = editorView.state.selection
+    const coords = editorView.coordsAtPos(from)
 
-  if (scrollEl) {
-    const containerTop = scrollEl.getBoundingClientRect().top
-    const targetTop = coords.top - containerTop + scrollEl.scrollTop - 100
-    scrollEl.scrollTo({
-      top: targetTop,
-      behavior: 'smooth',
+    if (scrollEl) {
+      scrollToViewportTop(scrollEl, coords.top)
+      return
+    }
+
+    window.scrollTo({
+      top: coords.top + window.scrollY - 100,
+      behavior: 'auto',
     })
-    return
   }
 
-  window.scrollTo({
-    top: coords.top - 100, // 偏移 100px，避免被固定导航遮挡
-    behavior: 'smooth',
+  align()
+  window.setTimeout(align, 0)
+  requestAnimationFrame(align)
+}
+
+const jumpToSourceHeading = (
+  codemirrorView: { cm: { dispatch: (spec: any) => void; focus: () => void; coordsAtPos: (pos: number) => { top: number } | null; scrollDOM: HTMLElement } },
+  headingPos: number,
+) => {
+  codemirrorView.cm.dispatch({
+    selection: { anchor: headingPos, head: headingPos },
+    scrollIntoView: true,
+  })
+  codemirrorView.cm.focus()
+
+  const align = () => {
+    const coords = codemirrorView.cm.coordsAtPos(headingPos)
+    if (coords) {
+      scrollToViewportTop(codemirrorView.cm.scrollDOM, coords.top)
+    }
+  }
+
+  window.setTimeout(align, 0)
+  window.setTimeout(align, 80)
+  requestAnimationFrame(align)
+}
+
+const scrollToViewportTop = (scrollEl: HTMLElement, viewportTop: number, offset = 100) => {
+  const containerTop = scrollEl.getBoundingClientRect().top
+  const targetTop = scrollEl.scrollTop + viewportTop - containerTop - offset
+  scrollEl.scrollTo({
+    top: Math.max(0, targetTop),
+    behavior: 'auto',
   })
 }
 
@@ -229,11 +260,7 @@ export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
         let idx = heads.findIndex((h) => h.id === curId)
         if (idx < 0) idx = 0
         const next = Math.min(Math.max(idx + delta, 0), heads.length - 1)
-        cm.cm.dispatch({
-          selection: { anchor: heads[next].pos, head: heads[next].pos },
-          scrollIntoView: true,
-        })
-        cm.cm.focus()
+        jumpToSourceHeading(cm, heads[next].pos)
       }
     }
 
@@ -278,14 +305,7 @@ export const TocView = ({ variant = 'sidebar' }: TocViewProps) => {
                 id: heading.id,
                 htmlNode: null,
                 onClick: () => {
-                  codemirrorView.cm.dispatch({
-                    selection: {
-                      anchor: heading.pos,
-                      head: heading.pos,
-                    },
-                    scrollIntoView: true,
-                  })
-                  codemirrorView.cm.focus()
+                  jumpToSourceHeading(codemirrorView, heading.pos)
                 },
               }
             })

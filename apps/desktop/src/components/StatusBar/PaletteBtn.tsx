@@ -38,11 +38,13 @@ export const PaletteBtn = memo(() => {
   return (
     <Tooltip title='Command Palette'>
       <Btn
+        type='button'
+        aria-label='Open command palette'
         onClick={() =>
           window.dispatchEvent(new CustomEvent('mf:cmd_palette:open', { detail: 'all' }))
         }
       >
-        <i className='ri-command-line' />
+        <i aria-hidden='true' className='ri-command-line' />
         Search
         <kbd>Cmd+K</kbd>
       </Btn>

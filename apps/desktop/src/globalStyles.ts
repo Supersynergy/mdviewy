@@ -49,9 +49,14 @@ export const GlobalStyles = createGlobalStyle`
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
     height: 32px;
     width: 32px;
     font-size: 1rem;
+    font-family: inherit;
     cursor: pointer;
     transition: all 0.3s ease;
     -webkit-font-smoothing: antialiased;
@@ -76,6 +81,10 @@ export const GlobalStyles = createGlobalStyle`
 
     &-disabled {
       color: ${(props) => props.theme.disabledFontColor};
+      cursor: not-allowed;
+    }
+
+    &:disabled {
       cursor: not-allowed;
     }
   }

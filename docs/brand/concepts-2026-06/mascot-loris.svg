@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Mdviewy slow loris mascot</title>
+  <desc id="desc">Cute flat vector slow-loris mascot with big round eyes holding a document.</desc>
+  <defs>
+    <linearGradient id="tile" x1="118" y1="88" x2="900" y2="938" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF9ED"/>
+      <stop offset=".52" stop-color="#E6F2EC"/>
+      <stop offset="1" stop-color="#96D6CC"/>
+    </linearGradient>
+    <linearGradient id="fur" x1="292" y1="220" x2="714" y2="810" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DCCCB2"/>
+      <stop offset="1" stop-color="#9B856B"/>
+    </linearGradient>
+    <filter id="shadow" x="120" y="150" width="780" height="760" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="26" stdDeviation="28" flood-color="#2F3D36" flood-opacity=".2"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#tile)"/>
+  <ellipse cx="512" cy="836" rx="230" ry="52" fill="#5A756E" opacity=".16"/>
+  <g filter="url(#shadow)">
+    <circle cx="326" cy="340" r="112" fill="#A99175"/>
+    <circle cx="698" cy="340" r="112" fill="#A99175"/>
+    <circle cx="326" cy="340" r="66" fill="#F2DFC2"/>
+    <circle cx="698" cy="340" r="66" fill="#F2DFC2"/>
+    <ellipse cx="512" cy="598" rx="194" ry="236" fill="url(#fur)"/>
+    <circle cx="512" cy="406" r="224" fill="url(#fur)"/>
+    <path fill="#F7E6C8" d="M512 226c96 46 152 106 168 180-10 116-74 192-168 192s-158-76-168-192c16-74 72-134 168-180Z"/>
+    <ellipse cx="402" cy="423" rx="92" ry="104" fill="#6F503B"/>
+    <ellipse cx="622" cy="423" rx="92" ry="104" fill="#6F503B"/>
+    <circle cx="402" cy="423" r="66" fill="#FFFDF5"/>
+    <circle cx="622" cy="423" r="66" fill="#FFFDF5"/>
+    <circle cx="402" cy="423" r="42" fill="#17252A"/>
+    <circle cx="622" cy="423" r="42" fill="#17252A"/>
+    <circle cx="385" cy="402" r="15" fill="#FFFFFF"/>
+    <circle cx="605" cy="402" r="15" fill="#FFFFFF"/>
+    <path fill="#60422F" d="M512 487c28 0 48 18 48 42 0 29-24 49-48 49s-48-20-48-49c0-24 20-42 48-42Z"/>
+    <path fill="none" stroke="#60422F" stroke-width="15" stroke-linecap="round" d="M478 596c22 22 46 22 68 0"/>
+    <circle cx="324" cy="520" r="24" fill="#E8A68F" opacity=".75"/>
+    <circle cx="700" cy="520" r="24" fill="#E8A68F" opacity=".75"/>
+    <rect x="342" y="620" width="340" height="222" rx="38" fill="#FFFFFF"/>
+    <path fill="#DDF4EF" d="M593 620v68c0 17 14 31 31 31h58l-89-99Z"/>
+    <path fill="#0F7B75" d="m416 697 34-34 62 62 62-62 34 34-96 96-96-96Z"/>
+    <rect x="424" y="800" width="176" height="22" rx="11" fill="#A9CBC5"/>
+    <ellipse cx="326" cy="722" rx="48" ry="70" fill="#A58C72"/>
+    <ellipse cx="698" cy="722" rx="48" ry="70" fill="#A58C72"/>
+  </g>
+</svg>

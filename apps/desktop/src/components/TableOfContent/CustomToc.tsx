@@ -169,18 +169,19 @@ const CustomToc = memo(({ headings, activeId, filterQuery, onSelectHeading }: Pr
             e.preventDefault()
             onSelectHeading?.(h.id)
             try {
-              h.onClick?.(h.raw)
+              if (h.onClick) {
+                h.onClick(h.raw)
+              } else {
+                const target =
+                  document.getElementById(h.id) ||
+                  (document.querySelector(`[data-heading-id="${h.id}"]`) as HTMLElement | null)
+                target?.scrollIntoView({ behavior: 'auto', block: 'start' })
+              }
             } catch (err) {
               console.warn('[CustomToc] onClick handler threw', err)
             }
-            // DOM fallback: scroll viewport to the heading element if it exists.
-            const target =
-              document.getElementById(h.id) ||
-              (document.querySelector(`[data-heading-id="${h.id}"]`) as HTMLElement | null)
-            if (target) {
-              target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            }
-            window.setTimeout(() => onSelectHeading?.(h.id), 80)
+            window.setTimeout(() => onSelectHeading?.(h.id), 120)
+            window.setTimeout(() => onSelectHeading?.(h.id), 320)
           }}
         >
           <Chapter>{h.chapter}</Chapter>

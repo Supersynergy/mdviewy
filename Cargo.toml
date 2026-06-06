@@ -5,8 +5,8 @@ members = ["apps/desktop/src-tauri", "crates/*", "tools/*"]
 [workspace.package]
 edition = "2024"
 rust-version = "1.95"
-repository = "https://git.marketdeck.io/Supersynergy/mdviewy"
-homepage = "https://git.marketdeck.io/Supersynergy/mdviewy"
+repository = "https://github.com/Supersynergy/mdviewy"
+homepage = "https://github.com/Supersynergy/mdviewy"
 license = "MIT"
 
 # Production binary: small, fast, single LTO unit.

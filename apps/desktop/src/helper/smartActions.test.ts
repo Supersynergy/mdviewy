@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 import {
   buildAgentHandoffPrompt,
   buildAiContextPack,
+  collectInlineSmartReferences,
   extractSmartReferences,
+  findSmartReferenceAroundOffset,
+  githubUrlForRepoName,
   stripCodeBlocks,
 } from './smartActions'
 
@@ -30,6 +33,40 @@ See [local](./docs/spec.md), "/Users/master/projects/mdviewy/README.md" and ./do
         label: 'README.md',
       },
     ])
+  })
+
+  it('detects GitHub owner/repo mentions and ignores local path fragments', () => {
+    const refs = extractSmartReferences(
+      'Use ujjwalkarn/Machine-Learning-Tutorials or nordbyte/rescope, not /Users/master/project.',
+    )
+
+    expect(refs).toContainEqual({
+      kind: 'github',
+      value: 'https://github.com/ujjwalkarn/Machine-Learning-Tutorials',
+      label: 'ujjwalkarn/Machine-Learning-Tutorials',
+    })
+    expect(refs).toContainEqual({
+      kind: 'github',
+      value: 'https://github.com/nordbyte/rescope',
+      label: 'nordbyte/rescope',
+    })
+    expect(refs.some((ref) => ref.label === 'Users/master')).toBe(false)
+    expect(githubUrlForRepoName('nordbyte/rescope')).toBe('https://github.com/nordbyte/rescope')
+  })
+
+  it('locates inline path and GitHub tokens around the hovered offset', () => {
+    const text = 'Open `~/projects/synapse/tuning.md` and nordbyte/rescope now.'
+    const refs = collectInlineSmartReferences(text)
+
+    expect(refs.map((ref) => ref.kind)).toEqual(['path', 'github'])
+    expect(findSmartReferenceAroundOffset(text, text.indexOf('rescope'))).toMatchObject({
+      kind: 'github',
+      value: 'https://github.com/nordbyte/rescope',
+    })
+    expect(findSmartReferenceAroundOffset(text, text.indexOf('tuning.md'))).toMatchObject({
+      kind: 'path',
+      value: '~/projects/synapse/tuning.md',
+    })
   })
 
   it('builds an AI context pack and can hide code blocks', () => {

@@ -7,6 +7,7 @@ interface MfIconButtonProps {
   className?: string
   onClick: (e?: React.MouseEvent<HTMLElement>) => void
   iconRef?: React.RefObject<any>
+  ariaLabel?: string
   active?: boolean
   tooltipProps?: Omit<TooltipProps, 'children'> & {
     style?: React.CSSProperties
@@ -23,12 +24,16 @@ export const MfIconButton = (props: MfIconButtonProps) => {
     onClick,
     tooltipProps,
     iconRef,
+    ariaLabel: explicitAriaLabel,
     rounded = 'square',
     disabled = false,
     unselected = false,
   } = props
 
-  const iconCls = classNames('icon', icon, props.className, {
+  const ariaLabel =
+    explicitAriaLabel || (typeof tooltipProps?.title === 'string' ? tooltipProps.title : undefined)
+
+  const buttonCls = classNames('icon', props.className, {
     'icon--active': props.active,
     [`icon-${props.size || 'medium'}`]: true,
     'icon-rounded': rounded === 'rounded',
@@ -38,13 +43,26 @@ export const MfIconButton = (props: MfIconButtonProps) => {
     'icon-disabled': disabled
   })
 
+  const content = (
+    <button
+      ref={iconRef}
+      type='button'
+      className={buttonCls}
+      onClick={disabled ? undefined : onClick}
+      aria-label={ariaLabel}
+      disabled={disabled}
+    >
+      <i aria-hidden='true' className={icon}></i>
+    </button>
+  )
+
   if (tooltipProps) {
     return (
       <Tooltip style={{ zIndex: 11 }} {...tooltipProps}>
-        <i ref={iconRef} className={iconCls} onClick={onClick}></i>
+        {content}
       </Tooltip>
     )
   }
 
-  return <i ref={iconRef} className={iconCls} onClick={onClick}></i>
+  return content
 }

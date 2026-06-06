@@ -48,11 +48,11 @@
 
 <img src="${screenshot}" alt="screenshot" />
 
-## ${en:'mdviewy is in the reconstruction phase ⚠️', zh:'mdviewy 目前处于 Beta 阶段 ⚠️', ja:'mdviewy はベータ版です ⚠️'}
+## ${en:'Status', zh:'状态', ja:'ステータス'}
 
-At present, mdviewy needs about 3 - 6 months to perform reconstruction, which will bring an exciting new version. If there is no major bug in the three months, the new version will not be released.<!--en-->
-目前 mdviewy 处于 beta 阶段，建议在有数据备份的情况下使用。<!--zh-->
-現在、mdviewy はベータ版であり、データのバックアップを取ることをお勧めします。<!--ja-->
+mdviewy is actively developed toward its 1.0 release and is usable today. See `docs/ROADMAP-1.0.md` for the road to 1.0.<!--en-->
+mdviewy 正在积极开发，目标是 1.0 正式版，现在即可使用。1.0 路线见 `docs/ROADMAP-1.0.md`。<!--zh-->
+mdviewy は 1.0 リリースに向けて活発に開発中で、現在も利用可能です。1.0 までのロードマップは `docs/ROADMAP-1.0.md` を参照してください。<!--ja-->
 
 ## ${en:'Features', zh:'功能特性', ja:'機能'}
 
