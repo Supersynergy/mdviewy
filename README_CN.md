@@ -60,12 +60,13 @@ mdviewy 正在积极开发，目标是 1.0 正式版，现在即可使用。1.0 
 
 支持平台 Linux, macOS 和 Windows.
 
-### Windows 11
 
+### Windows 11
 1. 打开 [GitHub Releases](https://github.com/Supersynergy/mdviewy/releases)。
 2. 下载并运行 `mdviewy_*_x64-setup.exe`。
 3. 如果 Windows 无法自动下载 WebView2，请使用 `mdviewy_offline_*_x64-setup.exe`。它内置 WebView2，文件更大。
 4. 托管安装可使用 `.msi` 包。未签名的预发布版本可能会触发 Microsoft SmartScreen，直到完成 Windows 代码签名。
+
 
 > [!NOTE]
 > 因为苹果安全策略对于没有开发者认证软件的限制，导致 **macOS aarch64** 版本无法直接安装. 你可以通过一下步骤忽略该限制:
