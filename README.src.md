@@ -106,6 +106,24 @@ Available for Linux, macOS and Windows.<!--en-->
 支持平台 Linux, macOS 和 Windows.<!--zh-->
 Linux、macOS、Windows向けに利用可能です。<!--ja-->
 
+### Windows 11<!--en-->
+1. Open [GitHub Releases](https://github.com/Supersynergy/mdviewy/releases).<!--en-->
+2. Download `mdviewy_*_x64-setup.exe` and run it.<!--en-->
+3. If Windows cannot download WebView2 automatically, use `mdviewy_offline_*_x64-setup.exe`. It is larger because it bundles WebView2.<!--en-->
+4. Use the `.msi` package for managed installs. Unsigned prerelease builds may show Microsoft SmartScreen until Windows code signing is configured.<!--en-->
+
+### Windows 11<!--zh-->
+1. 打开 [GitHub Releases](https://github.com/Supersynergy/mdviewy/releases)。<!--zh-->
+2. 下载并运行 `mdviewy_*_x64-setup.exe`。<!--zh-->
+3. 如果 Windows 无法自动下载 WebView2，请使用 `mdviewy_offline_*_x64-setup.exe`。它内置 WebView2，文件更大。<!--zh-->
+4. 托管安装可使用 `.msi` 包。未签名的预发布版本可能会触发 Microsoft SmartScreen，直到完成 Windows 代码签名。<!--zh-->
+
+### Windows 11<!--ja-->
+1. [GitHub Releases](https://github.com/Supersynergy/mdviewy/releases) を開きます。<!--ja-->
+2. `mdviewy_*_x64-setup.exe` をダウンロードして実行します。<!--ja-->
+3. Windows が WebView2 を自動取得できない場合は、WebView2 同梱の `mdviewy_offline_*_x64-setup.exe` を使います。通常版より大きいです。<!--ja-->
+4. 管理配布には `.msi` パッケージを使えます。Windows コード署名が完了するまで、未署名のプレリリースでは Microsoft SmartScreen が表示される場合があります。<!--ja-->
+
 > [!NOTE]
 > Because of Apple’s security policy restrictions on software without developer certification, the **macOS aarch64** version cannot be downloaded and used directly. You can ignore the limit by doing the following:<!--en-->
 > - Open your terminal<!--en-->

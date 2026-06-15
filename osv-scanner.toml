@@ -1,7 +1,7 @@
-# Tracked-and-accepted OSV findings with NO released upstream fix as of 2026-06-06.
+# Tracked-and-accepted OSV findings that cannot be fixed today.
 # Each entry has a review date (ignoreUntil) so it resurfaces — not a permanent mute.
-# Everything with a published patch was already fixed via package.json `resolutions`
-# (osv went 41 -> 6). Re-review on the date below or whenever an upstream fix ships.
+# Reasons are either "no released upstream fix" or "fixed version is too new for
+# the repo's 14-day supply-chain hold."
 
 [[IgnoredVulns]]
 id = "GHSA-866g-f22w-33x8"
@@ -22,3 +22,28 @@ reason = "lodash/-es code injection via _.template — fix version unreleased; a
 id = "GHSA-xxjr-mmjv-4gpg"
 ignoreUntil = 2026-09-06
 reason = "lodash-es prototype pollution in _.unset/_.omit — fix version unreleased; transitive/build-only."
+
+[[IgnoredVulns]]
+id = "GHSA-8988-4f7v-96qf"
+ignoreUntil = 2026-06-26
+reason = "@opentelemetry/core fix 2.8.0 was published 2026-06-11, inside the 14-day supply-chain hold."
+
+[[IgnoredVulns]]
+id = "GHSA-gvmj-g25r-r7wr"
+ignoreUntil = 2026-06-26
+reason = "dompurify fixes 3.4.8/3.4.9 were published 2026-06-03/2026-06-10, inside the 14-day supply-chain hold."
+
+[[IgnoredVulns]]
+id = "GHSA-vxr8-fq34-vvx9"
+ignoreUntil = 2026-06-26
+reason = "dompurify fix 3.4.9 was published 2026-06-10, inside the 14-day supply-chain hold."
+
+[[IgnoredVulns]]
+id = "GHSA-gv7w-rqvm-qjhr"
+ignoreUntil = 2026-06-26
+reason = "esbuild fix 0.28.1 was published 2026-06-11, inside the 14-day supply-chain hold."
+
+[[IgnoredVulns]]
+id = "GHSA-f38q-mgvj-vph7"
+ignoreUntil = 2026-06-26
+reason = "protobufjs fix 7.6.3 was published 2026-06-09, inside the 14-day supply-chain hold."

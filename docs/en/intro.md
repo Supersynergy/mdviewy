@@ -18,6 +18,13 @@ Currently, mdviewy is in the beta stage, and it is recommended to use it with da
 
 Available for Linux, macOS and Windows.
 
+### Windows 11
+
+1. Open [GitHub Releases](https://github.com/Supersynergy/mdviewy/releases).
+2. Download `mdviewy_*_x64-setup.exe` and run it.
+3. If Windows cannot download WebView2 automatically, use `mdviewy_offline_*_x64-setup.exe`. It is larger because it bundles WebView2.
+4. Use the `.msi` package for managed installs. Unsigned prerelease builds may show Microsoft SmartScreen until Windows code signing is configured.
+
 > [!NOTE]
 > Because of Apple’s security policy restrictions on software without developer certification, the **macOS aarch64** version cannot be downloaded and used directly. You can ignore the limit by doing the following:
 > - Open your terminal
@@ -42,4 +49,3 @@ You can read [CONTRIBUTING](./Community/CONTRIBUTING) to know how to start the p
 ## Support
 
 mdviewy is completely and permanently open source, if you want to support mdviewy, you can `star` this project. This will give me great support and help, love you.
-

@@ -7,7 +7,7 @@ edition = "2024"
 rust-version = "1.95"
 repository = "https://github.com/Supersynergy/mdviewy"
 homepage = "https://github.com/Supersynergy/mdviewy"
-license = "MIT"
+license = "AGPL-3.0-only"
 
 # Production binary: small, fast, single LTO unit.
 # On M-series the LTO+codegen-units=1 combo trims the binary ~25% and shaves

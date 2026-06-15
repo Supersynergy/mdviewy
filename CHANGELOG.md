@@ -1,9 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.90.2 - 2026-06-16
 
 ### Added
 
+- Added Windows 11 release install guidance to README/docs, including the normal setup EXE, offline WebView2 installer, MSI use case, and SmartScreen note for unsigned prereleases.
+- Added `.env.example` and `ATTRIBUTIONS.md` for release hygiene.
 - Added a premium brand/logo + mascot concept set in `docs/brand/concepts-2026-06/` (3 abstract marks, 3 mascots — koala/tarsier/loris, and a recommended macOS app-icon tile), generated as self-contained SVGs plus `png/` previews. Recommended v1.0 direction: tarsier app icon + caret mark for small sizes.
 - Added `docs/ROADMAP-1.0.md` — masterplan to 1.0 GA (6 phases: truth/naming, signing/distribution, security, tests, brand, release-eng) with per-phase gates and a critical path.
 - Applied the new tarsier app icon across all `apps/desktop/src-tauri/icons/*` (png/icns/ico + Square/Store tiles) and `public/logo.png`.
@@ -18,6 +20,8 @@
 
 ### Changed
 
+- Reworked GitHub release automation for the mdviewy rename: removed the stale MarkFlowy artifact names, removed the disabled updater/UpgradeLink release tail, switched Actions to Node 24-compatible pins, and made offline Windows installer assets distinct.
+- Aligned root/desktop license metadata with the AGPL root license and clarified public security reporting.
 - Trimmed 11 genuinely-unused Rust dependencies across 5 crates (verified by grep + `cargo check --all-features`): `mfdev` (anyhow/env_logger/log/os_pipe), `mdviewy-core` (serde_json/parking_lot/thiserror), `download_npm` (mdviewy-utils), `file_search` (dirs/toml), `mdviewy-utils` (regex). Added `cargo-machete` ignores for the two false-positives (`syntect` feature-gated, `log` macro-only) so `just lean` is clean.
 - Removed the inherited "reconstruction phase / 3-6 months / will not be released" notice from `README.md`, `README.src.md`, `README_CN.md`, `README_JA.md`; replaced with a Status section linking the roadmap.
 - Unified the product name to lowercase `mdviewy` everywhere user/tooling-visible (Tauri `productName`, window title, `APP_NAME`, locale `app_name`, HTML title, empty-state title, crate metadata).

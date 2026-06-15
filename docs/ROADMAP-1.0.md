@@ -1,7 +1,7 @@
 # mdviewy — Masterplan to 1.0
 
 Status: v0.90.1 (2026-06-02). Target: **1.0.0 GA**.
-Owner: Supersynergy. Last updated: 2026-06-05.
+Owner: Supersynergy. Last updated: 2026-06-15.
 
 Functionally close. The gap to 1.0 is **trust + distribution + narrative + brand**, not features.
 
@@ -25,12 +25,10 @@ Functionally close. The gap to 1.0 is **trust + distribution + narrative + brand
   `panic=abort`, `strip`) + `.cargo/config.toml` (sccache, `-dead_strip`,
   `target-cpu=apple-m1`) + lazy-loaded editor/AI + lodash purge. Gap: no
   `criterion`/`divan` benches on hot paths (render/FTS).
-- **Leancode: gate now wired** (`just lean` / `just security` / `just pre-pr`),
-  but findings remain:
-  - `cargo machete` flags unused Rust deps in 6 crates (e.g. `mdviewy-core`:
-    `syntect`, `serde_json`, `parking_lot`, `thiserror`; `mfdev`: `anyhow`,
-    `log`, `env_logger`, `os_pipe`). Verify each (machete has macro/feature
-    false-positives) then trim. — **Phase 3/2**
+- **Leancode: gate now wired** (`just lean` / `just security` / `just pre-pr`).
+  Current state:
+  - `cargo machete`: ✅ **resolved** — 11 genuinely unused Rust dependencies
+    trimmed and false-positives documented in package metadata.
   - `osv-scanner`: ✅ **resolved** — 41 → 0 actionable npm vulns (35 patched via
     `resolutions` + `uuid`/`tar`/`vitest` major bumps, all test-verified). The 6
     remaining have no released upstream fix (lodash/-es, `@ai-sdk/provider-utils`)
@@ -57,10 +55,10 @@ Release gate: `just check` green · `tauri:build` all 3 OS · signing verified �
 
 ## Phase 0 — Truth & Naming (0.5 day) — UNBLOCKS EVERYTHING
 
-- [ ] Remove "reconstruction phase / needs 3-6 months / no release" from `README.md` + `README.src.md`.
-- [ ] Pick canonical name casing: **mdviewy** (lowercase). Fix `tauri.conf` `productName` "MDviewy" → align.
-- [ ] Resolve naming churn: ADR `2026-05-26-rename-to-mdmaster.md` vs current "mdviewy" — write a superseding ADR stating final name.
-- [ ] Pick canonical repo home (Gitea `git.marketdeck.io` **or** GitHub `Supersynergy`). Make package.json / Cargo.toml / README badges / download links all agree.
+- [x] Remove "reconstruction phase / needs 3-6 months / no release" from `README.md` + `README.src.md`.
+- [x] Pick canonical name casing: **mdviewy** (lowercase). Fix `tauri.conf` `productName` "MDviewy" → align.
+- [x] Resolve naming churn: ADR `2026-05-26-rename-to-mdmaster.md` vs current "mdviewy" — superseded by `2026-06-05-canonical-name-and-repo-home.md`.
+- [x] Pick canonical repo home: GitHub `Supersynergy/mdviewy`. Make package.json / Cargo.toml / README badges / download links all agree.
 - Gate: no contradictory name/URL anywhere (`rg -i 'mdmaster|reconstruction'` clean).
 
 ## Phase 1 — Distribution & Trust (3–5 days) — #1 REAL BLOCKER
@@ -68,7 +66,7 @@ Release gate: `just check` green · `tauri:build` all 3 OS · signing verified �
 - [ ] macOS: Apple Developer ID signing + notarization in `tauri.conf` macOS block (`signingIdentity`, `entitlements`). Verify: `spctl -a -vv mdviewy.app` → "accepted".
 - [ ] Windows: code-signing cert wired into wix bundle. Verify SmartScreen reputation path.
 - [ ] Linux: AppImage/deb confirmed launching on clean box.
-- [ ] Update path decision: re-enable Tauri updater w/ signed manifest **or** document manual-update policy in README + in-app "check for updates" link. (Updater was removed in 0.90 — decide deliberately.)
+- [x] Update path decision for 0.90.x: updater stays disabled; manual updates are documented through GitHub Releases. Revisit auto-update only after signing is configured.
 - Gate: fresh-machine install on all 3 OS opens with zero terminal workaround.
 
 ## Phase 2 — Security Hardening (1–2 days)
@@ -97,7 +95,7 @@ Release gate: `just check` green · `tauri:build` all 3 OS · signing verified �
 
 ## Phase 5 — Release Engineering (1 day)
 
-- [ ] CI builds + signs all 3 OS on tag.
+- [ ] CI builds all 3 OS on tag; signing still needs owner-provided Apple/Windows certificates.
 - [ ] Cut CHANGELOG `1.0.0` section (move Unreleased).
 - [ ] Bump versions: tauri.conf, Cargo workspace, desktop package.json → `1.0.0`.
 - [ ] Release notes + launch copy (use `repo-release-excellence`).

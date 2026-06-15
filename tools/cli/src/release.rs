@@ -29,6 +29,7 @@ struct Package {
 
 const PACKAGEFILE_URL: &str = "apps/desktop/src-tauri/tauri.conf.json";
 const CRATESFILE_URL: &str = "apps/desktop/src-tauri/Cargo.toml";
+const DESKTOP_PACKAGEFILE_URL: &str = "apps/desktop/package.json";
 
 fn get_old_version() -> String {
     let package_str = std::fs::read_to_string(PACKAGEFILE_URL).unwrap();
@@ -40,18 +41,24 @@ fn get_old_version() -> String {
 fn write_new_version(new_version: String) {
     let package_str = std::fs::read_to_string(PACKAGEFILE_URL).unwrap();
     let crates_str = std::fs::read_to_string(CRATESFILE_URL).unwrap();
+    let desktop_package_str = std::fs::read_to_string(DESKTOP_PACKAGEFILE_URL).unwrap();
 
     let mut package: Map<String, serde_json::Value> =
         serde_json::from_str::<Map<String, serde_json::Value>>(&package_str).unwrap();
     let mut crate_data: Map<String, serde_json::Value> = toml::from_str(&crates_str).unwrap();
+    let mut desktop_package: Map<String, serde_json::Value> =
+        serde_json::from_str::<Map<String, serde_json::Value>>(&desktop_package_str).unwrap();
 
     crate_data.get_mut("package").unwrap()["version"] = Value::String(new_version.clone());
     package["version"] = Value::String(new_version.clone());
+    desktop_package["version"] = Value::String(new_version.clone());
 
     let new_package_str =
         serde_json::to_string_pretty::<Map<String, serde_json::Value>>(&package).unwrap();
     let new_crates_str =
         toml::to_string_pretty::<Map<String, serde_json::Value>>(&crate_data).unwrap();
+    let new_desktop_package_str =
+        serde_json::to_string_pretty::<Map<String, serde_json::Value>>(&desktop_package).unwrap();
 
     let mut input = String::new();
 
@@ -88,12 +95,25 @@ fn write_new_version(new_version: String) {
         println!("Releasing version: {new_version}");
         std::fs::write(PACKAGEFILE_URL, new_package_str).unwrap();
         std::fs::write(CRATESFILE_URL, new_crates_str).unwrap();
+        std::fs::write(DESKTOP_PACKAGEFILE_URL, new_desktop_package_str).unwrap();
+
+        Command::new("cargo")
+            .arg("update")
+            .arg("-p")
+            .arg("mdviewy")
+            .spawn()
+            .expect("failed to update Cargo.lock")
+            .wait()
+            .unwrap();
 
         wait_for_cargo_lock_update();
 
         Command::new("git")
             .arg("add")
-            .arg(".")
+            .arg(PACKAGEFILE_URL)
+            .arg(CRATESFILE_URL)
+            .arg(DESKTOP_PACKAGEFILE_URL)
+            .arg("Cargo.lock")
             .spawn()
             .expect("failed to execute process")
             .wait()
@@ -110,6 +130,8 @@ fn write_new_version(new_version: String) {
 
         Command::new("git")
             .arg("push")
+            .arg("origin")
+            .arg("HEAD")
             .spawn()
             .expect("failed to execute process")
             .wait()
@@ -135,7 +157,7 @@ pub fn create_git_tag(tag_name: String) {
 pub fn push_git_tag(tag_name: String) {
     Command::new("git")
         .arg("push")
-        .arg("mdviewy")
+        .arg("origin")
         .arg(tag_name)
         .spawn()
         .expect("failed to execute process")

@@ -33,9 +33,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
-        with:
-          token: ${{ secrets.ACCESS_TOKEN }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install dependencies (ubuntu only)
         if: matrix.os == 'ubuntu-24.04'
@@ -69,14 +67,8 @@ jobs:
 
       - name: Build the app
         run: yarn build:desktop --target ${{ matrix.target }}
-        env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'ubuntu-24.04'
         with:
           name: artifacts-${{ matrix.target }}
@@ -86,7 +78,7 @@ jobs:
             ./target/${{ matrix.target }}/release/bundle/deb/**.deb
             ./target/${{ matrix.target }}/release/bundle/rpm/**.rpm
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'macos-latest' && matrix.arch == 'aarch64'
         with:
           name: aarch64artifacts-${{ matrix.target }}
@@ -94,7 +86,7 @@ jobs:
             ./target/${{ matrix.target }}/release/bundle/dmg/**.dmg
             ./target/${{ matrix.target }}/release/bundle/macos/**.app.*
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'macos-latest' && matrix.arch == 'x86_64'
         with:
           name: artifacts-${{ matrix.target }}
@@ -102,7 +94,7 @@ jobs:
             ./target/${{ matrix.target }}/release/bundle/dmg/**.dmg
             ./target/${{ matrix.target }}/release/bundle/macos/**.app.*
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'windows-latest'
         with:
           name: artifacts-${{ matrix.target }}
@@ -125,9 +117,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
-        with:
-          token: ${{ secrets.ACCESS_TOKEN }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Write env file
         run: |
@@ -159,14 +149,8 @@ jobs:
 
       - name: Build the app
         run: yarn build:desktop --target ${{ matrix.target }}
-        env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'windows-latest'
         with:
           name: offline-installer-artifacts-${{ matrix.target }}
@@ -181,156 +165,111 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Query version number
-        run: echo "version=${GITHUB_REF:11}" >> $GITHUB_ENV
+        run: |
+          echo "release_tag=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
 
       - name: Download x86_64 artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.1
         with:
           pattern: artifacts-*
           path: artifacts/x86_64
           merge-multiple: true
 
       - name: Download aarch64 artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.1
         with:
           pattern: aarch64artifacts-*
           path: artifacts/aarch64
           merge-multiple: true
 
       - name: Download offline installer artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.1
         with:
           pattern: offline-installer-artifacts-*
           path: artifacts/offline-installer
           merge-multiple: true
 
-      - name: Rename artifacts
+      - name: Prepare release assets
         run: |
-          mv "artifacts/aarch64/dmg/MarkFlowy_${{ env.version }}_aarch64.dmg" "artifacts/MarkFlowy_v${{ env.version }}_aarch64.dmg"
-          mv "artifacts/aarch64/macos/MarkFlowy.app.tar.gz" "artifacts/MarkFlowy_aarch64.app.tar.gz"
-          mv "artifacts/aarch64/macos/MarkFlowy.app.tar.gz.sig" "artifacts/MarkFlowy_aarch64.app.tar.gz.sig"
+          set -euo pipefail
+          shopt -s globstar nullglob
+          mkdir -p release-assets
 
-          mv "artifacts/x86_64/dmg/MarkFlowy_${{ env.version }}_x64.dmg" "artifacts/MarkFlowy_v${{ env.version }}_x64.dmg"
-          mv "artifacts/x86_64/macos/MarkFlowy.app.tar.gz" "artifacts/MarkFlowy_x64.app.tar.gz"
-          mv "artifacts/x86_64/macos/MarkFlowy.app.tar.gz.sig" "artifacts/MarkFlowy_x64.app.tar.gz.sig"
+          copied=0
+          copy_asset() {
+            local source="$1"
+            local target="$2"
+            cp "$source" "release-assets/$target"
+            copied=$((copied + 1))
+          }
 
-          mv "artifacts/x86_64/deb/MarkFlowy_${{ env.version }}_amd64.deb" "artifacts/MarkFlowy_v${{ env.version }}_amd64.deb"
-          mv "artifacts/x86_64/appimage/MarkFlowy_${{ env.version }}_amd64.AppImage" "artifacts/MarkFlowy_v${{ env.version }}_amd64.AppImage"
-          mv "artifacts/x86_64/appimage/MarkFlowy_${{ env.version }}_amd64.AppImage.sig" "artifacts/MarkFlowy_v${{ env.version }}_amd64.AppImage.sig"
-          mv artifacts/x86_64/rpm/* artifacts/
+          for file in artifacts/x86_64/**/* artifacts/aarch64/**/*; do
+            [ -f "$file" ] || continue
+            case "$file" in
+              *.dmg|*.deb|*.rpm|*.AppImage|*.msi|*.exe|*.tar.gz|*.sig)
+                copy_asset "$file" "$(basename "$file")"
+                ;;
+            esac
+          done
 
-          mv "artifacts/x86_64/msi/MarkFlowy_${{ env.version }}_x64_en-US.msi" "artifacts/MarkFlowy_v${{ env.version }}_x64.msi"
-          mv "artifacts/x86_64/msi/MarkFlowy_${{ env.version }}_x64_en-US.msi.sig" "artifacts/MarkFlowy_v${{ env.version }}_x64.msi.sig"
+          for file in artifacts/offline-installer/**/*; do
+            [ -f "$file" ] || continue
+            case "$file" in
+              *.msi|*.exe|*.sig)
+                name="$(basename "$file")"
+                copy_asset "$file" "${name/mdviewy_/mdviewy_offline_}"
+                ;;
+            esac
+          done
 
-          mv "artifacts/x86_64/nsis/MarkFlowy_${{ env.version }}_x64-setup.exe" "artifacts/MarkFlowy_v${{ env.version }}_x64-setup.exe"
-          mv "artifacts/x86_64/nsis/MarkFlowy_${{ env.version }}_x64-setup.exe.sig" "artifacts/MarkFlowy_v${{ env.version }}_x64-setup.exe.sig"
+          if [ "$copied" -eq 0 ]; then
+            echo "No release assets found"
+            exit 1
+          fi
 
-          mv "artifacts/offline-installer/msi/MarkFlowy_${{ env.version }}_x64_en-US.msi" "artifacts/MarkFlowy_v${{ env.version }}_offline_installer_x64.msi"
-          mv "artifacts/offline-installer/msi/MarkFlowy_${{ env.version }}_x64_en-US.msi.sig" "artifacts/MarkFlowy_v${{ env.version }}_offline_installer_x64.msi.sig"
-
-          mv "artifacts/offline-installer/nsis/MarkFlowy_${{ env.version }}_x64-setup.exe" "artifacts/MarkFlowy_v${{ env.version }}_offline_installer_x64-setup.exe"
-          mv "artifacts/offline-installer/nsis/MarkFlowy_${{ env.version }}_x64-setup.exe.sig" "artifacts/MarkFlowy_v${{ env.version }}_offline_installer_x64-setup.exe.sig"
+          ls -lah release-assets
 
       - run: |
-          cat > release.txt << EOF
+          tee release.txt >/dev/null << 'EOF'
+          # mdviewy ${{ env.release_tag }}
 
-          ---
+          Fast native Markdown viewer/editor release for Windows, macOS, and Linux.
 
-          中国地区支持加速下载：请[点击](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA).
+          ## Windows 11
+
+          - Recommended: download `mdviewy_*_x64-setup.exe`.
+          - Offline/no-WebView2 machines: download `mdviewy_offline_*_x64-setup.exe`.
+          - MSI packages are included for managed installs.
+          - Unsigned builds may show Microsoft SmartScreen until Windows code signing is configured.
 
           <details>
 
-          <summary> FAQ | 常见问题 </summary>
+          <summary>FAQ</summary>
 
-          ## FAQ:
+          ### Windows
 
-          ### Windows users
-          - We provide an Offline Installer with built-in ​​WebView2 Runtime​​ for devices that cannot automatically install WebView2 online or are in a no-network environment. Please note that this installer is relatively large in size and is recommended to be used only when necessary.
+          The normal installer downloads WebView2 when Windows does not already have it. The offline installer bundles WebView2 and is larger.
 
-          ### macOS users
-          - ​​macOS x86_64 version​​: When you launch the app for the first time, you may see a prompt saying "Cannot open the application" because the app is from an unidentified developer. Please go to "System Preferences" > "Security & Privacy", and click "Open Anyway" in the "General" tab.
-          - ​​macOS aarch64 (Apple Silicon) users​​: If you see a prompt saying "The application is damaged" when you launch it for the first time, it is usually due to system security restrictions. Please open the terminal and run the following command to fix the permission issue, and then you can open the app normally:
-            xattr -cr /Applications/MarkFlowy.app
+          ### macOS
 
-          ## 常见问题：
+          These prerelease builds are not notarized yet. If macOS blocks first launch, open System Settings > Privacy & Security and allow the app, or run:
 
-          ### Windows 用户
-          - 我们提供了内置 ​​WebView2 运行时​​的离线安装包（Offline Installer），适用于无法自动在线安装 WebView2 或处于无网络环境的设备。请注意，此安装包体积较大，建议仅在必要时使用.
-
-          ### macOS 用户
-          - ​​macOS x86_64 版本​​：首次启动应用时，系统可能会提示“无法打开应用程序”，这是因为应用来自未识别的开发者。请前往“系统偏好设置” > “安全性与隐私”，在“通用”标签页中点击“仍要打开”即可.
-          - ​​macOS aarch64 (Apple Silicon) 用户​​：首次启动若提示“应用程序已损坏”，通常是由于系统的安全限制。请打开终端，执行以下命令来修复权限问题，之后即可正常打开应用
-            xattr -cr /Applications/MarkFlowy.app
+          ```bash
+          xattr -cr /Applications/mdviewy.app
+          ```
 
           </details>
 
           EOF
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2.1.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v3.0.0
         with:
-          tagName: v${{ env.version }}
-          releaseName: v${{ env.version }}
+          tag_name: ${{ env.release_tag }}
+          name: ${{ env.release_tag }}
           body_path: release.txt
-          releaseDraft: false
+          draft: false
           prerelease: true
-          files: ./artifacts/**/*
-
-      - uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Setup
-        run: yarn setup
-
-      - name: Updater JSON
-        run: yarn updater --token=${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Additional File to Same Release
-        uses: softprops/action-gh-release@v2.1.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.version }}
-          files: ./apps/desktop/updater/install.json
-          overwrite: true
-
-      - name: Deploy install.json
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./apps/desktop/updater
-          # force_orphan: true
- 
-  upgradeLink-upload:
-    needs: release
-    permissions:
-      contents: write
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Query version number
-        run: echo "version=${GITHUB_REF:11}" >> $GITHUB_ENV
-
-      - name: Generate release tag
-        id: save_tag
-        run: |
-          # 调试输出
-          echo ${{ env.version }}
-
-      - name: Send a request to UpgradeLink
-        uses: toolsetlink/upgradelink-action@3.0.2
-        with:
-          access_key: ${{ secrets.UPGRADE_LINK_ACCESS_KEY }}  # ACCESS_KEY  密钥key
-          access_secret: ${{ secrets.UPGRADE_LINK_ACCESS_SECRET }}
-          config: |
-            {
-              "app_type": "tauri",
-              "request": {
-                "app_key": "${{ secrets.UPGRADE_LINK_TAURI_KEY }}",
-                "latest_json_url": "https://github.com/drl990114/MarkFlowy/releases/download/v${{ env.version }}/install.json"
-              }
-            }
-
+          files: ./release-assets/*
+          fail_on_unmatched_files: true

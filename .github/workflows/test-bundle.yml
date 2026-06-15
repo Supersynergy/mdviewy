@@ -1,4 +1,4 @@
-name: Release
+name: Test Bundle
 
 on:
   push:
@@ -33,9 +33,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
-        with:
-          token: ${{ secrets.ACCESS_TOKEN }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install dependencies (ubuntu only)
         if: matrix.os == 'ubuntu-24.04'
@@ -45,12 +43,14 @@ jobs:
 
       - name: Write env file
         run: |
-          echo VITE_FIREBASE_APIKEY=${{ secrets.VITE_FIREBASE_APIKEY }}  >> ./apps/desktop/.env
-          echo VITE_FIREBASE_APPID=${{ secrets.VITE_FIREBASE_APPID }}  >> ./apps/desktop/.env
-          echo VITE_FIREBASE_MESSAGINGSENDERID=${{ secrets.VITE_FIREBASE_MESSAGINGSENDERID }}  >> ./apps/desktop/.env
-          echo VITE_FIREBASE_MEASUREMENTID=${{ secrets.VITE_FIREBASE_MEASUREMENTID }}  >> ./apps/desktop/.env
-          echo VITE_UMENG_APPKEY=${{ secrets.VITE_UMENG_APPKEY }}  >> ./apps/desktop/.env
-          echo VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}  >> ./apps/desktop/.env
+          {
+            echo VITE_FIREBASE_APIKEY=${{ secrets.VITE_FIREBASE_APIKEY }}
+            echo VITE_FIREBASE_APPID=${{ secrets.VITE_FIREBASE_APPID }}
+            echo VITE_FIREBASE_MESSAGINGSENDERID=${{ secrets.VITE_FIREBASE_MESSAGINGSENDERID }}
+            echo VITE_FIREBASE_MEASUREMENTID=${{ secrets.VITE_FIREBASE_MEASUREMENTID }}
+            echo VITE_UMENG_APPKEY=${{ secrets.VITE_UMENG_APPKEY }}
+            echo VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}
+          } >> ./apps/desktop/.env
 
       - name: Rust setup
         uses: dtolnay/rust-toolchain@stable
@@ -74,14 +74,8 @@ jobs:
 
       - name: Build the app
         run: yarn build:desktop --target ${{ matrix.target }}
-        env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'ubuntu-24.04'
         with:
           name: artifacts-${{ matrix.target }}
@@ -91,7 +85,7 @@ jobs:
             ./target/${{ matrix.target }}/release/bundle/deb/**.deb
             ./target/${{ matrix.target }}/release/bundle/rpm/**.rpm
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'macos-latest' && matrix.arch == 'aarch64'
         with:
           name: aarch64artifacts-${{ matrix.target }}
@@ -99,7 +93,7 @@ jobs:
             ./target/${{ matrix.target }}/release/bundle/dmg/**.dmg
             ./target/${{ matrix.target }}/release/bundle/macos/**.app.*
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'macos-latest' && matrix.arch == 'x86_64'
         with:
           name: artifacts-${{ matrix.target }}
@@ -107,7 +101,7 @@ jobs:
             ./target/${{ matrix.target }}/release/bundle/dmg/**.dmg
             ./target/${{ matrix.target }}/release/bundle/macos/**.app.*
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'windows-latest'
         with:
           name: artifacts-${{ matrix.target }}
@@ -130,18 +124,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
-        with:
-          token: ${{ secrets.ACCESS_TOKEN }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Write env file
         run: |
-          echo VITE_FIREBASE_APIKEY=${{ secrets.VITE_FIREBASE_APIKEY }}  >> ./apps/desktop/.env
-          echo VITE_FIREBASE_APPID=${{ secrets.VITE_FIREBASE_APPID }}  >> ./apps/desktop/.env
-          echo VITE_FIREBASE_MESSAGINGSENDERID=${{ secrets.VITE_FIREBASE_MESSAGINGSENDERID }}  >> ./apps/desktop/.env
-          echo VITE_FIREBASE_MEASUREMENTID=${{ secrets.VITE_FIREBASE_MEASUREMENTID }}  >> ./apps/desktop/.env
-          echo VITE_UMENG_APPKEY=${{ secrets.VITE_UMENG_APPKEY }}  >> ./apps/desktop/.env
-          echo VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}  >> ./apps/desktop/.env
+          {
+            echo VITE_FIREBASE_APIKEY=${{ secrets.VITE_FIREBASE_APIKEY }}
+            echo VITE_FIREBASE_APPID=${{ secrets.VITE_FIREBASE_APPID }}
+            echo VITE_FIREBASE_MESSAGINGSENDERID=${{ secrets.VITE_FIREBASE_MESSAGINGSENDERID }}
+            echo VITE_FIREBASE_MEASUREMENTID=${{ secrets.VITE_FIREBASE_MEASUREMENTID }}
+            echo VITE_UMENG_APPKEY=${{ secrets.VITE_UMENG_APPKEY }}
+            echo VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}
+          } >> ./apps/desktop/.env
 
       - name: Rust setup
         uses: dtolnay/rust-toolchain@stable
@@ -169,14 +163,8 @@ jobs:
 
       - name: Build the app
         run: yarn build:desktop --target ${{ matrix.target }}
-        env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: matrix.os == 'windows-latest'
         with:
           name: offline-installer-artifacts-${{ matrix.target }}
