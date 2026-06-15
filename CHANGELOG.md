@@ -22,6 +22,7 @@
 
 - Reworked GitHub release automation for the mdviewy rename: removed the stale MarkFlowy artifact names, removed the disabled updater/UpgradeLink release tail, switched Actions to Node 24-compatible pins, and made offline Windows installer assets distinct.
 - Aligned root/desktop license metadata with the AGPL root license and clarified public security reporting.
+- Hardened release CI by avoiding a missing macOS `sccache` wrapper during Tauri builds and removing the stale contributor-list workflow that failed on GitHub token permissions.
 - Trimmed 11 genuinely-unused Rust dependencies across 5 crates (verified by grep + `cargo check --all-features`): `mfdev` (anyhow/env_logger/log/os_pipe), `mdviewy-core` (serde_json/parking_lot/thiserror), `download_npm` (mdviewy-utils), `file_search` (dirs/toml), `mdviewy-utils` (regex). Added `cargo-machete` ignores for the two false-positives (`syntect` feature-gated, `log` macro-only) so `just lean` is clean.
 - Removed the inherited "reconstruction phase / 3-6 months / will not be released" notice from `README.md`, `README.src.md`, `README_CN.md`, `README_JA.md`; replaced with a Status section linking the roadmap.
 - Unified the product name to lowercase `mdviewy` everywhere user/tooling-visible (Tauri `productName`, window title, `APP_NAME`, locale `app_name`, HTML title, empty-state title, crate metadata).

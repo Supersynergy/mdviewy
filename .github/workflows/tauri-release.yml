@@ -66,6 +66,8 @@ jobs:
         run: rustup target add ${{ matrix.target }}
 
       - name: Build the app
+        env:
+          RUSTC_WRAPPER: ""
         run: yarn build:desktop --target ${{ matrix.target }}
 
       - uses: actions/upload-artifact@v7.0.1
@@ -148,6 +150,8 @@ jobs:
         run: rustup target add ${{ matrix.target }}
 
       - name: Build the app
+        env:
+          RUSTC_WRAPPER: ""
         run: yarn build:desktop --target ${{ matrix.target }}
 
       - uses: actions/upload-artifact@v7.0.1
