@@ -6,6 +6,8 @@ import { describe, expect, it } from 'vitest'
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const componentSource = readFileSync(join(currentDir, 'InlineReferenceActions.tsx'), 'utf8')
 const appSource = readFileSync(join(currentDir, '../../App.tsx'), 'utf8')
+const githubIcon = 'ri-' + 'github-fill'
+const linksIcon = 'ri-' + 'links-line'
 
 describe('InlineReferenceActions wiring', () => {
   it('mounts one global markdown reference action layer', () => {
@@ -21,15 +23,19 @@ describe('InlineReferenceActions wiring', () => {
     expect(componentSource).not.toContain('innerHTML')
   })
 
-  it('offers three compact hover actions for paths and GitHub references', () => {
-    expect(componentSource).toContain('Open GitHub repository')
+  it('offers compact hover actions for local paths only', () => {
     expect(componentSource).toContain('Open folder')
     expect(componentSource).toContain('Open containing folder')
     expect(componentSource).toContain('Copy path')
-    expect(componentSource).toContain('Copy Markdown link')
-    expect(componentSource).toContain('ri-github-fill')
     expect(componentSource).toContain('ri-folder-open-line')
     expect(componentSource).toContain('ri-file-copy-line')
+    expect(componentSource).toContain("const isPathRef = (ref: InlineSmartReference) => ref.kind === 'path'")
+    expect(componentSource).not.toContain('Open GitHub repository')
+    expect(componentSource).not.toContain('Open URL')
+    expect(componentSource).not.toContain('Copy URL')
+    expect(componentSource).not.toContain('Copy Markdown link')
+    expect(componentSource).not.toContain(githubIcon)
+    expect(componentSource).not.toContain(linksIcon)
   })
 
   it('resolves folder paths before rendering the first path action', () => {

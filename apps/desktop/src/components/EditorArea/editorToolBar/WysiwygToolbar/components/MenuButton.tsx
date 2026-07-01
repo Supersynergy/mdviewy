@@ -2,7 +2,6 @@ import { MfIconLabelButton } from '@/components/ui-v2/Button/icon-label-button'
 import useBookMarksStore from '@/extensions/bookmarks/useBookMarksStore'
 import bus from '@/helper/eventBus'
 import { getFileObject } from '@/helper/files'
-import { FileResultCode } from '@/helper/filesys'
 import { debounce } from '@/helper/timing'
 import { currentWindow } from '@/services/windows'
 import { useCommandStore, useEditorStateStore, useEditorStore } from '@/stores'
@@ -28,7 +27,7 @@ const EMPTY_FILE_NORMAL_INFO: FileNormalInfo = {
 }
 
 export const MenuButton = memo(() => {
-  const { activeId, getEditorContent } = useEditorStore()
+  const { activeId } = useEditorStore()
   const { execute } = useCommandStore()
   const { editorViewTypeMap } = useEditorViewTypeStore()
   const { t } = useTranslation()
@@ -82,26 +81,6 @@ export const MenuButton = memo(() => {
       unsubscribe.then((f) => f())
     }
   }, [curFile, getFileNormalInfo])
-
-  const convertText = useCallback(
-    async (variant: string) => {
-      const content = getEditorContent(curFile?.id || '')
-      try {
-        const res = await invoke<{ code: FileResultCode; content: string }>('convert_text', {
-          text: content || '',
-          variant,
-        })
-        if (res.code === FileResultCode.Success) {
-          bus.emit('editor_set_content', res.content)
-        } else {
-          toast.error(res.content)
-        }
-      } catch (error) {
-        toast.error(String(error))
-      }
-    },
-    [curFile?.id, getEditorContent],
-  )
 
   const handleMenuClick = useCallback(() => {
     const rect = ref.current?.getBoundingClientRect()
@@ -200,33 +179,9 @@ export const MenuButton = memo(() => {
             bus.emit('editor_export_image')
           },
         },
-        {
-          type: 'divider' as const,
-        },
-        {
-          label: t('action.convert_text'),
-          value: 'convert_text',
-          children: [
-            {
-              label: '简 -> 繁 (台湾)',
-              value: 'zh-TW',
-              handler: () => convertText('zh-TW'),
-            },
-            {
-              label: '简 -> 繁 (香港)',
-              value: 'zh-HK',
-              handler: () => convertText('zh-HK'),
-            },
-            {
-              label: '繁 -> 简',
-              value: 'zh-Hans',
-              handler: () => convertText('zh-Hans'),
-            },
-          ],
-        },
       ],
     })
-  }, [curFile, editorViewType, t, execute, convertText, fileNormalInfo])
+  }, [curFile, editorViewType, t, execute, fileNormalInfo])
 
   if (!curFile) return null
 

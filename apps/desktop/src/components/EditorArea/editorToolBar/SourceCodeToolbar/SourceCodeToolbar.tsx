@@ -123,9 +123,9 @@ export const SourceCodeToolbar: FC = () => {
       <ToolbarSection id="insert" registerWidth={registerItemWidth} hidden={hiddenIds.has('insert')}>
         <Divider />
         <CodeCommandButton
-          commandName='insertLink'
-          icon='ri-link'
-          label={t('toolbar.link') || 'Link'}
+          commandName='insertPageBreak'
+          icon='ri-separator'
+          label='Page break'
         />
         <CodeCommandButton
           commandName='insertImage'

@@ -13,7 +13,6 @@ mod search;
 mod setup;
 mod task_system;
 
-use std::env;
 use std::path::PathBuf;
 use std::sync;
 use std::{collections::HashMap, sync::Mutex};
@@ -41,7 +40,57 @@ lazy_static! {
     };
 }
 
-struct OpenedUrls(Mutex<Option<Vec<url::Url>>>);
+struct OpenedPaths(Mutex<Vec<String>>);
+
+fn opened_path_from_url(url: &url::Url) -> String {
+    if url.scheme() == "file" {
+        if let Ok(path) = url.to_file_path() {
+            return path.to_string_lossy().into_owned();
+        }
+    }
+
+    urlencoding::decode(url.as_str())
+        .map(|s| s.into_owned())
+        .unwrap_or_else(|_| url.as_str().to_string())
+}
+
+fn opened_path_from_arg(arg: &str, cwd: &str) -> Option<String> {
+    let value = arg.trim();
+    if value.is_empty() || value == "--" || value.starts_with("-psn_") {
+        return None;
+    }
+
+    if value.contains("://") {
+        if let Ok(url) = url::Url::parse(value) {
+            return Some(opened_path_from_url(&url));
+        }
+    }
+
+    let path = PathBuf::from(value);
+    let path = if path.is_absolute() {
+        path
+    } else {
+        PathBuf::from(cwd).join(path)
+    };
+
+    Some(path.to_string_lossy().into_owned())
+}
+
+fn opened_paths_from_args<I, S>(args: I, cwd: &str) -> Vec<String>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<str>,
+{
+    args.into_iter()
+        .filter_map(|arg| opened_path_from_arg(arg.as_ref(), cwd))
+        .collect()
+}
+
+#[tauri::command]
+fn take_opened_paths(opened_paths: State<OpenedPaths>) -> Vec<String> {
+    let mut paths = opened_paths.0.lock().unwrap();
+    std::mem::take(&mut *paths)
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -58,7 +107,7 @@ pub fn run() {
     let context = tauri::generate_context!();
 
     tauri::Builder::default()
-        .manage(OpenedUrls(Default::default()))
+        .manage(OpenedPaths(Default::default()))
         // Pre-window plugins — only those needed before/during the first
         // window build (path resolution, dialog, file/shell access).
         .plugin(tauri_plugin_store::Builder::default().build())
@@ -69,16 +118,10 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_single_instance::init(
             |app_handle: &tauri::AppHandle, args: Vec<String>, _cwd: String| {
-                // 提取文件路径参数（args[0]是程序本身，args[1..]是传递的参数）
-                let opened_urls = if args.len() > 1 {
-                    // 跳过程序本身，将其余参数用逗号连接
-                    args[1..].join(",")
-                } else {
-                    "".to_string()
-                };
+                let opened_paths = opened_paths_from_args(args.iter().skip(1), &_cwd);
 
                 // 调用setup函数处理参数和窗口复用逻辑
-                if let Err(e) = crate::setup::init(app_handle.clone(), opened_urls) {
+                if let Err(e) = crate::setup::init(app_handle.clone(), opened_paths) {
                     println!("单例参数处理失败: {:?}", e);
                 }
             },
@@ -141,6 +184,7 @@ pub fn run() {
             file_watcher::cmd::stop_all_file_watchers,
             app::clipboard::get_clipboard_html,
             app::clipboard::get_clipboard_text,
+            take_opened_paths,
             core_cmd::core_scan_folder,
             core_cmd::core_extract_meta,
             core_cmd::core_render_md,
@@ -155,38 +199,26 @@ pub fn run() {
             let home_dir_path = app.path().home_dir().expect("failed to get home dir");
             APP_DIR.lock().unwrap().insert(0, home_dir_path);
 
-            let opened_urls: State<OpenedUrls> = app.state();
-            let file_urls = opened_urls.inner().to_owned();
+            let opened_paths: State<OpenedPaths> = app.state();
+            let file_paths = opened_paths.inner().to_owned();
 
             #[cfg(any(windows, target_os = "linux"))]
             {
                 // NOTICE: `args` may include URL protocol (`your-app-protocol://`) or arguments (`--`) if app supports them.
-                let mut urls = Vec::new();
-                for arg in env::args().skip(1) {
-                    if let Ok(url) = url::Url::parse(&arg) {
-                        urls.push(url);
-                    }
-                }
+                let cwd = std::env::current_dir()
+                    .ok()
+                    .and_then(|p| p.to_str().map(|s| s.to_string()))
+                    .unwrap_or_default();
+                let paths = opened_paths_from_args(std::env::args().skip(1), &cwd);
 
-                if !urls.is_empty() {
-                    file_urls.0.lock().unwrap().replace(urls);
+                if !paths.is_empty() {
+                    *file_paths.0.lock().unwrap() = paths;
                 }
             }
 
-            let opened_urls = if let Some(urls) = &*file_urls.0.lock().unwrap() {
-                urls.iter()
-                    .map(|u| {
-                        urlencoding::decode(u.as_str())
-                            .unwrap()
-                            .replace("\\", "\\\\")
-                    })
-                    .collect::<Vec<_>>()
-                    .join(",")
-            } else {
-                "".into()
-            };
+            let opened_paths = file_paths.0.lock().unwrap().clone();
 
-            setup::init(app.handle().clone(), opened_urls).expect("failed to setup app");
+            setup::init(app.handle().clone(), opened_paths).expect("failed to setup app");
 
             #[cfg(target_os = "macos")]
             menu::generate_menu(app).expect("failed to generate menu");
@@ -229,33 +261,30 @@ pub fn run() {
         .run(|app, event| {
             #[cfg(target_os = "macos")]
             if let tauri::RunEvent::Opened { urls, .. } = event {
-                let opened_urls = app.try_state::<OpenedUrls>();
-                if let Some(u) = opened_urls {
-                    u.0.lock().unwrap().replace(urls.clone());
+                let opened_paths = urls.iter().map(opened_path_from_url).collect::<Vec<_>>();
+                let opened_paths_state = app.try_state::<OpenedPaths>();
+                if let Some(u) = opened_paths_state {
+                    *u.0.lock().unwrap() = opened_paths.clone();
                 }
 
-                let urls_str = urls
-                    .iter()
-                    .map(|u| {
-                        urlencoding::decode(u.as_str())
-                            .unwrap()
-                            .replace("\\", "\\\\")
-                    })
-                    .collect::<Vec<_>>()
-                    .join(",");
-
-                println!("Processed URLs string: {}", urls_str);
+                println!("Processed opened paths: {:?}", opened_paths);
 
                 if let Some(window) = window_manager::get_focused_window(app) {
                     use tauri::Emitter;
                     println!("Emitting to focused window: {}", window.label());
-                    let result = window.emit("opened-urls", urls_str.clone());
+                    if let Ok(paths_json) = serde_json::to_string(&opened_paths) {
+                        let _ = window.eval(&format!("window.openedUrls = {paths_json};"));
+                    }
+                    let result = window.emit("opened-urls", opened_paths.clone());
                     println!("Emit result: {:?}", result);
                 } else {
                     if let Some(window) = window_manager::get_last_opened_window(app) {
                         use tauri::Emitter;
                         println!("Emitting to last opened window: {}", window.label());
-                        let result = window.emit("opened-urls", urls_str.clone());
+                        if let Ok(paths_json) = serde_json::to_string(&opened_paths) {
+                            let _ = window.eval(&format!("window.openedUrls = {paths_json};"));
+                        }
+                        let result = window.emit("opened-urls", opened_paths.clone());
                         println!("Emit result: {:?}", result);
                     } else {
                         println!("No window found to emit event");

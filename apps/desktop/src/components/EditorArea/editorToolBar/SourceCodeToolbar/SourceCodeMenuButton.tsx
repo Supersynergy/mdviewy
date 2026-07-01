@@ -4,7 +4,6 @@ import { showContextMenu } from '@/components/ui-v2/ContextMenu'
 import useBookMarksStore from '@/extensions/bookmarks/useBookMarksStore'
 import bus from '@/helper/eventBus'
 import { getFileObject } from '@/helper/files'
-import { FileResultCode } from '@/helper/filesys'
 import { debounce } from '@/helper/timing'
 import { currentWindow } from '@/services/windows'
 import { useCommandStore, useEditorStateStore, useEditorStore } from '@/stores'
@@ -82,22 +81,6 @@ export const SourceCodeMenuButton = memo(() => {
       unsubscribe.then((f) => f())
     }
   }, [curFile, getFileNormalInfo])
-
-  const convertText = useCallback(async (variant: string) => {
-    try {
-      const res = await invoke<{ code: FileResultCode; content: string }>('convert_text', {
-        text: '',
-        variant,
-      })
-      if (res.code === FileResultCode.Success) {
-        bus.emit('editor_set_content', res.content)
-      } else {
-        toast.error(res.content)
-      }
-    } catch (error) {
-      toast.error(String(error))
-    }
-  }, [])
 
   const handleMenuClick = useCallback(() => {
     const rect = ref.current?.getBoundingClientRect()
@@ -198,33 +181,9 @@ export const SourceCodeMenuButton = memo(() => {
             bus.emit('editor_export_image')
           },
         },
-        {
-          type: 'divider' as const,
-        },
-        {
-          label: t('action.convert_text'),
-          value: 'convert_text',
-          children: [
-            {
-              label: '简 -> 繁 (台湾)',
-              value: 'zh-TW',
-              handler: () => convertText('zh-TW'),
-            },
-            {
-              label: '简 -> 繁 (香港)',
-              value: 'zh-HK',
-              handler: () => convertText('zh-HK'),
-            },
-            {
-              label: '繁 -> 简',
-              value: 'zh-Hans',
-              handler: () => convertText('zh-Hans'),
-            },
-          ],
-        },
       ],
     })
-  }, [curFile, editorViewType, t, execute, convertText, fileNormalInfo])
+  }, [curFile, editorViewType, t, execute, fileNormalInfo])
 
   if (!curFile) return null
 

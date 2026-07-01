@@ -1,6 +1,6 @@
 // Startup benchmark marker — printed to webview console + sent to Tauri stdout.
 declare global {
-  interface Window { __MDM_BOOT__?: number; openedUrls: string | null }
+  interface Window { __MDM_BOOT__?: number; openedUrls: string | string[] | null }
 }
 window.__MDM_BOOT__ = performance.now()
 ;(window as any).__mdm_log_boot = (label: string) => {

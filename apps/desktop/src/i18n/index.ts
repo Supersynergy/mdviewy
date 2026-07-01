@@ -14,7 +14,6 @@ import zhCN from '../../../../locales/zh-CN.json'
 
 export const locales = {
   en: 'English',
-  cn: '简体中文',
   frFR: 'Français',
   es: 'Español',
   ja: '日本語'

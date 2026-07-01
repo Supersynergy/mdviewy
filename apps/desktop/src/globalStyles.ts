@@ -186,6 +186,67 @@ export const GlobalStyles = createGlobalStyle`
     background: ${(props) => props.theme.hoverColor};
     font-weight: 600;
   }
+
+  .markdown-body {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+  }
+
+  .markdown-body :where(p, li, blockquote, td, th, figcaption) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .markdown-body :where(img, video, canvas, svg) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .markdown-body table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: normal;
+  }
+
+  .markdown-body a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  .markdown-body .mdviewy-page-break {
+    display: block;
+    height: 0;
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px dashed ${(props) => props.theme.borderColor};
+    break-after: page;
+    page-break-after: always;
+  }
+
+  @media print {
+    html,
+    body {
+      overflow: visible;
+    }
+
+    .markdown-body {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .markdown-body .mdviewy-page-break {
+      margin: 0;
+      border: 0;
+      break-after: page;
+      page-break-after: always;
+    }
+  }
+
   .display-none {
     display: none;
   }
@@ -198,12 +259,23 @@ export const GlobalStyles = createGlobalStyle`
   .rme-block-handler,
   .rme-draggable-handler,
   .rme-block-handler *,
+  .rme-draggable-handler *,
+  body .rme-block-handler,
+  body .rme-draggable-handler,
+  body [class*="rme-block-handler"],
+  body [class*="rme-draggable-handler"],
+  .markdown-body [class*="rme-block-handler"],
+  .markdown-body [class*="rme-draggable-handler"],
   .markdown-body .rme-block-handler,
   .markdown-body .rme-draggable-handler,
   .markdown-body .rme-table-body-selector,
   .markdown-body .rme-table-row-selector,
   .markdown-body .rme-table-column-selector {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
     pointer-events: none !important;
   }
 

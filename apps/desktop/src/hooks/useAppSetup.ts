@@ -4,6 +4,7 @@ import { loadLocalThemeCss } from '@/helper/extensions'
 import { getFileObject, getFileObjectByPath, getSaveOpenedEditorEntries } from '@/helper/files'
 import { getFileNameFromPath, readDirectory } from '@/helper/filesys'
 import { logger } from '@/helper/logger'
+import { parseOpenedPaths, type OpenedUrlsPayload } from '@/helper/openedPaths'
 import { i18nInit } from '@/i18n'
 import { appSettingStoreSetup } from '@/services/app-setting'
 import { checkUnsavedFiles } from '@/services/checkUnsavedFiles'
@@ -131,15 +132,12 @@ async function appWorkspaceSetup() {
     const recentWorkspaces = getOpenedCacheRes.recent_workspaces
     setRecentWorkspaces(recentWorkspaces)
 
-    if (window.openedUrls) {
-      const openedPaths = window.openedUrls?.split(',').map((p) => {
-        if (p.startsWith('file://')) {
-          p = p.slice(7)
-        }
+    const queuedOpenedPaths = await invoke<string[]>('take_opened_paths').catch(() => [])
+    const openedPaths = Array.from(
+      new Set([...parseOpenedPaths(window.openedUrls), ...queuedOpenedPaths]),
+    )
 
-        return p
-      })
-
+    if (openedPaths.length > 0) {
       window.openedUrls = null
 
       await handleOpenedPaths(openedPaths)
@@ -321,15 +319,11 @@ const useAppSetup = () => {
       useCommandStore.getState().execute(payload)
     })
 
-    const unListenOpenedUrls = currentWindow.listen<string>('opened-urls', async ({ payload }) => {
+    const unListenOpenedUrls = currentWindow.listen<OpenedUrlsPayload>('opened-urls', async ({ payload }) => {
       logger.debug('Received opened-urls event:', payload)
-      if (payload) {
-        const openedPaths = payload.split(',').map((p) => {
-          if (p.startsWith('file://')) {
-            return p.slice(7)
-          }
-          return p
-        })
+      const openedPaths = parseOpenedPaths(payload)
+      if (openedPaths.length > 0) {
+        await invoke('take_opened_paths').catch(() => undefined)
         await handleOpenedPaths(openedPaths)
         currentWindow.setFocus()
       }

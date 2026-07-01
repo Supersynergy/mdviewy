@@ -90,17 +90,19 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
         instances.insert(window_label.clone(), path.clone());
     }
 
-    let opened_urls = workspace_path
+    let opened_paths = workspace_path
         .as_ref()
-        .map(|p| p.to_str().unwrap_or("").to_string())
-        .unwrap_or("".into());
+        .map(|p| vec![p.to_str().unwrap_or("").to_string()])
+        .unwrap_or_default();
 
     // 使用JSON序列化确保路径中的特殊字符被正确转义
-    let escaped_urls = serde_json::to_string(&opened_urls).unwrap_or_else(|_| opened_urls.clone());
+    let escaped_urls = serde_json::to_string(&opened_paths).unwrap_or_else(|_| "[]".to_string());
 
-    println!("opened_urls:{}", opened_urls);
+    println!("opened_paths:{:?}", opened_paths);
     println!("escaped_urls:{}", escaped_urls);
-    println!("path:{}", path.as_ref().unwrap());
+    if let Some(path) = path.as_ref() {
+        println!("path:{}", path);
+    }
     tauri::async_runtime::spawn(async move {
         let mut new_win =
             WebviewWindowBuilder::new(&_app, window_label, WebviewUrl::App("index.html".into()))

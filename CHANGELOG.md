@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Made `.md` file opens from Finder/CLI/single-instance/native events reliable: opened-file payloads are now `Vec<String>`/`string[]` paths (no more comma-joined strings that broke on paths with commas/whitespace), with a new `take_opened_paths` Tauri command so files opened before the frontend listener attaches are no longer lost. Paths from `file://` URLs and relative CLI args are normalized on both the Rust (`opened_paths_from_args`) and TS (`parseOpenedPaths`/`normalizeOpenedPath`) sides, each with tests.
+- Hardened markdown rendering layout in `GlobalStyles`: long words/URLs wrap instead of overflowing, images/media cap at container width, wide tables scroll horizontally, and a dedicated `mdviewy-page-break` element renders as a dashed rule on screen and a real page break in print.
+- Source toolbar: page-break insertion replaces the redundant link-insertion command (covered by `source-code-toolbar.test.ts`).
+
+### Changed
+
+- Simplified toolbar chrome onto the shared semantic `MfIconButton` (MenuButton, MoreActions, SmartActionsButton, SourceCodeMenuButton, CodeCommandButton, InlineReferenceActions), removing ~380 lines of duplicated styled-button code.
+- Removed the dead `convert_text` path from `EditorInfoBar` and unused i18n/icon-subset leftovers.
+
 ## 0.90.2 - 2026-06-16
 
 ### Added

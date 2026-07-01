@@ -24,8 +24,8 @@ const commandMap: Record<string, CommandFunction> = {
   toggleOrderedList: mdCommands.applyOrderedList,
   toggleTaskList: mdCommands.applyTaskList,
   toggleDelete: mdCommands.applyStrikethrough,
-  insertLink: mdCommands.insertLink,
   insertImage: mdCommands.insertImage,
+  insertPageBreak: mdCommands.insertPageBreak,
 }
 
 export interface CodeCommandButtonProps {

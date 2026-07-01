@@ -7,12 +7,11 @@ import {
   extractSmartReferences,
   fileNameOf,
   folderOf,
-  markdownLinkForPath,
   type SmartReference,
 } from '@/helper/smartActions'
 import { useEditorStore } from '@/stores'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
-import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
+import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { Command } from '@tauri-apps/plugin-shell'
 import { memo, useMemo } from 'react'
 import styled from 'styled-components'
@@ -54,10 +53,6 @@ const openFolder = async (dir: string) => {
 }
 
 const openPathOrUrl = async (value: string) => {
-  if (/^https?:\/\//i.test(value)) {
-    await openUrl(value)
-    return
-  }
   await openFolder(value)
 }
 
@@ -97,17 +92,6 @@ const ACTION_GROUPS: ActionGroup[] = [
           if (!p) return
           await writeText(p)
           toast.success('Folder copied')
-        },
-        disabled: (f) => !f.path,
-      },
-      {
-        icon: 'ri-links-line',
-        label: 'Copy as Markdown link',
-        hint: '[name](path)',
-        run: async (f) => {
-          if (!f.path) return
-          await writeText(markdownLinkForPath(f.path, f.name))
-          toast.success('Markdown link copied')
         },
         disabled: (f) => !f.path,
       },
@@ -503,7 +487,7 @@ const SmartActionsPanel = memo(() => {
         currentDir: folderOf(f.path),
         workspaceRoot: useEditorStore.getState().getRootPath(),
         limit: 10,
-      }),
+      }).filter((ref) => ref.kind === 'path'),
     }
   }, [activeId])
 
@@ -574,13 +558,13 @@ const SmartActionsPanel = memo(() => {
 
       {file && (
         <Group>
-          <div className='group-title'>Detected links & paths</div>
+          <div className='group-title'>Detected paths</div>
           {refs.length ? (
             <RefList>
               {refs.map((ref: SmartReference) => (
                 <RefRow key={`${ref.kind}:${ref.value}`} title={ref.value}>
                   <div className='ref-label'>
-                    {ref.kind === 'url' ? 'URL' : 'Path'} · {ref.label}
+                    Path · {ref.label}
                   </div>
                   <button
                     type='button'
@@ -594,7 +578,7 @@ const SmartActionsPanel = memo(() => {
                     title='Copy'
                     onClick={async () => {
                       await writeText(ref.value)
-                      toast.success(ref.kind === 'url' ? 'URL copied' : 'Path copied')
+                      toast.success('Path copied')
                     }}
                   >
                     <i className='ri-file-copy-line' />
@@ -604,7 +588,7 @@ const SmartActionsPanel = memo(() => {
             </RefList>
           ) : (
             <FileCard>
-              <div className='empty'>No local paths or URLs detected in this file.</div>
+              <div className='empty'>No local paths detected in this file.</div>
             </FileCard>
           )}
         </Group>

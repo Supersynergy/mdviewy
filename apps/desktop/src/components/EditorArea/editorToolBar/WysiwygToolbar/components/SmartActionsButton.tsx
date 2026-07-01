@@ -7,10 +7,9 @@ import {
   extractSmartReferences,
   fileNameOf,
   folderOf,
-  markdownLinkForPath,
 } from '@/helper/smartActions'
 import { useEditorStore } from '@/stores'
-import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
+import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { Command } from '@tauri-apps/plugin-shell'
 import { useCallback, useRef } from 'react'
@@ -41,10 +40,6 @@ const openFolder = async (dir: string) => {
 }
 
 const openPathOrUrl = async (value: string) => {
-  if (/^https?:\/\//i.test(value)) {
-    await openUrl(value)
-    return
-  }
   await openFolder(value)
 }
 
@@ -75,7 +70,7 @@ export const SmartActionsButton = () => {
       currentDir: dir,
       workspaceRoot: useEditorStore.getState().getRootPath(),
       limit: 8,
-    })
+    }).filter((ref) => ref.kind === 'path')
 
     showContextMenu({
       x: rect.x,
@@ -106,15 +101,6 @@ export const SmartActionsButton = () => {
             if (!path) return
             await writeText(`@${path}`)
             toast.success('@-mention copied')
-          },
-        },
-        {
-          label: 'Copy as Markdown link',
-          value: 'copy-md',
-          handler: async () => {
-            if (!path) return
-            await writeText(markdownLinkForPath(path, curFile.name))
-            toast.success('Markdown link copied')
           },
         },
         {
@@ -242,9 +228,7 @@ export const SmartActionsButton = () => {
             value: `copy-ref-${index}`,
             handler: async () => {
               await writeText(smartRef.value)
-              toast.success(
-                `${smartRef.kind === 'path' ? 'Path' : smartRef.kind === 'github' ? 'GitHub repo' : 'URL'} copied`,
-              )
+              toast.success('Path copied')
             },
           },
         ]),

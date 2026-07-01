@@ -3,14 +3,12 @@ import {
   findSmartReferenceAroundOffset,
   fileNameOf,
   folderOf,
-  markdownLinkForPath,
   type InlineSmartReference,
 } from '@/helper/smartActions'
 import { getFileObject } from '@/helper/files'
 import { useEditorStore } from '@/stores'
 import { invoke } from '@tauri-apps/api/core'
 import { homeDir } from '@tauri-apps/api/path'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { Command } from '@tauri-apps/plugin-shell'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -70,7 +68,7 @@ const ActionButton = styled.button`
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
-const isUrlRef = (ref: InlineSmartReference) => ref.kind === 'url' || ref.kind === 'github'
+const isPathRef = (ref: InlineSmartReference) => ref.kind === 'path'
 
 const looksLikeFolderPath = (path: string) => {
   if (path.endsWith('/')) return true
@@ -108,7 +106,7 @@ const getPathTargetKind = async (
   kind: InlineSmartReference['kind'],
   value: string,
 ): Promise<PathTargetKind> => {
-  if (kind === 'url' || kind === 'github') return 'unknown'
+  if (kind !== 'path') return 'unknown'
 
   const resolved = await expandUserPath(value)
   try {
@@ -119,20 +117,10 @@ const getPathTargetKind = async (
 }
 
 const openReference = async (ref: InlineSmartReference) => {
-  if (isUrlRef(ref)) {
-    await openUrl(ref.value)
-    return
-  }
-
   await runOpenCommand(ref.value)
 }
 
 const openReferenceFolder = async (ref: InlineSmartReference) => {
-  if (isUrlRef(ref)) {
-    await openUrl(ref.value)
-    return
-  }
-
   const folder = folderOf(ref.value)
   if (folder) {
     await runOpenCommand(folder)
@@ -141,16 +129,7 @@ const openReferenceFolder = async (ref: InlineSmartReference) => {
 
 const copyReference = async (ref: InlineSmartReference) => {
   await writeText(ref.value)
-  toast.success(`${ref.kind === 'path' ? 'Path' : ref.kind === 'github' ? 'GitHub repo' : 'URL'} copied`)
-}
-
-const copyReferenceMarkdown = async (ref: InlineSmartReference) => {
-  if (ref.kind === 'path') {
-    await writeText(markdownLinkForPath(ref.value, ref.label))
-  } else {
-    await writeText(`[${ref.label}](${ref.value})`)
-  }
-  toast.success('Markdown link copied')
+  toast.success('Path copied')
 }
 
 const getFirstRect = (range: Range): DOMRect | null => {
@@ -189,7 +168,7 @@ const detectTextReference = (event: PointerEvent, context: InlineContext): Hover
   }
 
   const ref = findSmartReferenceAroundOffset(textNode.textContent, range.startOffset, context)
-  if (!ref) return null
+  if (!ref || !isPathRef(ref)) return null
 
   const tokenRange = document.createRange()
   tokenRange.setStart(textNode, ref.start)
@@ -208,7 +187,7 @@ const detectElementReference = (target: Element, context: InlineContext): HoverS
 
   const text = element.textContent || element.getAttribute('href') || ''
   const ref = findFirstSmartReference(text, context)
-  if (!ref) return null
+  if (!ref || !isPathRef(ref)) return null
 
   return { ref, rect: element.getBoundingClientRect() }
 }
@@ -292,7 +271,7 @@ export function InlineReferenceActions() {
     let canceled = false
     setPathTargetKind('unknown')
 
-    if (!hoverKind || !hoverValue || hoverKind === 'url' || hoverKind === 'github') {
+    if (!hoverKind || !hoverValue || hoverKind !== 'path') {
       return () => {
         canceled = true
       }
@@ -309,7 +288,6 @@ export function InlineReferenceActions() {
 
   if (!hover) return null
 
-  const isUrl = isUrlRef(hover.ref)
   const firstPathButton =
     pathTargetKind === 'folder'
       ? { icon: 'ri-folder-open-line', label: 'Open folder', action: openReference }
@@ -319,21 +297,11 @@ export function InlineReferenceActions() {
           action: openReference,
         }
 
-  const buttons = isUrl
-    ? [
-        {
-          icon: hover.ref.kind === 'github' ? 'ri-github-fill' : 'ri-arrow-right-up-line',
-          label: hover.ref.kind === 'github' ? 'Open GitHub repository' : 'Open URL',
-          action: openReference,
-        },
-        { icon: 'ri-file-copy-line', label: 'Copy URL', action: copyReference },
-        { icon: 'ri-links-line', label: 'Copy Markdown link', action: copyReferenceMarkdown },
-      ]
-    : [
-        firstPathButton,
-        { icon: 'ri-folder-open-line', label: 'Open containing folder', action: openReferenceFolder },
-        { icon: 'ri-file-copy-line', label: 'Copy path', action: copyReference },
-      ]
+  const buttons = [
+    firstPathButton,
+    { icon: 'ri-folder-open-line', label: 'Open containing folder', action: openReferenceFolder },
+    { icon: 'ri-file-copy-line', label: 'Copy path', action: copyReference },
+  ]
   const position = getPosition(hover.rect, buttons.length)
 
   return (

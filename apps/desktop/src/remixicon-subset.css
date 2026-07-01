@@ -78,8 +78,6 @@
 .ri-keyboard-fill:before { content: "\ee74"; }
 .ri-layout-left-line:before { content: "\ee94"; }
 .ri-layout-right-line:before { content: "\ee9b"; }
-.ri-link:before { content: "\eeb2"; }
-.ri-links-line:before { content: "\eeb8"; }
 .ri-list-check:before { content: "\eeba"; }
 .ri-list-ordered:before { content: "\eebb"; }
 .ri-list-unordered:before { content: "\eebe"; }
@@ -99,6 +97,7 @@
 .ri-robot-2-line:before { content: "\f3d9"; }
 .ri-search-2-line:before { content: "\f0cd"; }
 .ri-search-line:before { content: "\f0d1"; }
+.ri-separator:before { content: "\f0de"; }
 .ri-settings-3-line:before { content: "\f0e6"; }
 .ri-sparkling-2-line:before { content: "\f36b"; }
 .ri-sparkling-line:before { content: "\f36d"; }

@@ -1,7 +1,6 @@
 import useBookMarksStore from '@/extensions/bookmarks/useBookMarksStore'
 import bus from '@/helper/eventBus'
 import { getFileObject } from '@/helper/files'
-import { FileResultCode } from '@/helper/filesys'
 import { debounce } from '@/helper/timing'
 import { isEmptyEditor } from '@/services/editor-file'
 import { currentWindow } from '@/services/windows'
@@ -30,7 +29,7 @@ const EMPTY_FILE_NORMAL_INFO: FileNormalInfo = {
 }
 
 export const EditorInfoBar = memo(() => {
-  const { activeId, folderData, getEditorContent } = useEditorStore()
+  const { activeId, folderData } = useEditorStore()
   const [workspace, setWorkspace] = useState<WorkSpace | null>(null)
 
   const { editorViewTypeMap } = useEditorViewTypeStore()
@@ -90,26 +89,6 @@ export const EditorInfoBar = memo(() => {
     }
   }, [workspace?.syncMode, getFileNormalInfo])
 
-  const convertText = useCallback(
-    async (variant: string) => {
-      const content = getEditorContent(curFile?.id || '')
-      try {
-        const res = await invoke<{ code: FileResultCode; content: string }>('convert_text', {
-          text: content || '',
-          variant,
-        })
-        if (res.code === FileResultCode.Success) {
-          bus.emit('editor_set_content', res.content)
-        } else {
-          toast.error(res.content)
-        }
-      } catch (error) {
-        toast.error(String(error))
-      }
-    },
-    [curFile?.id, getEditorContent],
-  )
-
   const handleMoreAction = useCallback(() => {
     const rect = ref1.current?.getBoundingClientRect()
     if (rect === undefined) return
@@ -146,38 +125,9 @@ export const EditorInfoBar = memo(() => {
             bus.emit('editor_export_image')
           },
         },
-        {
-          type: 'divider' as const,
-        },
-        {
-          label: '简繁转换',
-          value: 'convert_text',
-          children: [
-            {
-              label: '简 -> 繁 (台湾)',
-              value: 'zh-TW',
-              handler: () => convertText('zh-TW'),
-            },
-            {
-              label: '简 -> 繁 (香港)',
-              value: 'zh-HK',
-              handler: () => convertText('zh-HK'),
-            },
-            {
-              label: '繁 -> 简',
-              value: 'zh-Hans',
-              handler: () => convertText('zh-Hans'),
-            },
-          ],
-        },
       ],
     })
-  }, [
-    curFile,
-    t,
-    execute,
-    convertText,
-  ])
+  }, [curFile, t, execute])
 
   const handleViewClick = useCallback(() => {
     const rect = ref.current?.getBoundingClientRect()

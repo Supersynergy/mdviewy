@@ -6,9 +6,9 @@ import { type EditorView } from '@codemirror/view'
 const urlRE =
   /^\[([^\]]+)\]\((.+?)\)|(((?:(?:aaas?|about|acap|adiumxtra|af[ps]|aim|apt|attachment|aw|beshare|bitcoin|bolo|callto|cap|chrome(?:-extension)?|cid|coap|com-eventbrite-attendee|content|crid|cvs|data|dav|dict|dlna-(?:playcontainer|playsingle)|dns|doi|dtn|dvb|ed2k|facetime|feed|file|finger|fish|ftp|geo|gg|git|gizmoproject|go|gopher|gtalk|h323|hcp|https?|iax|icap|icon|im|imap|info|ipn|ipp|irc[6s]?|iris(?:\.beep|\.lwz|\.xpc|\.xpcs)?|itms|jar|javascript|jms|keyparc|lastfm|ldaps?|magnet|mailto|maps|market|message|mid|mms|ms-help|msnim|msrps?|mtqp|mumble|mupdate|mvn|news|nfs|nih?|nntp|notes|oid|opaquelocktoken|palm|paparazzi|platform|pop|pres|proxy|psyc|query|res(?:ource)?|rmi|rsync|rtmp|rtsp|secondlife|service|session|sftp|sgn|shttp|sieve|sips?|skype|sm[bs]|snmp|soap\.beeps?|soldat|spotify|ssh|steam|svn|tag|teamspeak|tel(?:net)?|tftp|things|thismessage|tip|tn3270|tv|udp|unreal|urn|ut2004|vemmi|ventrilo|view-source|webcal|wss?|wtai|wyciwyg|xcon(?:-userid)?|xfire|xmlrpc\.beeps?|xmpp|xri|ymsgr|z39\.50[rs]?):(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.-]+[.][a-z]{2,4}\/)(?:[^\s()<>]|\([^\s()<>]*\))+(?:\([^\s()<>]*\)|[^\s`*!()[\]{};:'".,<>?«»“”‘’])))|([a-z0-9.\-_+]+?@[a-z0-9.\-_+]+\.[a-z]{2,7})$/i
 
-function insertLinkOrImage(target: EditorView, type: 'link' | 'image') {
-  const pre = type === 'image' ? '!' : ''
+export const PAGE_BREAK_MARKDOWN = '<div class="mdviewy-page-break"></div>'
 
+function insertImageMarkdown(target: EditorView) {
   clipboardRead()
     .then(({ text }) => {
       const url = urlRE.test(text || '') ? text : ''
@@ -22,12 +22,10 @@ function insertLinkOrImage(target: EditorView, type: 'link' | 'image') {
           offset = 3 + title.length
         }
 
-        if (type === 'image') {
-          offset++
-        }
+        offset++
 
         return {
-          changes: { from, to, insert: `${pre}[${title}](${url})` },
+          changes: { from, to, insert: `![${title}](${url})` },
           range: EditorSelection.cursor(from + offset),
         }
       })
@@ -189,10 +187,17 @@ export function applyTaskList(target: EditorView): boolean {
   return true
 }
 
-export function insertLink(target: EditorView): boolean {
-  return insertLinkOrImage(target, 'link')
+export function insertImage(target: EditorView): boolean {
+  return insertImageMarkdown(target)
 }
 
-export function insertImage(target: EditorView): boolean {
-  return insertLinkOrImage(target, 'image')
+export function insertPageBreak(target: EditorView): boolean {
+  const marker = `\n\n${PAGE_BREAK_MARKDOWN}\n\n`
+  const transaction = target.state.changeByRange(({ from, to }) => ({
+    changes: { from, to, insert: marker },
+    range: EditorSelection.cursor(from + marker.length),
+  }))
+
+  target.dispatch(transaction)
+  return true
 }
