@@ -6,7 +6,25 @@ Captures the security decisions for the 1.0 hardening pass. Some items are
 applied; others are deliberately deferred with rationale so they are not "fixed"
 blindly in a way that breaks the editor.
 
-## 1. Content-Security-Policy — RECOMMENDED, not yet applied
+## 1. Content-Security-Policy — APPLIED + runtime-verified (2026-07-02, v0.90.3)
+
+Enforced policy in `tauri.conf.json`: `default-src 'self'`, `script-src 'self'`
+(Tauri adds per-launch nonces for its own injected scripts), `style-src 'self'
+'unsafe-inline'`, `img/media-src` allow `asset:`/`https:`/`data:`/`blob:`,
+`connect-src` allows IPC + HTTPS + localhost (Ollama/dev), `object-src 'none'`.
+
+**Hard-won gotcha:** Tauri's automatic CSP modification also injects a *style*
+nonce. Per CSP3, a nonce in `style-src` makes `'unsafe-inline'` ignored, which
+blocks every styled-components `<style>` tag → styled-components error #17 →
+React never mounts (app stuck on the boot skeleton). Fix:
+`"dangerousDisableAssetCspModification": ["style-src"]` — disables nonce
+injection ONLY for style-src; script-src keeps its nonces.
+
+Runtime-verified in the built app (2026-07-02): file open via single-instance,
+local image via asset protocol, remote https image, tables/ToC, full styling.
+AI/export not re-tested; both ride on allowed `https:`/IPC connect-src.
+
+Original proposal kept below for history:
 
 `tauri.conf.json` `app.security.csp` is currently `null` (no CSP). A CSP is
 enforced by the webview at **runtime**, so flipping it blindly cannot be verified
@@ -40,6 +58,12 @@ files. We keep it broad and revisit if a sandboxed/portable mode is added.
 API keys (OpenAI/DeepSeek/Copilot) must live in the OS keychain via Tauri's
 secure store, never plaintext in the config JSON. Action: audit the settings
 read/write path; migrate if any key is persisted in plaintext.
+
+**Audit result (2026-07-02):** keys are persisted plaintext in the
+tauri-plugin-store file `~/Library/Application Support/com.supersynergy.mdviewy/mdviewy_store.bin`
+(JSON despite the `.bin` extension; fields `extensions_{chatgpt,deepseek,google}_apikey`).
+Keychain migration remains OPEN for 1.0 — candidate: `keyring` crate behind a
+small `secrets` Tauri command pair, with one-time migration from the store file.
 
 ## 4. Dependency advisories — ACCEPTED, tracked
 

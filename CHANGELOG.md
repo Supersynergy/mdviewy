@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.90.3 - 2026-07-02
+
+### Security
+
+- Enforced a real Content-Security-Policy (was `csp: null`): `script-src 'self'` with Tauri per-launch nonces, `object-src 'none'`, images/media restricted to `asset:`/HTTPS/`data:`/`blob:`, network restricted to IPC + HTTPS + localhost. Includes the required `dangerousDisableAssetCspModification: ["style-src"]` so Tauri's injected style nonce does not disable `'unsafe-inline'` for styled-components (CSP3 rule; without it the app hangs on the boot skeleton — see ADR `2026-06-05-security-posture-1.0.md`). Runtime-verified in the built app: file open, local `asset:` image, remote HTTPS image, tables/ToC, full styling.
+- Audited AI key storage: keys live plaintext in the tauri-plugin-store file (`mdviewy_store.bin`); keychain migration stays open for 1.0 and is tracked in the ADR. Security contact in `SECURITY.md` now points to the fork maintainer; added a Security-posture section linking the ADR rationale (broad read-only asset scope stays accepted so any opened Markdown can render its images).
 
 ### Fixed
 
