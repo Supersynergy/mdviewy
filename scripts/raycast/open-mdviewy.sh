@@ -6,14 +6,14 @@
 # @raycast.mode silent
 
 # Optional parameters:
-# @raycast.icon /Users/master/Applications/mdviewy.app/Contents/Resources/icon.icns
+# @raycast.icon /Applications/mdviewy.app/Contents/Resources/icon.icns
 # @raycast.packageName mdviewy
 # @raycast.description Open the local native mdviewy macOS app.
 
 set -euo pipefail
 
 PROJECT_APP="/Users/master/projects/mdviewy/target/release/bundle/macos/mdviewy.app"
-INSTALLED_APP="$HOME/Applications/mdviewy.app"
+INSTALLED_APP="/Applications/mdviewy.app"
 
 activate_or_launch() {
   local app_path="$1"

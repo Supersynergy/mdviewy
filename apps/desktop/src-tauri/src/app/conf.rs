@@ -1,5 +1,5 @@
-use crate::{fc::exists, APP_DIR};
-use etcetera::{choose_app_strategy, AppStrategy, AppStrategyArgs};
+use crate::{APP_DIR, fc::exists};
+use etcetera::{AppStrategy, AppStrategyArgs, choose_app_strategy};
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -412,11 +412,7 @@ impl AppConf {
         }
 
         let dark = cur_theme.to_lowercase().to_string().contains("dark");
-        if dark {
-            Theme::Dark
-        } else {
-            Theme::Light
-        }
+        if dark { Theme::Dark } else { Theme::Light }
     }
 
     pub fn theme_mode_with_app(app: &AppHandle) -> Theme {
@@ -433,11 +429,7 @@ impl AppConf {
         }
 
         let dark = cur_theme.to_lowercase().to_string().contains("dark");
-        if dark {
-            Theme::Dark
-        } else {
-            Theme::Light
-        }
+        if dark { Theme::Dark } else { Theme::Light }
     }
 }
 
@@ -449,7 +441,7 @@ impl Default for AppConf {
 
 pub mod cmd {
     use super::AppConf;
-    use tauri::{command, AppHandle, WebviewUrl, WebviewWindowBuilder};
+    use tauri::{AppHandle, WebviewUrl, WebviewWindowBuilder, command};
 
     #[command]
     pub fn get_app_conf(app: AppHandle) -> AppConf {

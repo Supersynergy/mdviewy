@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.91.0 - 2026-07-05
+
+### Fixed
+
+- Warm-instance file opens (app already running, opened via Finder/CLI/`open -a`) now call `set_focus()`/`unminimize()` on the target window. Previously the file loaded silently behind other apps with no visible change — looked like the open had failed.
+- `scripts/install-mdviewy-app.sh` installed to `~/Applications`, which doesn't exist on this machine; the real app LaunchServices resolves for Finder/CLI/Spotlight is `/Applications/mdviewy.app`. The installed app had drifted 2.5 weeks stale (0.90.2) behind the built source (0.90.3). Install now targets `/Applications` by default (override with `DEST_DIR`); `scripts/raycast/open-mdviewy.sh` updated to match.
+- Replaced every remaining occurrence of the old pre-rebrand mark and the generic indigo/violet placeholder gradient with the tarsier app icon: Settings sidebar (`src/assets/logo.svg` was the old black-tile mark), the pre-React boot skeleton and the post-hydration Suspense fallback (`index.html` + `main.tsx`, previously two separately-coded purple squares with different centering math — the boot skeleton mocked a fake sidebar layout that pushed its logo off true-center), and the empty-editor hero (`EmptyState.tsx`). Also fixed `index.html`'s favicon link, which pointed at a non-existent `/src/favicon.svg`.
+
+### Added
+
+- `just install` — builds the desktop app and deploys straight to `/Applications` in one step (strip quarantine, ad-hoc re-sign, re-register with LaunchServices), so a rebuild never leaves Gatekeeper's "unidentified developer" prompt or a stale install behind.
+
 ## 0.90.3 - 2026-07-02
 
 ### Security

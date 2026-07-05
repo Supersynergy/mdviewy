@@ -33,6 +33,15 @@ security:
     gitleaks dir . -c .gitleaks.toml --redact --no-banner
     osv-scanner --config osv-scanner.toml --lockfile yarn.lock
 
+# Build the desktop app and deploy straight to /Applications: strips
+# quarantine + re-signs ad-hoc + re-registers with LaunchServices, so the
+# real running app (Finder/CLI/Spotlight-resolved) is never stale and never
+# triggers an "unidentified developer" Gatekeeper prompt on this machine.
+install:
+    yarn workspace @mdviewy/desktop build
+    yarn workspace @mdviewy/desktop tauri:build
+    ./scripts/install-mdviewy-app.sh
+
 # Full CI gate: type/lint/test + audit.
 ci: check
 

@@ -6,8 +6,8 @@ use std::{
     num::NonZeroUsize,
     pin::pin,
     sync::{
-        atomic::{AtomicBool, Ordering},
         Arc,
+        atomic::{AtomicBool, Ordering},
     },
 };
 
@@ -15,7 +15,7 @@ use async_channel as chan;
 use futures::StreamExt;
 use futures_concurrency::future::Join;
 use tokio::{spawn, sync::oneshot, task::JoinHandle};
-use tracing::{error, info, instrument, trace, warn, Instrument};
+use tracing::{Instrument, error, info, instrument, trace, warn};
 
 use super::{
     error::{DispatcherShutdownError, RunError, SystemError},

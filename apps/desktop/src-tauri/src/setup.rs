@@ -1,10 +1,10 @@
 use crate::app::{conf::AppConf, window_manager};
-use tauri::{utils::config::WebviewUrl, AppHandle, Emitter, WebviewWindowBuilder};
+use tauri::{AppHandle, Emitter, WebviewWindowBuilder, utils::config::WebviewUrl};
 
 #[cfg(target_os = "macos")]
 use tauri::TitleBarStyle;
 #[cfg(target_os = "macos")]
-use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
+use window_vibrancy::{NSVisualEffectMaterial, NSVisualEffectState, apply_vibrancy};
 
 pub fn init(
     app_handle: AppHandle,

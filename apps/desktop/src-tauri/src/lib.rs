@@ -272,6 +272,8 @@ pub fn run() {
                 if let Some(window) = window_manager::get_focused_window(app) {
                     use tauri::Emitter;
                     println!("Emitting to focused window: {}", window.label());
+                    let _ = window.unminimize();
+                    let _ = window.set_focus();
                     if let Ok(paths_json) = serde_json::to_string(&opened_paths) {
                         let _ = window.eval(&format!("window.openedUrls = {paths_json};"));
                     }
@@ -281,6 +283,12 @@ pub fn run() {
                     if let Some(window) = window_manager::get_last_opened_window(app) {
                         use tauri::Emitter;
                         println!("Emitting to last opened window: {}", window.label());
+                        // Warm-instance file open (app already running, no window
+                        // currently OS-focused): without this, the window loads
+                        // the new file silently behind other apps and looks like
+                        // "nothing happened" (verified 2026-07-05).
+                        let _ = window.unminimize();
+                        let _ = window.set_focus();
                         if let Ok(paths_json) = serde_json::to_string(&opened_paths) {
                             let _ = window.eval(&format!("window.openedUrls = {paths_json};"));
                         }

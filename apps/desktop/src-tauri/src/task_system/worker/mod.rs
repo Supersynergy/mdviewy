@@ -1,12 +1,12 @@
 use std::{
     cell::RefCell,
-    sync::{atomic::AtomicUsize, Arc},
+    sync::{Arc, atomic::AtomicUsize},
     time::Duration,
 };
 
 use async_channel as chan;
 use tokio::{spawn, sync::oneshot, task::JoinHandle};
-use tracing::{error, info, instrument, trace, warn, Instrument};
+use tracing::{Instrument, error, info, instrument, trace, warn};
 
 use super::{
     error::{RunError, SystemError},

@@ -2,27 +2,54 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/src/assets/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>mdviewy</title>
     <style>
       /* Pre-React skeleton: paints instantly before any JS executes.
-         Removed by main.tsx once React mounts. */
+         Removed by main.tsx once React mounts (CSS-only, no JS needed —
+         `#root:not(:empty)` matches as soon as React commits its first node).
+         Kept as one centered mark (not a fake app-chrome mock) so it lines
+         up exactly with main.tsx's FallbackSpinner — same icon, same spot,
+         no visible jump if a Suspense boundary also fires right after. */
       html, body { margin: 0; padding: 0; height: 100%; background: #fafafa; color: #1f2329; -webkit-font-smoothing: antialiased; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
       body.dark { background: #1e1f22; color: #d8dade; }
-      #mdf-skeleton { position: fixed; inset: 0; display: flex; flex-direction: column; pointer-events: none; }
-      #mdf-skeleton .top { height: 28px; flex: 0 0 28px; }
-      #mdf-skeleton .body { flex: 1; display: flex; }
-      #mdf-skeleton .sidebar { width: 240px; border-right: 1px solid rgba(127,127,127,0.12); }
-      #mdf-skeleton .main { flex: 1; display: flex; align-items: center; justify-content: center; }
-      #mdf-skeleton .logo { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%); box-shadow: 0 6px 18px -8px rgba(99,102,241,0.45); animation: mdf-pulse 1.4s ease-in-out infinite; }
+      #mdf-skeleton { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+      #mdf-skeleton .logo { width: 48px; height: 48px; animation: mdf-pulse 1.4s ease-in-out infinite; }
       @keyframes mdf-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.55; transform: scale(0.92); } }
       #root:not(:empty) ~ #mdf-skeleton { display: none; }
     </style>
   </head>
   <body>
     <div id="root"></div>
-    <div id="mdf-skeleton" aria-hidden="true"><div class="top"></div><div class="body"><div class="sidebar"></div><div class="main"><div class="logo"></div></div></div></div>
+    <div id="mdf-skeleton" aria-hidden="true">
+      <svg class="logo" viewBox="0 0 1024 1024" role="img" aria-label="mdviewy">
+        <defs>
+          <linearGradient id="tile-boot" x1="120" y1="70" x2="900" y2="960" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#0D2C35"/>
+            <stop offset=".5" stop-color="#166870"/>
+            <stop offset="1" stop-color="#72D6C7"/>
+          </linearGradient>
+          <linearGradient id="fur-boot" x1="316" y1="238" x2="714" y2="812" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#D3B895"/>
+            <stop offset="1" stop-color="#8B684B"/>
+          </linearGradient>
+        </defs>
+        <rect width="1024" height="1024" rx="224" fill="url(#tile-boot)"/>
+        <circle cx="298" cy="354" r="128" fill="#9A7858"/>
+        <circle cx="726" cy="354" r="128" fill="#9A7858"/>
+        <circle cx="298" cy="354" r="70" fill="#F0D9B4"/>
+        <circle cx="726" cy="354" r="70" fill="#F0D9B4"/>
+        <ellipse cx="512" cy="602" rx="186" ry="232" fill="url(#fur-boot)"/>
+        <circle cx="512" cy="406" r="228" fill="url(#fur-boot)"/>
+        <circle cx="407" cy="420" r="104" fill="#FFFDF5"/>
+        <circle cx="617" cy="420" r="104" fill="#FFFDF5"/>
+        <circle cx="407" cy="420" r="72" fill="#15262D"/>
+        <circle cx="617" cy="420" r="72" fill="#15262D"/>
+        <rect x="332" y="620" width="360" height="232" rx="42" fill="#FFFFFF"/>
+        <path fill="#0D6D70" d="m411 700 36-36 65 65 65-65 36 36-101 101-101-101Z"/>
+      </svg>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

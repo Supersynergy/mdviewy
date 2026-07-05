@@ -5,8 +5,8 @@ use std::{
     panic::AssertUnwindSafe,
     pin::pin,
     sync::{
-        atomic::{AtomicBool, Ordering},
         Arc,
+        atomic::{AtomicBool, Ordering},
     },
     time::Duration,
 };
@@ -18,9 +18,9 @@ use tokio::{
     spawn,
     sync::oneshot,
     task::{JoinError, JoinHandle},
-    time::{sleep, timeout, Instant},
+    time::{Instant, sleep, timeout},
 };
-use tracing::{debug, error, instrument, trace, warn, Instrument};
+use tracing::{Instrument, debug, error, instrument, trace, warn};
 
 use super::{
     super::{
@@ -32,7 +32,7 @@ use super::{
             Task, TaskId, TaskOutput, TaskStatus, TaskWorkState, TaskWorktable,
         },
     },
-    TaskRunnerOutput, WorkStealer, WorkerId, ONE_SECOND,
+    ONE_SECOND, TaskRunnerOutput, WorkStealer, WorkerId,
 };
 
 const TEN_SECONDS: Duration = Duration::from_secs(10);
@@ -415,8 +415,8 @@ impl<E: RunError> Runner<E> {
             (PendingTaskKind::Priority, PendingTaskKind::Normal) => {
                 if self.waiting_suspension.is_waiting() {
                     trace!(
-						"Worker is already waiting for a task to be suspended, will enqueue new task"
-					);
+                        "Worker is already waiting for a task to be suspended, will enqueue new task"
+                    );
                     self.priority_tasks.push_front(task_work_state);
                 } else {
                     trace!("Old task will be suspended");
@@ -673,11 +673,13 @@ impl<E: RunError> Runner<E> {
             Steal(Option<StoleTaskMessage<E>>),
         }
 
-        let mut msg_stream = pin!((
-            suspend_on_shutdown_stole_task_rx.map(StreamMessage::Steal),
-            suspend_on_shutdown_task_output_rx.map(StreamMessage::Output),
-        )
-            .merge());
+        let mut msg_stream = pin!(
+            (
+                suspend_on_shutdown_stole_task_rx.map(StreamMessage::Steal),
+                suspend_on_shutdown_task_output_rx.map(StreamMessage::Output),
+            )
+                .merge()
+        );
 
         while let Some(msg) = msg_stream.next().await {
             match msg {
@@ -933,10 +935,10 @@ impl<E: RunError> Runner<E> {
 
         if self.task_kinds.capacity() > TASK_QUEUE_INITIAL_SIZE {
             assert_eq!(
-				self.task_kinds.len(),
-				self.paused_tasks.len(),
-				"If we're idle, the number of task_kinds MUST be equal to the number of paused tasks"
-			);
+                self.task_kinds.len(),
+                self.paused_tasks.len(),
+                "If we're idle, the number of task_kinds MUST be equal to the number of paused tasks"
+            );
             self.task_kinds.shrink_to(TASK_QUEUE_INITIAL_SIZE);
         }
 

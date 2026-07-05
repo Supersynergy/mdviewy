@@ -1,10 +1,10 @@
 use std::{
     fmt,
     future::{Future, IntoFuture},
-    pin::{pin, Pin},
+    pin::{Pin, pin},
     sync::{
-        atomic::{AtomicBool, Ordering},
         Arc,
+        atomic::{AtomicBool, Ordering},
     },
     task::{Context, Poll},
     time::Duration,
@@ -12,10 +12,10 @@ use std::{
 
 use async_channel as chan;
 use async_trait::async_trait;
-use downcast_rs::{impl_downcast, Downcast};
+use downcast_rs::{Downcast, impl_downcast};
 use futures::StreamExt;
 use tokio::{spawn, sync::oneshot};
-use tracing::{error, instrument, trace, warn, Instrument};
+use tracing::{Instrument, error, instrument, trace, warn};
 use uuid::Uuid;
 
 use super::{

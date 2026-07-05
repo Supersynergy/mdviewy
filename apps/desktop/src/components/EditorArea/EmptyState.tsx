@@ -69,9 +69,32 @@ export const EmptyState = memo(() => {
   return (
     <Container className='w-full h-full'>
       <div className='hero'>
-        <div className='logo-mark'>
-          <span className='logo-glyph'>md</span>
-        </div>
+        <svg className='logo-mark' viewBox='0 0 1024 1024' role='img' aria-label='mdviewy'>
+          <defs>
+            <linearGradient id='tile-empty' x1='120' y1='70' x2='900' y2='960' gradientUnits='userSpaceOnUse'>
+              <stop offset='0' stopColor='#0D2C35' />
+              <stop offset='.5' stopColor='#166870' />
+              <stop offset='1' stopColor='#72D6C7' />
+            </linearGradient>
+            <linearGradient id='fur-empty' x1='316' y1='238' x2='714' y2='812' gradientUnits='userSpaceOnUse'>
+              <stop offset='0' stopColor='#D3B895' />
+              <stop offset='1' stopColor='#8B684B' />
+            </linearGradient>
+          </defs>
+          <rect width='1024' height='1024' rx='224' fill='url(#tile-empty)' />
+          <circle cx='298' cy='354' r='128' fill='#9A7858' />
+          <circle cx='726' cy='354' r='128' fill='#9A7858' />
+          <circle cx='298' cy='354' r='70' fill='#F0D9B4' />
+          <circle cx='726' cy='354' r='70' fill='#F0D9B4' />
+          <ellipse cx='512' cy='602' rx='186' ry='232' fill='url(#fur-empty)' />
+          <circle cx='512' cy='406' r='228' fill='url(#fur-empty)' />
+          <circle cx='407' cy='420' r='104' fill='#FFFDF5' />
+          <circle cx='617' cy='420' r='104' fill='#FFFDF5' />
+          <circle cx='407' cy='420' r='72' fill='#15262D' />
+          <circle cx='617' cy='420' r='72' fill='#15262D' />
+          <rect x='332' y='620' width='360' height='232' rx='42' fill='#FFFFFF' />
+          <path fill='#0D6D70' d='m411 700 36-36 65 65 65-65 36 36-101 101-101-101Z' />
+        </svg>
         <h1 className='app-title'>mdviewy</h1>
         <p className='tagline'>A calm place to read & write markdown.</p>
 
@@ -153,20 +176,8 @@ const Container = styled.div`
     width: 56px;
     height: 56px;
     border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-    box-shadow: 0 8px 24px -8px rgba(99, 102, 241, 0.55);
+    box-shadow: 0 8px 24px -8px rgba(13, 44, 53, 0.45);
     margin-bottom: 18px;
-  }
-
-  .logo-glyph {
-    font-family: 'SF Mono', ui-monospace, monospace;
-    font-weight: 700;
-    font-size: 20px;
-    color: #fff;
-    letter-spacing: -0.5px;
   }
 
   .app-title {
