@@ -43,7 +43,7 @@ const FallbackSpinner = () => (
       viewBox='0 0 1024 1024'
       role='img'
       aria-label='mdviewy'
-      style={{ width: 36, height: 36, animation: 'mdf-pulse 1.4s ease-in-out infinite' }}
+      style={{ width: 112, height: 112, animation: 'mdf-pulse 1.4s ease-in-out infinite' }}
     >
       <defs>
         <linearGradient id='tile-suspense' x1='120' y1='70' x2='900' y2='960' gradientUnits='userSpaceOnUse'>

@@ -39,7 +39,7 @@ security:
 # triggers an "unidentified developer" Gatekeeper prompt on this machine.
 install:
     yarn workspace @mdviewy/desktop build
-    yarn workspace @mdviewy/desktop tauri:build
+    yarn workspace @mdviewy/desktop tauri:build --bundles app
     ./scripts/install-mdviewy-app.sh
 
 # Full CI gate: type/lint/test + audit.
