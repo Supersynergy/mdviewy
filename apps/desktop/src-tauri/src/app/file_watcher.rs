@@ -194,7 +194,7 @@ impl FileWatcherManager {
 
     /// 停止所有文件监听器
     pub fn stop_all(&mut self) {
-        for (_, watcher) in self.watchers.iter_mut() {
+        for watcher in self.watchers.values_mut() {
             watcher.stop();
         }
     }

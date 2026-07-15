@@ -17,9 +17,11 @@ use std::path::PathBuf;
 use std::sync;
 use std::{collections::HashMap, sync::Mutex};
 
+#[cfg(target_os = "macos")]
+use app::window_manager;
 use app::{
     bookmarks, conf, extensions, file_watcher, keybindings, opened_cache, process, themes,
-    window_manager, workspace,
+    workspace,
 };
 use lazy_static::lazy_static;
 use tauri::{Manager, State};
@@ -262,18 +264,18 @@ pub fn run() {
         })
         .build(context)
         .unwrap()
-        .run(|app, event| {
+        .run(|_app, _event| {
             #[cfg(target_os = "macos")]
-            if let tauri::RunEvent::Opened { urls, .. } = event {
+            if let tauri::RunEvent::Opened { urls, .. } = _event {
                 let opened_paths = urls.iter().map(opened_path_from_url).collect::<Vec<_>>();
-                let opened_paths_state = app.try_state::<OpenedPaths>();
+                let opened_paths_state = _app.try_state::<OpenedPaths>();
                 if let Some(u) = opened_paths_state {
                     *u.0.lock().unwrap() = opened_paths.clone();
                 }
 
                 println!("Processed opened paths: {:?}", opened_paths);
 
-                if let Some(window) = window_manager::get_focused_window(app) {
+                if let Some(window) = window_manager::get_focused_window(_app) {
                     use tauri::Emitter;
                     println!("Emitting to focused window: {}", window.label());
                     let _ = window.unminimize();
@@ -285,7 +287,7 @@ pub fn run() {
                     let result = window.emit("opened-urls", opened_paths.clone());
                     println!("Emit result: {:?}", result);
                 } else {
-                    if let Some(window) = window_manager::get_last_opened_window(app) {
+                    if let Some(window) = window_manager::get_last_opened_window(_app) {
                         use tauri::Emitter;
                         println!("Emitting to last opened window: {}", window.label());
                         // Warm-instance file open (app already running, no window

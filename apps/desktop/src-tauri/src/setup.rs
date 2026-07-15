@@ -26,7 +26,7 @@ pub fn init(
 
     let theme = AppConf::theme_mode(&app_handle.clone());
 
-    let mut main_win = WebviewWindowBuilder::new(
+    let main_win = WebviewWindowBuilder::new(
         &app_handle,
         "main".to_string(),
         WebviewUrl::App("index.html".into()),
@@ -44,9 +44,7 @@ pub fn init(
     .min_inner_size(400.0, 400.0);
 
     #[cfg(target_os = "macos")]
-    {
-        main_win = main_win.title_bar_style(TitleBarStyle::Transparent);
-    }
+    let main_win = main_win.title_bar_style(TitleBarStyle::Transparent);
 
     let window = main_win.build()?;
     eprintln!(

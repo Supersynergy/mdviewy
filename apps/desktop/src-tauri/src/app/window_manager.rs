@@ -110,7 +110,7 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
     let initialization_script = opened_urls_initialization_script(&opened_paths, false);
     let cleanup_label = window_label_clone.clone();
     tauri::async_runtime::spawn(async move {
-        let mut new_win =
+        let new_win =
             WebviewWindowBuilder::new(&_app, window_label, WebviewUrl::App("index.html".into()))
                 .initialization_script(initialization_script)
                 .title("mdviewy")
@@ -122,16 +122,14 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
                 .min_inner_size(400.0, 400.0);
 
         #[cfg(target_os = "macos")]
-        {
-            new_win = new_win.title_bar_style(TitleBarStyle::Transparent);
-        }
+        let new_win = new_win.title_bar_style(TitleBarStyle::Transparent);
 
         // #[cfg(not(target_os = "macos"))]
         // {
         //     new_win = new_win.decorations(false);
         // }
 
-        let win = match new_win.build() {
+        let _win = match new_win.build() {
             Ok(window) => window,
             Err(error) => {
                 eprintln!("Failed to create window '{cleanup_label}': {error}");
@@ -145,7 +143,7 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
         #[cfg(target_os = "macos")]
         {
             let _ = apply_vibrancy(
-                &win,
+                &_win,
                 NSVisualEffectMaterial::HudWindow,
                 Some(NSVisualEffectState::Active),
                 Some(12.0),
@@ -250,7 +248,7 @@ pub fn get_last_opened_window(app: &AppHandle) -> Option<tauri::WebviewWindow> {
 
 pub fn get_focused_window(app: &AppHandle) -> Option<tauri::WebviewWindow> {
     if let Ok(instances) = WINDOW_INSTANCES.lock() {
-        for (window_label, _) in instances.iter() {
+        for window_label in instances.keys() {
             if let Some(window) = app.get_webview_window(window_label) {
                 if window.is_focused().unwrap_or(false) {
                     return Some(window);
