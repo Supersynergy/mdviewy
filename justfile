@@ -43,7 +43,7 @@ security:
 # real running app (Finder/CLI/Spotlight-resolved) is never stale and never
 # triggers an "unidentified developer" Gatekeeper prompt on this machine.
 install:
-    yarn workspace @mdviewy/desktop build
+    yarn build
     yarn workspace @mdviewy/desktop tauri:build --bundles app
     ./scripts/install-mdviewy-app.sh
 

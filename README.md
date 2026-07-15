@@ -33,7 +33,7 @@ Open a file and read. Open a folder when you want a workspace. mdviewy does not 
 | Reading | GitHub-style README preview, sanitized HTML, GFM tables, tasks and alerts, relative assets, math, Mermaid diagrams, responsive media |
 | Writing | Source and WYSIWYG editing, tabs, spellcheck, typewriter scroll, frontmatter, autosave, atomic file replacement |
 | Navigation | File tree, quick open, full-text search, command palette, outline, bookmarks, recent files |
-| Smart Actions | Metadata and word insights, deterministic document brief, local-path actions, GitHub repository detection, Codex/Claude handoffs |
+| Smart Actions | Metadata and word insights, deterministic document brief, local-path actions, GitHub repository detection, agent-ready handoff packs |
 | Export | HTML, image, Print / Save as PDF |
 | Personalization | Light/dark themes, custom themes, shortcuts, focused/wide/full content widths, multilingual UI |
 | Safety | No automatic home-folder indexing, bounded workspace scans, recoverable UI errors, CSP, sanitized README HTML |

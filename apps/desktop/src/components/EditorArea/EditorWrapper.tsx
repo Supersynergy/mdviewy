@@ -39,6 +39,15 @@ export const EditorWrapper = styled.div.attrs<EditorWrapperProps>((props) => pro
     grid-row: 1;
   }
 
+  /* Pretty mode renders semantic formatting. RME normally reveals Markdown
+     delimiters when the caret enters a mark; keep those implementation markers
+     hidden here. Literal and escaped stars are plain text and remain visible. */
+  & .md-mark {
+    display: none !important;
+    font-size: 0 !important;
+    letter-spacing: 0 !important;
+  }
+
   ${(props) =>
     props.active
       ? css({

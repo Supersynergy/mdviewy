@@ -12,13 +12,9 @@ mdviewy supports custom themes, and you can also share your themes with others.
 
 ### 1. Create theme files
 
-You can fork [mdviewy-Theme-Template](https://github.com/mdviewy/custom-theme-template) to create your theme.
+Start from a small local CSS file and import it from **Settings → Themes**. This keeps theme development local and avoids depending on an abandoned template repository.
 
-```bash
-pnpm install
-
-pnpm run dev
-```
+For a shareable package, use the repository's current Yarn toolchain and expose the compiled theme CSS as your package entry point.
 
 ### 2. Edit theme files
 
@@ -70,7 +66,6 @@ If you want more users to use your theme, you can submit it to mdviewy's officia
 
 3. **Create Pull Request**
    Submit the changes to the main repository. After review and approval by maintainers, your theme will appear in the theme store.
-
 
 
 

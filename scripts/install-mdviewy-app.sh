@@ -15,7 +15,7 @@ LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchS
 
 if [[ ! -d "$SOURCE_APP" ]]; then
   echo "Missing app bundle: $SOURCE_APP"
-  echo "Build it first with: yarn workspace @mdviewy/desktop build && yarn workspace @mdviewy/desktop tauri:build"
+  echo "Build it first with: yarn build:desktop"
   exit 1
 fi
 

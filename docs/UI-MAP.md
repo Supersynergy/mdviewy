@@ -1,6 +1,6 @@
 # mdviewy UI Map
 
-Status: restored from the local Claude file history on 2026-05-26.
+Status: verified against the 0.92 desktop interface on 2026-07-15.
 
 ## Layout
 

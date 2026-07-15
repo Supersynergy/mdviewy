@@ -4,7 +4,7 @@ import { loadLocalThemeCss } from '@/helper/extensions'
 import { getFileObject, getFileObjectByPath, getSaveOpenedEditorEntries } from '@/helper/files'
 import { getFileNameFromPath, readDirectory } from '@/helper/filesys'
 import { logger } from '@/helper/logger'
-import { parseOpenedPaths } from '@/helper/openedPaths'
+import { parseOpenedEvent, parseOpenedPaths } from '@/helper/openedPaths'
 import { requestDocumentFocus } from '@/helper/documentFocus'
 import { i18nInit } from '@/i18n'
 import { appSettingStoreSetup } from '@/services/app-setting'
@@ -28,6 +28,12 @@ import { isArray } from '../helper'
 import useExtensionsManagerStore from '../stores/useExtensionsManagerStore'
 import useThemeStore, { isBuiltInTheme } from '../stores/useThemeStore'
 import useWorkspaceWatcher from './useWorkspaceWatcher'
+
+declare global {
+  interface Window {
+    __mdviewyOpenPaths?: (paths: string[]) => void
+  }
+}
 
 interface LocalTheme {
   id: string
@@ -123,12 +129,12 @@ async function handleOpenedPaths(openedPaths: string[]) {
 
 let openedPathIngress = Promise.resolve(false)
 
-function consumeOpenedPathIngress() {
+function consumeOpenedPathIngress(eventPaths: string[] = []) {
   const task = openedPathIngress.then(async () => {
     const injectedPaths = parseOpenedPaths(window.openedUrls)
     window.openedUrls = null
     const queuedPaths = await invoke<string[]>('take_opened_paths').catch(() => [])
-    const openedPaths = Array.from(new Set([...injectedPaths, ...queuedPaths]))
+    const openedPaths = Array.from(new Set([...eventPaths, ...injectedPaths, ...queuedPaths]))
     if (openedPaths.length === 0) return false
 
     await handleOpenedPaths(openedPaths)
@@ -140,6 +146,15 @@ function consumeOpenedPathIngress() {
     return false
   })
   return task
+}
+
+// Rust calls this fixed, tiny bridge for warm Finder opens. Tauri events and
+// the Rust queue remain fallbacks, but the primary path no longer depends on a
+// focus/listener race inside React's effect lifecycle.
+window.__mdviewyOpenPaths = (paths) => {
+  void consumeOpenedPathIngress(parseOpenedPaths(paths)).then((consumed) => {
+    if (consumed) currentWindow.setFocus()
+  })
 }
 
 async function appWorkspaceSetup() {
@@ -268,13 +283,13 @@ const appSetup = onceAsync(async function () {
   // is near-instant.
   schedule(async () => {
     try {
-      const [rme, opts] = await Promise.all([
-        import('rme'),
+      const [editor, opts] = await Promise.all([
+        import('@/components/EditorArea/createMdviewyWysiwygDelegate'),
         import('@/components/EditorArea/createWysiwygDelegateOptions'),
       ])
       // Create + discard. Internal caches (schemas, plugins, parsers) stay
       // warm in remirror's module-level singletons.
-      rme.createWysiwygDelegate(opts.createWysiwygDelegateOptions())
+      editor.createMdviewyWysiwygDelegate(opts.createWysiwygDelegateOptions())
     } catch (e) {
       logger.debug('editor pre-warm failed (non-fatal)', e)
     }
@@ -334,8 +349,11 @@ const useAppSetup = () => {
       useCommandStore.getState().execute(payload)
     })
 
-    const consumeAndFocus = async () => {
-      if (await consumeOpenedPathIngress()) currentWindow.setFocus()
+    const consumeAndFocus = async (event?: unknown) => {
+      // Warm macOS opens already contain the authoritative path list. Consume
+      // that payload directly instead of relying only on a shared one-shot
+      // queue that a concurrent focus event may drain first.
+      if (await consumeOpenedPathIngress(parseOpenedEvent(event))) currentWindow.setFocus()
     }
     const unListenOpenedUrls = currentWindow.listen('opened-urls', consumeAndFocus)
     const unListenWindowFocus = currentWindow.listen('tauri://focus', consumeAndFocus)

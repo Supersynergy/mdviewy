@@ -1,5 +1,10 @@
 export type OpenedUrlsPayload = string | string[] | null | undefined
 
+export function parseOpenedEvent(event: unknown): string[] {
+  if (!event || typeof event !== 'object' || !('payload' in event)) return []
+  return parseOpenedPaths((event as { payload?: OpenedUrlsPayload }).payload)
+}
+
 export function normalizeOpenedPath(value: string, options?: { decodeNativePath?: boolean }): string | null {
   const trimmed = value.trim()
   if (!trimmed) return null

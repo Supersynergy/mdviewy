@@ -12,13 +12,9 @@ mdviewy 支持自定义主题，你还可以与他人分享你的主题。
 
 ### 1. 创建主题文件
 
-你可以 fork [mdviewy-Theme-Template](https://github.com/mdviewy/custom-theme-template) 来创建你的主题。
+从一个小型本地 CSS 文件开始，然后在 **设置 → 主题** 中导入。这样无需依赖已停止维护的模板仓库，也能在本地完成主题开发。
 
-```bash
-pnpm install
-
-pnpm run dev
-```
+如需制作可分享的软件包，请使用本仓库当前的 Yarn 工具链，并将编译后的主题 CSS 设为软件包入口。
 
 ### 2. 编辑主题文件
 

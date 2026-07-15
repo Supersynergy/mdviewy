@@ -32,7 +32,6 @@ import { useTranslation } from 'react-i18next'
 import { useMount, useUnmount } from 'react-use'
 import {
   createSourceCodeDelegate,
-  createWysiwygDelegate,
   EditorChangeEventParams,
   EditorChangeHandler,
   EditorContext,
@@ -44,6 +43,7 @@ import {
 } from 'rme'
 import { toast } from 'zens'
 import { createWysiwygDelegateOptions } from './createWysiwygDelegateOptions'
+import { createMdviewyWysiwygDelegate } from './createMdviewyWysiwygDelegate'
 import { EditorWrapper, normalizeEditorContentWidth } from './EditorWrapper'
 import { GitHubMarkdownPreview, requiresSourceSafeEditing } from './GitHubMarkdownPreview'
 import { WarningHeader } from './styles'
@@ -82,7 +82,7 @@ function TextEditor(props: TextEditorProps) {
           },
         })
       } else {
-        return createWysiwygDelegate(createWysiwygDelegateOptions(id))
+        return createMdviewyWysiwygDelegate(createWysiwygDelegateOptions(id))
       }
     },
     [id],
@@ -395,7 +395,7 @@ function TextEditor(props: TextEditorProps) {
             } else if (nextView === EditorViewType.PREVIEW) {
               debounceRefreshToc()
             } else {
-              const wysiwygDelegate = createWysiwygDelegate(
+              const wysiwygDelegate = createMdviewyWysiwygDelegate(
                 createWysiwygDelegateOptions(curFile.id),
               )
               setEditorDelegate(curFile.id, wysiwygDelegate)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeOpenedPath, parseOpenedPaths } from './openedPaths'
+import { normalizeOpenedPath, parseOpenedEvent, parseOpenedPaths } from './openedPaths'
 
 describe('openedPaths helpers', () => {
   it('normalizes Finder file URLs into real markdown paths', () => {
@@ -33,5 +33,13 @@ describe('openedPaths helpers', () => {
       '/Users/master/a.md',
       '/Users/master/b.md',
     ])
+  })
+
+  it('takes warm-open paths directly from the native event payload', () => {
+    expect(parseOpenedEvent({ payload: ['/tmp/README.md', "/tmp/O'Brien.md"] })).toEqual([
+      '/tmp/README.md',
+      "/tmp/O'Brien.md",
+    ])
+    expect(parseOpenedEvent(new Event('focus'))).toEqual([])
   })
 })

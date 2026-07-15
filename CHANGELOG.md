@@ -5,7 +5,8 @@
 ### Fixed
 
 - Removed the startup folder suggestions that recursively opened large home, Claude, and Codex trees. Workspace scans are now bounded by entry count and depth, and failures reject visibly instead of leaving a pending promise.
-- Removed unsafe startup/new-window debug scripts that broke WebView initialization when a path contained an apostrophe, and added a queued browser-event fallback so Finder/CLI file opens survive missed native listener timing.
+- Removed unsafe startup/new-window debug scripts that broke WebView initialization when a path contained an apostrophe. Warm Finder/CLI opens now use a direct native-to-window bridge with queued event fallbacks, so paths survive listener and focus races.
+- Pretty mode now hides formatting delimiters at the caret while preserving intentional escaped stars as literal text.
 - Added a top-level recovery boundary with Reload and Safe start actions so render failures no longer end in an unrecoverable white screen.
 - File writes now use a durable same-directory temporary file and atomic replacement. Dirty state clears only after the native write succeeds.
 - External single-file opens now enter focus mode and collapse stale left/right panel widths. This removes the blank sidebar area that survived earlier overflow-only whitespace fixes.
@@ -34,7 +35,7 @@
 ### Verified
 
 - `yarn workspace @mdviewy/desktop test`
-- `yarn workspace @mdviewy/desktop build`
+- `yarn build`
 - `yarn workspace @mdviewy/web build:prod`
 - `cargo test --workspace`
 - `cargo clippy --workspace --all-targets --all-features -- -D warnings`

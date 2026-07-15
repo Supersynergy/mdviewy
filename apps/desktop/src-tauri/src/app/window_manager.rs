@@ -15,7 +15,9 @@ pub(crate) fn opened_urls_initialization_script(opened_paths: &[String], notify:
     let escaped_urls = serde_json::to_string(opened_paths).unwrap_or_else(|_| "[]".to_string());
     let assignment = format!("window.openedUrls = {escaped_urls};");
     if notify {
-        format!("{assignment} window.dispatchEvent(new CustomEvent('mdviewy-opened-urls'));")
+        format!(
+            "{assignment} if (typeof window.__mdviewyOpenPaths === 'function') {{ window.__mdviewyOpenPaths({escaped_urls}); }} else {{ window.dispatchEvent(new CustomEvent('mdviewy-opened-urls')); }}"
+        )
     } else {
         assignment
     }
@@ -174,6 +176,7 @@ mod tests {
     fn notification_script_uses_a_fixed_browser_event() {
         let script = opened_urls_initialization_script(&["/tmp/README.md".to_string()], true);
 
+        assert!(script.contains("window.__mdviewyOpenPaths([\"/tmp/README.md\"])"));
         assert!(script.contains("new CustomEvent('mdviewy-opened-urls')"));
         assert!(!script.contains("console.log"));
     }
