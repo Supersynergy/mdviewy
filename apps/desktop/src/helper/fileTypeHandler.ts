@@ -37,7 +37,7 @@ export function getFileTypeConfig(file: IFile): FileTypeConfig {
     type: 'markdown',
     supportedModes: [VIEW_PREVIEW, VIEW_WYSIWYG, VIEW_SOURCECODE],
     defaultMode: settingData.md_editor_default_mode || VIEW_WYSIWYG,
-    exporters: ['Html', 'Image'],
+    exporters: ['Html', 'Image', 'Pdf'],
   }
 
   const fileTypeConfigs: Record<string, FileTypeConfig> = {

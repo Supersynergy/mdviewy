@@ -41,4 +41,14 @@ describe('GlobalStyles editor chrome overrides', () => {
     expect(source).not.toContain('.markdown-body pre {\n    white-space: normal;')
     expect(source).not.toContain('.markdown-body code {\n    white-space: normal;')
   })
+
+  it('prints only the active document without app chrome', () => {
+    const currentDir = dirname(fileURLToPath(import.meta.url))
+    const source = readFileSync(join(currentDir, 'globalStyles.ts'), 'utf8')
+
+    expect(source).toContain("body.${'mdviewy-printing'} *")
+    expect(source).toContain("[data-mdviewy-active-editor='true']")
+    expect(source).toContain('max-width: none !important;')
+    expect(source).toContain('overflow: visible !important;')
+  })
 })

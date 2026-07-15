@@ -3,7 +3,7 @@ use std::pin::pin;
 use async_channel as chan;
 use futures::StreamExt;
 use futures_concurrency::stream::Merge;
-use tokio::time::{Instant, interval_at};
+use tokio::time::{interval_at, Instant};
 use tokio_stream::wrappers::IntervalStream;
 use tracing::{debug, error, instrument, trace, warn};
 
@@ -13,8 +13,8 @@ use super::{
         message::{StoleTaskMessage, TaskOutputMessage, WorkerMessage},
         system::SystemComm,
     },
-    ONE_SECOND, WorkStealer, WorkerId,
     runner::Runner,
+    WorkStealer, WorkerId, ONE_SECOND,
 };
 
 enum StreamMessage<E: RunError> {
@@ -37,15 +37,13 @@ pub(super) async fn run<E: RunError>(
     let mut idle_checker_interval = interval_at(Instant::now(), ONE_SECOND);
     idle_checker_interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
 
-    let mut msg_stream = pin!(
-        (
-            msgs_rx.map(StreamMessage::Commands),
-            stole_task_rx.map(StreamMessage::Steal),
-            task_output_rx.map(StreamMessage::TaskOutput),
-            IntervalStream::new(idle_checker_interval).map(|_| StreamMessage::IdleCheck),
-        )
-            .merge()
-    );
+    let mut msg_stream = pin!((
+        msgs_rx.map(StreamMessage::Commands),
+        stole_task_rx.map(StreamMessage::Steal),
+        task_output_rx.map(StreamMessage::TaskOutput),
+        IntervalStream::new(idle_checker_interval).map(|_| StreamMessage::IdleCheck),
+    )
+        .merge());
 
     while let Some(msg) = msg_stream.next().await {
         match msg {

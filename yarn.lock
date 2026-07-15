@@ -11113,15 +11113,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:^3.2.6, dompurify@npm:^3.3.1":
-  version: 3.4.7
-  resolution: "dompurify@npm:3.4.7"
+"dompurify@npm:3.4.11":
+  version: 3.4.11
+  resolution: "dompurify@npm:3.4.11"
   dependencies:
     "@types/trusted-types": "npm:^2.0.7"
   dependenciesMeta:
     "@types/trusted-types":
       optional: true
-  checksum: 10/7432e2a2fe1f4235e09e54d40c285eb76812afab46605fb52449891ca922e474fd5cab2cc297ae9ae1e235d1186e9e9924c32178903359d18e4587cd5119471b
+  checksum: 10/d0473e1a22ed9cc23d86ef426717bce866913d1a725512a9478985bd917b272e0faba5f1d6ad8b2e37f3f4219206c4385162d7c984cfedcd23396e1e6ae0bc5e
   languageName: node
   linkType: hard
 
@@ -14444,16 +14444,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"linkify-it@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "linkify-it@npm:5.0.0"
-  dependencies:
-    uc.micro: "npm:^2.0.0"
-  checksum: 10/ef3b7609dda6ec0c0be8a7b879cea195f0d36387b0011660cd6711bba0ad82137f59b458b7e703ec74f11d88e7c1328e2ad9b855a8500c0ded67461a8c4519e6
-  languageName: node
-  linkType: hard
-
-"linkify-it@npm:^5.0.1":
+"linkify-it@npm:5.0.1":
   version: 5.0.1
   resolution: "linkify-it@npm:5.0.1"
   dependencies:
@@ -17869,9 +17860,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"protobufjs@npm:^7.2.5, protobufjs@npm:^7.3.0":
-  version: 7.6.2
-  resolution: "protobufjs@npm:7.6.2"
+"protobufjs@npm:7.6.3":
+  version: 7.6.3
+  resolution: "protobufjs@npm:7.6.3"
   dependencies:
     "@protobufjs/aspromise": "npm:^1.1.2"
     "@protobufjs/base64": "npm:^1.1.2"
@@ -17885,7 +17876,7 @@ __metadata:
     "@protobufjs/utf8": "npm:^1.1.1"
     "@types/node": "npm:>=13.7.0"
     long: "npm:^5.3.2"
-  checksum: 10/964e39237febf2369cba371175a49602ccc7582f059504ab35e27adb01c690ad669bc2c134577f08f5fb55d1dc8320483f6a65a97f236dc6e749046d89283b5f
+  checksum: 10/80c05985e8d7b9657bc7c2e72dea3b20be96209d6f4a550f7849dd9ed73adb3f698b9d876e3a6329828051572e4af253f9b53f56e09fbc009651a26338e5da8b
   languageName: node
   linkType: hard
 
@@ -20864,10 +20855,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:6.24.0":
-  version: 6.24.0
-  resolution: "undici@npm:6.24.0"
-  checksum: 10/fdb636cd583c9f12736b32ef088a2d9da9398fc0b80805b519137b3d8e5fcaa6e4c25630414df678aa9912e7f9c1c49911645592da07abda2e1094398175e9da
+"undici@npm:6.27.0":
+  version: 6.27.0
+  resolution: "undici@npm:6.27.0"
+  checksum: 10/30c18cdb235edf4dd36f8aa3ace1ffaf44060289a7d62ad44c33180d2d74a224015d25574812f62ce9c625b5beb1b0b766495b650fedf356aca11eed7ce2c816
   languageName: node
   linkType: hard
 

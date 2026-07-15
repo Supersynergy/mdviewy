@@ -45,23 +45,16 @@ mdviewy is actively developed toward its 1.0 release and is usable today. See `d
 
 ## Features
 
-- **Built-in AI:** Currently supports Copilot, one-click export of dialogues, translation of articles to any language, and article summaries. It supports large models like `DeepSeek` and `Chatgpt`, making them your intelligent assistant.
-
-- **lightweight:** mdviewy is based on Tauri, boasting a size of less than 20MB and improved performance.
-
-- **Multiple Editing Modes:** mdviewy uses Prosemirror as its core editor, offering high extensibility and a superior editing experience. It supports multiple editing modes, such as source code and wysiwyg.
-
-- **Editing Multiple File Types:** In addition to Markdown, it supports editing `JSON`, `TXT`, and other file types.
-
-- **Custom Themes:** Supports custom themes, and you can share your themes with others.
-
-- **Custom Keyboard Shortcuts:** Supports custom keyboard shortcuts to meet individual needs.
-
-- **Image Processing:** When pasting images into mdviewy, you can choose to paste them to a specified path or convert them to `base64`.
-
-- **File Management**: A powerful file tree that supports drag-and-drop movement, global search, and other common functions.
-
-- **Multi-language support:** Supports multiple languages ​​including Chinese, English, Spanish, Japanese, and French.
+- **Reliable native open:** Finder, CLI and warm-instance opens preserve real paths and switch single files into a distraction-free focus layout.
+- **Adaptive editor:** WYSIWYG and source modes, multiple tabs, typewriter scrolling, spellcheck, and adaptive/focused/wide/full document widths.
+- **Fast navigation:** Command palette, recent tabs, file search, native Rust full-text search, Table of Contents, and reveal-in-folder actions.
+- **Rich Markdown:** Math plus 19 bundled Mermaid diagram types, wide-table handling, page breaks, and responsive local/remote media.
+- **Smart Actions:** Detect local paths and GitHub repositories, copy agent-ready context/handoffs, and create deterministic document briefs.
+- **Frontmatter insights:** Titles and tags appear in Smart Actions without changing the document.
+- **Built-in AI:** OpenAI-compatible, DeepSeek, Google and local Ollama providers with explicit opt-in settings.
+- **Export:** HTML, image, and Print / Save as PDF with print-only document styling.
+- **Workspace tools:** File tree, drag-and-drop, bookmarks, image asset rules, custom themes, and keyboard shortcuts.
+- **Cross-platform and multilingual:** macOS, Windows and Linux; Chinese, English, Spanish, Japanese and French.
 
 ## Download
 

@@ -146,7 +146,8 @@
       "close_right": "Cerrar a la derecha",
       "close_all": "Cerrar todo",
       "export_html": "Exportar a HTML",
-      "export_image": "Exportar como imagen"
+      "export_image": "Exportar como imagen",
+      "print_pdf": "Imprimir / Guardar como PDF"
     }
   },
   "notification": {},
@@ -194,6 +195,14 @@
         "full_width": {
           "label": "Anchura completa",
           "desc": "Establecer el editor a anchura completa."
+        },
+        "content_width": {
+          "label": "Anchura del documento",
+          "desc": "El modo adaptable reduce el espacio vacío y los modos de enfoque mantienen el texto legible.",
+          "adaptive": "Adaptable (recomendado)",
+          "focused": "Enfocado",
+          "wide": "Amplio",
+          "full": "Anchura completa"
         },
         "font_size": {
           "label": "Tamaño de letra",

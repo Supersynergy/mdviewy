@@ -5,8 +5,8 @@ use std::{
     panic::AssertUnwindSafe,
     pin::pin,
     sync::{
-        Arc,
         atomic::{AtomicBool, Ordering},
+        Arc,
     },
     time::Duration,
 };
@@ -18,9 +18,9 @@ use tokio::{
     spawn,
     sync::oneshot,
     task::{JoinError, JoinHandle},
-    time::{Instant, sleep, timeout},
+    time::{sleep, timeout, Instant},
 };
-use tracing::{Instrument, debug, error, instrument, trace, warn};
+use tracing::{debug, error, instrument, trace, warn, Instrument};
 
 use super::{
     super::{
@@ -32,7 +32,7 @@ use super::{
             Task, TaskId, TaskOutput, TaskStatus, TaskWorkState, TaskWorktable,
         },
     },
-    ONE_SECOND, TaskRunnerOutput, WorkStealer, WorkerId,
+    TaskRunnerOutput, WorkStealer, WorkerId, ONE_SECOND,
 };
 
 const TEN_SECONDS: Duration = Duration::from_secs(10);
@@ -673,13 +673,11 @@ impl<E: RunError> Runner<E> {
             Steal(Option<StoleTaskMessage<E>>),
         }
 
-        let mut msg_stream = pin!(
-            (
-                suspend_on_shutdown_stole_task_rx.map(StreamMessage::Steal),
-                suspend_on_shutdown_task_output_rx.map(StreamMessage::Output),
-            )
-                .merge()
-        );
+        let mut msg_stream = pin!((
+            suspend_on_shutdown_stole_task_rx.map(StreamMessage::Steal),
+            suspend_on_shutdown_task_output_rx.map(StreamMessage::Output),
+        )
+            .merge());
 
         while let Some(msg) = msg_stream.next().await {
             match msg {

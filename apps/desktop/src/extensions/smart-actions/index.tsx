@@ -4,7 +4,9 @@ import { getFileObject } from '@/helper/files'
 import {
   buildAgentHandoffPrompt,
   buildAiContextPack,
+  buildDocumentBrief,
   extractSmartReferences,
+  extractMarkdownMetadata,
   fileNameOf,
   folderOf,
   type SmartReference,
@@ -97,8 +99,8 @@ const ACTION_GROUPS: ActionGroup[] = [
       },
       {
         icon: 'ri-double-quotes-l',
-        label: 'Copy as Wiki link',
-        hint: '[[file]]',
+        label: 'Copy wiki-style text',
+        hint: '[[file]] text only — no backlink index yet',
         run: async (f) => {
           const name = (fileNameOf(f.path) || f.name).replace(/\.md$/i, '')
           await writeText(`[[${name}]]`)
@@ -253,6 +255,23 @@ const ACTION_GROUPS: ActionGroup[] = [
         },
       },
       {
+        icon: 'ri-file-list-3-line',
+        label: 'Copy document brief',
+        hint: 'Title, tags, word count and outline',
+        run: async (f) => {
+          const content = useEditorStore.getState().getEditorContent(f.id)
+          await writeText(
+            buildDocumentBrief({
+              path: f.path,
+              name: f.name,
+              content,
+              workspaceRoot: useEditorStore.getState().getRootPath(),
+            }),
+          )
+          toast.success('Document brief copied')
+        },
+      },
+      {
         icon: 'ri-chat-smile-ai-line',
         label: 'Copy AI context pack',
         hint: 'File metadata + markdown',
@@ -334,6 +353,26 @@ const FileCard = styled.div`
     color: ${(p) => p.theme.labelFontColor};
     word-break: break-all;
     opacity: 0.8;
+  }
+
+  .metadata-title {
+    margin-top: 8px;
+    color: ${(p) => p.theme.labelFontColor};
+  }
+
+  .metadata-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 7px;
+  }
+
+  .metadata-tag {
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: ${(p) => p.theme.hoverColor};
+    color: ${(p) => p.theme.accentColor};
+    font-size: 0.68rem;
   }
 
   .path-actions {
@@ -475,14 +514,15 @@ const Row = styled.button<{ $disabled?: boolean }>`
 const SmartActionsPanel = memo(() => {
   const { activeId } = useEditorStore()
 
-  const { file, refs } = useMemo(() => {
-    if (!activeId) return { file: null, refs: [] }
+  const { file, refs, metadata } = useMemo(() => {
+    if (!activeId) return { file: null, refs: [], metadata: null }
     const f = getFileObject(activeId)
-    if (!f) return { file: null, refs: [] }
+    if (!f) return { file: null, refs: [], metadata: null }
     const file = { path: f.path, name: f.name || fileNameOf(f.path) || 'untitled', id: f.id }
     const content = useEditorStore.getState().getEditorContent(f.id)
     return {
       file,
+      metadata: extractMarkdownMetadata(content),
       refs: extractSmartReferences(content, {
         currentDir: folderOf(f.path),
         workspaceRoot: useEditorStore.getState().getRootPath(),
@@ -498,6 +538,18 @@ const SmartActionsPanel = memo(() => {
           <>
             <div className='name'>{file.name}</div>
             <div className='path'>{file.path || '(unsaved)'}</div>
+            {metadata?.title && metadata.title !== file.name && (
+              <div className='metadata-title'>{metadata.title}</div>
+            )}
+            {!!metadata?.tags.length && (
+              <div className='metadata-tags' aria-label='Frontmatter tags'>
+                {metadata.tags.map((tag) => (
+                  <span className='metadata-tag' key={tag}>
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
             {file.path && (
               <div className='path-actions'>
                 <button

@@ -54,6 +54,13 @@ export const MoreActions = () => {
             bus.emit('editor_export_image')
           },
         },
+        {
+          value: 'print_pdf',
+          label: t('contextmenu.editor_tab.print_pdf'),
+          handler: () => {
+            bus.emit('editor_print_pdf')
+          },
+        },
       ],
     })
   }, [curFile, execute, t])

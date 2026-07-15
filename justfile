@@ -1,5 +1,10 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
+# Fixed releases for these 2026-07 advisories are below the repository's
+# 14-day package-age floor. Review/remove all three ignores on 2026-07-22;
+# rationale: docs/adr/2026-06-05-security-posture-1.0.md.
+rustsec_fresh_fix_ignores := "--ignore RUSTSEC-2026-0204 --ignore RUSTSEC-2026-0194 --ignore RUSTSEC-2026-0195"
+
 fmt:
     cargo fmt --all
 
@@ -10,17 +15,17 @@ test:
     cargo nextest run --workspace --all-features --no-tests pass
 
 audit:
-    cargo audit --no-fetch --stale
+    cargo audit --no-fetch --stale {{rustsec_fresh_fix_ignores}}
 
 audit-online:
-    cargo audit
+    cargo audit {{rustsec_fresh_fix_ignores}}
 
 check:
     cargo fmt --all -- --check
     cargo check --workspace --all-targets --all-features
     cargo clippy --workspace --all-targets --all-features -- -D warnings
     cargo nextest run --workspace --all-features --no-tests pass
-    cargo audit --no-fetch --stale
+    cargo audit --no-fetch --stale {{rustsec_fresh_fix_ignores}}
 
 # Lean gate — flag unused dependencies (code = liability). Warn-only.
 lean:

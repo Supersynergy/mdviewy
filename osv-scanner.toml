@@ -19,31 +19,6 @@ ignoreUntil = 2026-09-06
 reason = "lodash/-es code injection via _.template — fix version unreleased; app does not call _.template on untrusted input."
 
 [[IgnoredVulns]]
-id = "GHSA-xxjr-mmjv-4gpg"
-ignoreUntil = 2026-09-06
-reason = "lodash-es prototype pollution in _.unset/_.omit — fix version unreleased; transitive/build-only."
-
-[[IgnoredVulns]]
 id = "GHSA-8988-4f7v-96qf"
-ignoreUntil = 2026-06-26
-reason = "@opentelemetry/core fix 2.8.0 was published 2026-06-11, inside the 14-day supply-chain hold."
-
-[[IgnoredVulns]]
-id = "GHSA-gvmj-g25r-r7wr"
-ignoreUntil = 2026-06-26
-reason = "dompurify fixes 3.4.8/3.4.9 were published 2026-06-03/2026-06-10, inside the 14-day supply-chain hold."
-
-[[IgnoredVulns]]
-id = "GHSA-vxr8-fq34-vvx9"
-ignoreUntil = 2026-06-26
-reason = "dompurify fix 3.4.9 was published 2026-06-10, inside the 14-day supply-chain hold."
-
-[[IgnoredVulns]]
-id = "GHSA-gv7w-rqvm-qjhr"
-ignoreUntil = 2026-06-26
-reason = "esbuild fix 0.28.1 was published 2026-06-11, inside the 14-day supply-chain hold."
-
-[[IgnoredVulns]]
-id = "GHSA-f38q-mgvj-vph7"
-ignoreUntil = 2026-06-26
-reason = "protobufjs fix 7.6.3 was published 2026-06-09, inside the 14-day supply-chain hold."
+ignoreUntil = 2026-08-15
+reason = "@opentelemetry/core 2.8.0 is a breaking major incompatible with contentlayer2 0.5.8, whose current release pins the 1.30 line; web-docs build dependency only."

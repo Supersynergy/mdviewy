@@ -19,6 +19,13 @@ export interface SmartFileContext {
   workspaceRoot?: string
 }
 
+export interface MarkdownMetadata {
+  title: string
+  tags: string[]
+  headings: Array<{ level: number; text: string }>
+  wordCount: number
+}
+
 export type AgentHandoffTarget = 'claude' | 'codex' | 'review'
 
 const URL_RE = /https?:\/\/[^\s)\]>"']+/gi
@@ -94,6 +101,97 @@ export const buildAgentHandoffPrompt = (ctx: SmartFileContext, target: AgentHand
   }
 
   return `${workspace}In Codex, inspect ${mention}, make the focused code change, run the repo checks, and leave the worktree clean. Do not revert unrelated user changes.`
+}
+
+const cleanMetadataValue = (value: string) =>
+  value.trim().replace(/^['"]|['"]$/g, '').trim()
+
+const uniqueValues = (values: string[]) =>
+  Array.from(new Set(values.map(cleanMetadataValue).filter(Boolean)))
+
+export const extractMarkdownMetadata = (markdown: string): MarkdownMetadata => {
+  const normalized = markdown.replace(/\r\n?/g, '\n')
+  let body = normalized
+  let title = ''
+  let tags: string[] = []
+
+  if (normalized.startsWith('---\n')) {
+    const closing = normalized.indexOf('\n---\n', 4)
+    if (closing !== -1) {
+      const frontmatterLines = normalized.slice(4, closing).split('\n')
+      body = normalized.slice(closing + 5)
+
+      for (let index = 0; index < frontmatterLines.length; index += 1) {
+        const line = frontmatterLines[index]
+        const keyValue = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/)
+        if (!keyValue) continue
+
+        const [, key, rawValue] = keyValue
+        if (key.toLowerCase() === 'title') {
+          title = cleanMetadataValue(rawValue)
+        }
+        if (key.toLowerCase() === 'tags') {
+          if (rawValue.trim().startsWith('[') && rawValue.trim().endsWith(']')) {
+            tags = rawValue.trim().slice(1, -1).split(',')
+          } else if (rawValue.trim()) {
+            tags = rawValue.split(',')
+          } else {
+            const listTags: string[] = []
+            while (frontmatterLines[index + 1]?.match(/^\s+-\s+/)) {
+              index += 1
+              listTags.push(frontmatterLines[index].replace(/^\s+-\s+/, ''))
+            }
+            tags = listTags
+          }
+        }
+      }
+    }
+  }
+
+  const headings = stripCodeBlocks(body)
+    .split('\n')
+    .flatMap((line) => {
+      const heading = line.match(/^(#{1,6})\s+(.+?)\s*#*$/)
+      if (!heading) return []
+      const text = heading[2]
+        .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+        .replace(/[*_`~]/g, '')
+        .trim()
+      return text ? [{ level: heading[1].length, text }] : []
+    })
+
+  if (!title) title = headings.find((heading) => heading.level === 1)?.text || ''
+
+  const readable = stripCodeBlocks(body)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\[[^\]]*]\([^)]+\)/g, ' ')
+    .replace(/[^\p{L}\p{N}\s'-]/gu, ' ')
+  const wordCount = readable.trim() ? readable.trim().split(/\s+/u).length : 0
+
+  return { title, tags: uniqueValues(tags), headings: headings.slice(0, 24), wordCount }
+}
+
+export const buildDocumentBrief = (ctx: SmartFileContext) => {
+  const metadata = extractMarkdownMetadata(ctx.content || '')
+  const title = metadata.title || ctx.name.replace(/\.md$/i, '')
+  const outline = metadata.headings.slice(0, 12).map((heading) =>
+    `${'  '.repeat(Math.max(0, heading.level - 1))}- ${heading.text}`,
+  )
+
+  return [
+    '# Document brief',
+    '',
+    `Title: ${title}`,
+    `File: ${ctx.path || ctx.name}`,
+    ctx.workspaceRoot ? `Workspace: ${ctx.workspaceRoot}` : undefined,
+    metadata.tags.length ? `Tags: ${metadata.tags.join(', ')}` : undefined,
+    `Words: ${metadata.wordCount}`,
+    outline.length ? '' : undefined,
+    outline.length ? 'Outline:' : undefined,
+    ...outline,
+  ]
+    .filter((line): line is string => typeof line === 'string')
+    .join('\n')
 }
 
 export const extractSmartReferences = (

@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import {
   buildAgentHandoffPrompt,
   buildAiContextPack,
+  buildDocumentBrief,
   collectInlineSmartReferences,
   extractSmartReferences,
+  extractMarkdownMetadata,
   findSmartReferenceAroundOffset,
   githubUrlForRepoName,
   stripCodeBlocks,
@@ -103,5 +105,41 @@ See [local](./docs/spec.md), "/Users/master/projects/mdviewy/README.md" and ./do
     })
 
     expect(refs).toHaveLength(2)
+  })
+
+  it('extracts frontmatter and a bounded document outline', () => {
+    const metadata = extractMarkdownMetadata(`---
+title: "Release plan"
+tags:
+  - product
+  - launch
+---
+# Ignored fallback
+## Gate one
+
+Text for the plan.
+`)
+
+    expect(metadata.title).toBe('Release plan')
+    expect(metadata.tags).toEqual(['product', 'launch'])
+    expect(metadata.headings).toEqual([
+      { level: 1, text: 'Ignored fallback' },
+      { level: 2, text: 'Gate one' },
+    ])
+    expect(metadata.wordCount).toBeGreaterThan(0)
+  })
+
+  it('builds a deterministic document brief for assistant handoff', () => {
+    const brief = buildDocumentBrief({
+      path: '/Users/master/project/plan.md',
+      name: 'plan.md',
+      workspaceRoot: '/Users/master/project',
+      content: '---\ntags: [release, mac]\n---\n# Plan\n## Verify\nShip it.',
+    })
+
+    expect(brief).toContain('Title: Plan')
+    expect(brief).toContain('Tags: release, mac')
+    expect(brief).toContain('Outline:')
+    expect(brief).toContain('  - Verify')
   })
 })

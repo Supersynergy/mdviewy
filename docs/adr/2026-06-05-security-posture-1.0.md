@@ -78,3 +78,21 @@ direct upgrade path appears or severity rises.
 - [ ] AI keys confirmed in OS keychain.
 - [ ] assetProtocol rationale linked from SECURITY.md.
 - [ ] audit warnings re-reviewed at release cut.
+
+### Time-bounded July 2026 Rust advisories
+
+Release `0.92.0` updates the mature QUIC fix to `quinn-proto 0.11.15`. Three
+advisory IDs remain explicitly ignored by the release gate until **2026-07-22**
+because every compatible fixed dependency was published less than 14 days
+before the release cut:
+
+- `RUSTSEC-2026-0204`: `crossbeam-epoch 0.9.18`; the affected pointer formatter
+  is transitive through Rayon/Ignore and is not called directly by mdviewy.
+- `RUSTSEC-2026-0194` and `RUSTSEC-2026-0195`: `quick-xml 0.37/0.39`; the fixed
+  `0.41` line currently requires the 2026-07-04/06 `plist` and Windows toast
+  wrapper releases. mdviewy does not expose `NsReader` or XML parsing to opened
+  Markdown content.
+
+The `justfile` owns the matching ignore list. On 2026-07-22, remove the ignores,
+update the lockfile, and run `just check` plus Windows/macOS packaging. This is a
+temporary supply-chain quarantine, not a claim that the advisories are fixed.

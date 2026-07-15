@@ -1,5 +1,5 @@
-use crate::{APP_DIR, fc::exists};
-use etcetera::{AppStrategy, AppStrategyArgs, choose_app_strategy};
+use crate::{fc::exists, APP_DIR};
+use etcetera::{choose_app_strategy, AppStrategy, AppStrategyArgs};
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -34,6 +34,7 @@ pub_struct!(AppConf {
     copilot_model: Option<String>,
     copilot_enabled: Option<bool>,
     editor_full_width: Option<bool>,
+    editor_content_width: Option<String>,
     editor_typewriter_scroll: Option<bool>,
     editor_root_font_size: Option<u32>,
     editor_root_line_height: Option<String>,
@@ -171,6 +172,11 @@ fn migrate_from_file(_app: &AppHandle) -> Option<AppConf> {
 
 impl AppConf {
     pub fn new() -> Self {
+        let upload_image_path = app_root().join("assets/images");
+        Self::new_with_upload_image_path(upload_image_path.to_string_lossy().into_owned())
+    }
+
+    fn new_with_upload_image_path(upload_image_path: String) -> Self {
         Self {
             theme: Some("light".to_string()),
             language: Some("en".to_string()),
@@ -180,11 +186,12 @@ impl AppConf {
             copilot_model: Some("".to_string()),
             copilot_enabled: Some(false),
             editor_full_width: Some(false),
+            editor_content_width: Some("adaptive".to_string()),
             editor_typewriter_scroll: Some(false),
             editor_root_font_size: Some(15),
             editor_root_line_height: Some("1.6".to_string()),
             md_editor_default_mode: Some("wysiwyg".to_string()),
-            autosave: Some(false),
+            autosave: Some(true),
             autosave_interval: Some(2000),
             editor_root_font_family: Some("Open Sans".to_string()),
             editor_code_font_family: Some("Fira Code".to_string()),
@@ -211,13 +218,7 @@ impl AppConf {
             paste_image_save_relative_path: Some("assets/images".to_string()),
             paste_image_save_relative_path_rule: Some("${documentPath}/assets".to_string()),
             when_upload_image: Some("save_to_local_absolute".to_string()),
-            upload_image_save_absolute_path: Some(
-                app_root()
-                    .join("assets/images")
-                    .to_str()
-                    .unwrap()
-                    .to_string(),
-            ),
+            upload_image_save_absolute_path: Some(upload_image_path),
             upload_image_save_relative_path: Some("assets/images".to_string()),
             upload_image_save_relative_path_rule: Some("${documentPath}/assets".to_string()),
         }
@@ -293,6 +294,7 @@ impl AppConf {
             copilot_model,
             copilot_enabled,
             editor_full_width,
+            editor_content_width,
             editor_typewriter_scroll,
             editor_root_font_size,
             editor_root_line_height,
@@ -412,7 +414,11 @@ impl AppConf {
         }
 
         let dark = cur_theme.to_lowercase().to_string().contains("dark");
-        if dark { Theme::Dark } else { Theme::Light }
+        if dark {
+            Theme::Dark
+        } else {
+            Theme::Light
+        }
     }
 
     pub fn theme_mode_with_app(app: &AppHandle) -> Theme {
@@ -429,7 +435,11 @@ impl AppConf {
         }
 
         let dark = cur_theme.to_lowercase().to_string().contains("dark");
-        if dark { Theme::Dark } else { Theme::Light }
+        if dark {
+            Theme::Dark
+        } else {
+            Theme::Light
+        }
     }
 }
 
@@ -439,9 +449,22 @@ impl Default for AppConf {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::AppConf;
+
+    #[test]
+    fn safe_new_install_defaults_are_enabled() {
+        let conf = AppConf::new_with_upload_image_path("/tmp/assets/images".to_string());
+
+        assert_eq!(conf.autosave, Some(true));
+        assert_eq!(conf.editor_content_width.as_deref(), Some("adaptive"));
+    }
+}
+
 pub mod cmd {
     use super::AppConf;
-    use tauri::{AppHandle, WebviewUrl, WebviewWindowBuilder, command};
+    use tauri::{command, AppHandle, WebviewUrl, WebviewWindowBuilder};
 
     #[command]
     pub fn get_app_conf(app: AppHandle) -> AppConf {

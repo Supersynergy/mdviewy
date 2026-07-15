@@ -275,7 +275,7 @@ pub fn run() {
                     let _ = window.unminimize();
                     let _ = window.set_focus();
                     if let Ok(paths_json) = serde_json::to_string(&opened_paths) {
-                        let _ = window.eval(&format!("window.openedUrls = {paths_json};"));
+                        let _ = window.eval(format!("window.openedUrls = {paths_json};"));
                     }
                     let result = window.emit("opened-urls", opened_paths.clone());
                     println!("Emit result: {:?}", result);
@@ -290,7 +290,7 @@ pub fn run() {
                         let _ = window.unminimize();
                         let _ = window.set_focus();
                         if let Ok(paths_json) = serde_json::to_string(&opened_paths) {
-                            let _ = window.eval(&format!("window.openedUrls = {paths_json};"));
+                            let _ = window.eval(format!("window.openedUrls = {paths_json};"));
                         }
                         let result = window.emit("opened-urls", opened_paths.clone());
                         println!("Emit result: {:?}", result);

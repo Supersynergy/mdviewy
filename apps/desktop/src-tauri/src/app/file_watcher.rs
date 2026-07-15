@@ -2,7 +2,7 @@ use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::sync::mpsc::{Receiver, Sender, channel};
+use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread;
 use std::time::Duration;
 
@@ -216,7 +216,7 @@ pub mod cmd {
     use super::{FileWatcherManager, WatcherEvent};
     use lazy_static::lazy_static;
     use std::sync::Mutex;
-    use tauri::{AppHandle, Emitter, EventTarget, command};
+    use tauri::{command, AppHandle, Emitter, EventTarget};
 
     lazy_static! {
         static ref FILE_WATCHER_MANAGER: Mutex<FileWatcherManager> =

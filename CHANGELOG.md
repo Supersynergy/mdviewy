@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.92.0 - 2026-07-15
+
+### Fixed
+
+- External single-file opens now enter focus mode and collapse stale left/right panel widths. This removes the blank sidebar area that survived earlier overflow-only whitespace fixes.
+- Replaced the fixed 980px editor column with configurable adaptive, focused, wide, and full-width modes; existing legacy full-width users keep their choice.
+
+### Added
+
+- Added `Print / Save as PDF` to every editor action menu. Print CSS isolates the active document from application chrome and preserves page-break styling.
+- Smart Actions now surface frontmatter titles/tags and can copy a deterministic document brief with file metadata, word count, and a bounded heading outline.
+- Added `app_reset_layout` to the command palette for one-step recovery from stale persisted panel sizes.
+
+### Changed
+
+- Replaced the misleading “Copy as Wiki link” label with “Copy wiki-style text” and an explicit no-backlink-index note.
+- New installations now enable autosave by default; existing explicit preferences remain unchanged during config migration.
+- Rebuilt the README feature list from verified code paths and refreshed the gap analysis; unsupported backlinks, DOCX, and direct PDF file export remain clearly open.
+
+### Security
+
+- Updated mature transitive fixes for DOMPurify, linkify-it, protobufjs, undici, and quinn-proto. The remaining OpenTelemetry advisory is isolated to the web-docs build and time-bounded in `osv-scanner.toml`; three newly published Rust fixes stay quarantined until their 14-day package-age floor on 2026-07-22, with exact impact and removal steps in the security ADR.
+
+### Verified
+
+- `yarn workspace @mdviewy/desktop test`
+- `yarn workspace @mdviewy/desktop build`
+- `cargo check -p mdviewy --all-targets`
+- `yarn translate:check`
+
 ## 0.91.0 - 2026-07-05
 
 ### Fixed

@@ -621,7 +621,7 @@ pub fn convert_text_async(
     };
     use async_trait::async_trait;
     use thiserror::Error;
-    use zhconv::{Variant, zhconv};
+    use zhconv::{zhconv, Variant};
 
     #[derive(Debug, Error)]
     enum ConvertError {

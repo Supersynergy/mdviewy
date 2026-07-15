@@ -17,6 +17,7 @@ import {
 import { FileTypeConfig } from '@/helper/fileTypeHandler'
 import { logger } from '@/helper/logger'
 import { analyzeMarkdownContent } from '@/helper/markdownInsights'
+import { printActiveDocument } from '@/helper/printDocument'
 import { debounce, type DebouncedFunc, throttle } from '@/helper/timing'
 import { useEditorKeybindingStore } from '@/hooks/useKeyboard'
 import { useCommandStore, useEditorStateStore, useEditorStore } from '@/stores'
@@ -43,7 +44,7 @@ import {
 } from 'rme'
 import { toast } from 'zens'
 import { createWysiwygDelegateOptions } from './createWysiwygDelegateOptions'
-import { EditorWrapper } from './EditorWrapper'
+import { EditorWrapper, normalizeEditorContentWidth } from './EditorWrapper'
 import { WarningHeader } from './styles'
 
 type SaveHandlerParams = {
@@ -488,13 +489,24 @@ function TextEditor(props: TextEditorProps) {
         })
     }
 
+    const printPdfHandler = () => {
+      if (!active) return
+      try {
+        printActiveDocument()
+      } catch (error) {
+        toast.error(String(error))
+      }
+    }
+
     bus.on('editor_export_html', exportHtmlHandler)
     bus.on('editor_export_image', exportImageHandler)
+    bus.on('editor_print_pdf', printPdfHandler)
     bus.on('editor_set_content', setContentHandler)
 
     return () => {
       bus.detach('editor_export_html', exportHtmlHandler)
       bus.detach('editor_export_image', exportImageHandler)
+      bus.detach('editor_print_pdf', printPdfHandler)
       bus.detach('editor_set_content', setContentHandler)
     }
   }, [active, setContentHandler])
@@ -695,7 +707,11 @@ function TextEditor(props: TextEditorProps) {
     <EditorWrapper
       id='editorarea-wrapper'
       className={cls}
-      fullWidth={settingData.editor_full_width}
+      contentWidth={normalizeEditorContentWidth(
+        settingData.editor_content_width,
+        settingData.editor_full_width,
+      )}
+      data-mdviewy-active-editor={active ? 'true' : 'false'}
       active={active}
       onClick={handleWrapperClick}
     >

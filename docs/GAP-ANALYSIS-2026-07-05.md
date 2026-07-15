@@ -1,6 +1,6 @@
 # mdviewy — Gap-Analyse gegen die Top-21 Markdown-Editoren/Notiz-Tools
 
-**Stand:** 2026-07-05 · **Scope:** Feature/Friction von mdviewy (v0.91.0) gegen die aktuelle Markdown-Editor/PKM-Landschaft.
+**Stand:** 2026-07-15 · **Scope:** Feature/Friction von mdviewy (v0.92.0) gegen die aktuelle Markdown-Editor/PKM-Landschaft.
 **Methode:** gleiche Formel wie `~/BASE/ggprojects/gg-coder-adapter/docs/GAP-ANALYSIS-2026-07-05.md` (Δt × Häufigkeit × Personen × Tage), übertragen von Coding-Agenten auf Markdown-Editoren.
 
 > **Warum dieses Dokument:** mdviewy ist bei Diagrammen/AI/FTS technisch stark, aber bei PKM-Grundfunktionen (Backlinks, Export, Marketplace) hinter dem Feld. Zahlen zu Δt/Häufigkeit sind hier **Schätzungen für einen täglichen Power-User**, nicht wie im ggcoder-Dokument aus externen Vergleichstests belegt — klar markiert.
@@ -10,14 +10,14 @@
 ## 🎯 Antwort in 60 Sekunden
 
 - **mdviewy-Score:** ✅10 nativ stark · 🟡4 halb/oberflächlich · ❌7 offen (von 21 geprüften Konkurrenz-Features).
-- **Größter Hebel:** natives PDF/DOCX-Export (aktuell nur HTML+Image) · Backlinks (aktuell nur `[[text]]`-Textmakro ohne Index).
+- **Größter verbleibender Hebel:** direkter DOCX-Export · echte Backlinks (aktuell bewusst als `[[text]]` ohne Index beschriftet).
 - **Größte Stärke, die kein Konkurrent im Feld so hat:** 19 gebündelte Mermaid-Diagrammtypen + native Rust-FTS (tantivy) + eingebautes Multi-Provider-AI (kein Plugin-Umweg wie bei Obsidian).
-- **Versteckter Honesty-Bug:** `[[file]]`-Smart-Action schreibt Wikilink-Syntax, aber es gibt **keinen** Backlink-Index dahinter — sieht aus wie Obsidian, verhält sich nicht so. Das ist ein Vertrauensrisiko, kein Feature.
+- **Honesty-Bug geschlossen:** Die `[[file]]`-Aktion heißt jetzt ausdrücklich „wiki-style text“ und sagt, dass kein Backlink-Index existiert.
 
 ### Das Urteil in einem Bild
 
 ```
-🔴 SOFORT PRÜFEN (billig, hoher Hebel):     PDF/DOCX-Export nativ · Tag-Browser-Panel · Reveal-Backlink-Lücke im UI kennzeichnen
+🔴 SOFORT PRÜFEN (billig, hoher Hebel):     DOCX-Export · echter Tag-Browser/Filter · Backlink-Zielgruppe entscheiden
 🟡 EINPLANEN (2. Welle, wenn PKM-Zielgruppe):  echte Backlinks+Index · Daily-Notes-Template · Versions-Timeline
 ⚪ GEDÖNS (bewusst nicht bauen):              Graph-View · Realtime-Multi-User-Collab · Citation-Manager (Nische, Zettlr besetzt das)
 ```
@@ -54,9 +54,9 @@
 | 14 | Sandboxed Extensions-Ausführung | ✅ (Fundament) | 8/21 haben volles Ökosystem | iframe-Sandbox mit beschnittenem `window.top`, echte Isolation |
 | 15 | Ordner-als-Workspace (Vault-Modell) | ✅ | Obsidian/Logseq-Standard | "Open Folder" ist primärer CTA, kein Single-File-Tool |
 | 16 | Kontext-bewusste Erstnutzung (Quick-Start) | ✅✅ | **0/21 identisch gefunden** | Auto-Erkennung von Downloads/Documents/.claude/.codex/Projects/Obsidian im Home-Verzeichnis — echter Alleinstellungs-Fund |
-| 17 | Frontmatter-Erkennung | 🟡 | ~8/21 haben echtes Tag-Panel | nur `stripFrontmatter()` als Boolean-Flag für Wortzählung — kein Tag-Browser, keine Metadata-UI |
+| 17 | Frontmatter-Erkennung | 🟡 | ~8/21 haben echtes Tag-Panel | Titel + Tags erscheinen in Smart Actions und im Dokument-Brief; workspaceweiter Tag-Browser/Filter fehlt |
 | 18 | `[[Wikilink]]`-Syntax | 🟡 | 7/21 haben *echte* Backlinks | Smart-Action schreibt `[[name]]`-Text — **kein Index, kein Klick-Navigieren, kein Backlink-Pane dahinter** |
-| 19 | Export-Formate | 🟡 | ~18/21 haben PDF/DOCX direkt | `exporters: ['Html', 'Image']` — PDF nur indirekt über OS-Print-Dialog (Page-Break-CSS vorhanden), kein direktes "Export as PDF/DOCX" |
+| 19 | Export-Formate | 🟡 | ~18/21 haben PDF/DOCX direkt | HTML, Image und explizites „Print / Save as PDF“ mit dokumentisoliertem Print-CSS; DOCX und dialogfreier PDF-Dateiexport fehlen |
 | 20 | Versions-/Revisions-Timeline | ❌ | 6/21 | kein Fund im Code (nur Editor-Undo-Stack, kein persistenter Verlauf) |
 | 21 | Backlinks-Index / echte bidirektionale Links | ❌ | 7/21 | kein Backlink-Index, keine Graph-Struktur im Code |
 | 22 | Graph-View | ❌ | 4/21 (Obsidian/Logseq/Zettlr/Foam) | kein Fund |
@@ -72,12 +72,12 @@
 
 | Lücke | Δt-Schätzung | f/Tag (geschätzt) | FT/Jahr (1 Person) | Klasse |
 |---|---|---|---|---|
-| PDF/DOCX nicht nativ (Umweg über OS-Print oder Fremd-Tool) | 45 s/Export | 2×/Tag | 5,5 h | 🔴 |
+| DOCX/dialogfreier PDF-Export fehlt | neu zu messen | abhängig vom Exportprofil | n/a | 🟡 |
 | `[[Wikilink]]` ohne Backlink-Index (User such manuell) | 25 s/Suche | 3×/Tag | 4,6 h | 🟡 |
 | Kein Tag-Browser (manuelles Grep/Scrollen statt Filter-Klick) | 20 s/Suche | 4×/Tag | 4,9 h | 🟡 |
 | Kein Versions-Verlauf (Angst vor Datenverlust, manuelle Backups) | selten, aber teuer bei Eintritt | 1×/Monat | ~2 h + Vertrauensschaden | 🟡 |
 
-**Kumuliert (die 4 oben): ~17 h/Jahr/Power-User** — deutlich kleiner als ggcoder's 43 min/Tag, weil ein Editor seltener pro Nutzung "reibt" als ein Agent-Loop. Realistischer Rahmen für Priorisierung: **PDF-Export zuerst**, weil einmalig gebaut und universell genutzt (jeder Nutzer exportiert irgendwann), Backlink-Index nur falls Zielgruppe = PKM/Zettelkasten-Nutzer (sonst Gedöns).
+Die frühere 5,5-h-Schätzung für den PDF-Umweg ist durch „Print / Save as PDF“ nicht mehr aktuell. Restkosten für DOCX und dialogfreien PDF-Export müssen neu gemessen werden; Backlinks lohnen nur, falls PKM/Zettelkasten-Nutzer wirklich Zielgruppe sind.
 
 ---
 
@@ -90,12 +90,12 @@
 
 ---
 
-## 🚧 Der Honesty-Bug: `[[Wikilink]]` ohne Backlink
+## ✅ Honesty-Fix: `[[Wikilink]]` ohne Backlink klar beschriftet
 
-Konkret in `apps/desktop/src/extensions/smart-actions/index.tsx`: eine Smart-Action bietet den Hint `[[file]]` an und schreibt `[[${name}]]` in den Editor — optisch identisch zu Obsidians Wikilink-Syntax. Es gibt aber **keinen Index, keine Klick-Navigation, keine Backlink-Pane** dahinter (verifiziert: keine Treffer für Backlink/Graph-Infrastruktur im gesamten Frontend). Ein Nutzer, der das aus Obsidian kennt, tippt `[[note]]`, erwartet Autovervollständigung + Rücksprung — bekommt nur eingefärbten Text. Das ist strukturell derselbe Fehler-Typ wie die 3 Bugs von heute Vormittag (Doku/UI verspricht mehr als der Code hält). Zwei Auswege: (a) Hint entfernen bis ein echter Index existiert, oder (b) den Index bauen (Δt-Hebel steigt, sobald mdviewy PKM-Nutzer anspricht).
+Konkret in `apps/desktop/src/extensions/smart-actions/index.tsx`: Die Aktion kopiert weiterhin `[[${name}]]`, nennt sich jetzt aber „Copy wiki-style text“ und trägt den Hint „text only — no backlink index yet“. Damit verspricht die UI keine Obsidian-Navigation mehr. Ein echter Index, Klick-Navigation und Backlink-Pane bleiben bewusst offen, bis PKM-Nutzer zur Zielgruppe gehören.
 
 ---
 
 ## Nächster Schritt
 
-Kein Sofort-Bau-Zwang — das ist eine Prioritäten-Karte. Wenn 1.0-Fokus weiter "solider Editor" bleibt (nicht PKM-Tool), reicht: PDF-Export nativ + Wikilink-Hint entfernen/klar labeln. Wenn Zielgruppe Richtung Obsidian-Nutzer verschiebt, dann Backlink-Index + Tag-Panel als echte 2. Welle.
+Wenn 1.0-Fokus weiter „solider Editor“ bleibt, sind DOCX, signierte Distribution und ein workspaceweiter Tag-Filter die nächsten klaren Lücken. Wenn Zielgruppe Richtung Obsidian-Nutzer verschiebt, dann Backlink-Index + echte Wikilink-Navigation als zweite Welle.

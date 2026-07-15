@@ -5,6 +5,7 @@ import { getFileObject, getFileObjectByPath, getSaveOpenedEditorEntries } from '
 import { getFileNameFromPath, readDirectory } from '@/helper/filesys'
 import { logger } from '@/helper/logger'
 import { parseOpenedPaths, type OpenedUrlsPayload } from '@/helper/openedPaths'
+import { requestDocumentFocus } from '@/helper/documentFocus'
 import { i18nInit } from '@/i18n'
 import { appSettingStoreSetup } from '@/services/app-setting'
 import { checkUnsavedFiles } from '@/services/checkUnsavedFiles'
@@ -92,6 +93,7 @@ async function handleOpenedPaths(openedPaths: string[]) {
           setFolderData(res)
         })
       }
+      return false
     } else {
       const existingFile = getFileObjectByPath(openedPath)
       if (existingFile) {
@@ -107,11 +109,13 @@ async function handleOpenedPaths(openedPaths: string[]) {
           path: openedPath,
         })
       }
+      return true
     }
   }
 
   if (openedPaths.length === 1) {
-    await handleOpenedPath(openedPaths[0])
+    const openedFile = await handleOpenedPath(openedPaths[0])
+    if (openedFile) requestDocumentFocus()
   } else {
     await Promise.all(openedPaths.map(handleOpenedPath))
   }

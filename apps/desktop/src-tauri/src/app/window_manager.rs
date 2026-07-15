@@ -1,7 +1,7 @@
 use crate::WINDOW_INSTANCES;
 use serde_json;
 use std::path::PathBuf;
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder, command};
+use tauri::{command, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 use uuid;
 
 use super::conf::AppConf;
@@ -9,7 +9,7 @@ use super::conf::AppConf;
 #[cfg(target_os = "macos")]
 use tauri::TitleBarStyle;
 #[cfg(target_os = "macos")]
-use window_vibrancy::{NSVisualEffectMaterial, NSVisualEffectState, apply_vibrancy};
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
 /// 获取所有窗口实例信息
 #[command]

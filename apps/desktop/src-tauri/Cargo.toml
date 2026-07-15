@@ -1,6 +1,6 @@
 [package]
 name = "mdviewy"
-version = "0.91.0"
+version = "0.92.0"
 description = "A Markdown Editor App"
 authors = ["Supersynergy"]
 license = "AGPL-3.0-only"

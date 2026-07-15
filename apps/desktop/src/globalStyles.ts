@@ -228,6 +228,27 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   @media print {
+    body.${'mdviewy-printing'} * {
+      visibility: hidden !important;
+    }
+
+    body.${'mdviewy-printing'} [data-mdviewy-active-editor='true'],
+    body.${'mdviewy-printing'} [data-mdviewy-active-editor='true'] * {
+      visibility: visible !important;
+    }
+
+    body.${'mdviewy-printing'} [data-mdviewy-active-editor='true'] {
+      position: absolute !important;
+      inset: 0;
+      width: 100% !important;
+      max-width: none !important;
+      height: auto !important;
+      min-height: 100%;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+    }
+
     html,
     body {
       overflow: visible;

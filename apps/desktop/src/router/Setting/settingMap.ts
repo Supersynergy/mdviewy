@@ -112,15 +112,33 @@ export const getSettingMap = () => {
       },
       Style: {
         i18nKey: 'settings.editor.style.label',
-        fullWidth: {
-          key: 'editor_full_width',
-          type: 'switch',
+        contentWidth: {
+          key: 'editor_content_width',
+          type: 'select',
           title: {
-            i18nKey: 'settings.editor.style.full_width.label',
+            i18nKey: 'settings.editor.style.content_width.label',
           },
           desc: {
-            i18nKey: 'settings.editor.style.full_width.desc',
+            i18nKey: 'settings.editor.style.content_width.desc',
           },
+          options: [
+            {
+              value: 'adaptive',
+              title: i18n.t('settings.editor.style.content_width.adaptive'),
+            },
+            {
+              value: 'focused',
+              title: i18n.t('settings.editor.style.content_width.focused'),
+            },
+            {
+              value: 'wide',
+              title: i18n.t('settings.editor.style.content_width.wide'),
+            },
+            {
+              value: 'full',
+              title: i18n.t('settings.editor.style.content_width.full'),
+            },
+          ],
         },
         fontSize: {
           key: 'editor_root_font_size',

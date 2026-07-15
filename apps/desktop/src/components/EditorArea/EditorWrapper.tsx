@@ -2,7 +2,26 @@ import styled, { css } from 'styled-components'
 
 interface EditorWrapperProps {
   active: boolean
-  fullWidth: boolean
+  contentWidth: EditorContentWidth
+}
+
+export type EditorContentWidth = 'adaptive' | 'focused' | 'wide' | 'full'
+
+export const normalizeEditorContentWidth = (
+  value: unknown,
+  legacyFullWidth = false,
+): EditorContentWidth => {
+  if (value === 'adaptive' || value === 'focused' || value === 'wide' || value === 'full') {
+    return value
+  }
+  return legacyFullWidth ? 'full' : 'adaptive'
+}
+
+const maxWidthByMode: Record<EditorContentWidth, string> = {
+  adaptive: 'min(100%, clamp(1120px, 90vw, 1600px))',
+  focused: 'min(100%, 920px)',
+  wide: 'min(100%, 1320px)',
+  full: '100%',
 }
 
 export const EditorWrapper = styled.div.attrs<EditorWrapperProps>((props) => props)`
@@ -23,9 +42,10 @@ export const EditorWrapper = styled.div.attrs<EditorWrapperProps>((props) => pro
   ${(props) =>
     props.active
       ? css({
-          maxWidth: props.fullWidth ? '100%' : 'min(100%, 980px)',
+          maxWidth: maxWidthByMode[props.contentWidth],
           margin: '0 auto',
-          paddingInline: props.fullWidth ? '24px' : 'clamp(18px, 4vw, 56px)',
+          paddingInline:
+            props.contentWidth === 'full' ? '24px' : 'clamp(18px, 2.5vw, 48px)',
           paddingBottom: '3rem',
           marginInlineStart: 'auto',
           marginInlineEnd: 'auto',

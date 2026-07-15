@@ -7,6 +7,7 @@ import { useRefreshAIProvidersModels } from '@/extensions/ai/useAiChatStore'
 import useBookMarksStore from '@/extensions/bookmarks/useBookMarksStore'
 import { useCommandInit } from '@/hooks/useCommandInit'
 import { useExternalLinks } from '@/hooks/useExternalLinks'
+import { subscribeDocumentFocus } from '@/helper/documentFocus'
 import { appInfoStoreSetup } from '@/services/app-info'
 import { useCommandStore } from '@/stores'
 import useLayoutStore from '@/stores/useLayoutStore'
@@ -16,6 +17,7 @@ import DeferredRootSurfaces from './DeferredRootSurfaces'
 import { StyleSeparator } from './styles'
 
 export const RESIZE_PANEL_STORAGE_KEY = 'root-resize-panel'
+export const RESIZE_PANEL_LOCAL_STORAGE_KEY = `react-resizable-panels:${RESIZE_PANEL_STORAGE_KEY}`
 
 function Root() {
   useRefreshAIProvidersModels()
@@ -28,6 +30,13 @@ function Root() {
   const { setLeftBarVisible, setRightBarVisible } = useLayoutStore()
   const leftPanelRef = useRef<PanelImperativeHandle>(null)
   const rightPanelRef = useRef<PanelImperativeHandle>(null)
+
+  const focusDocument = () => {
+    leftPanelRef.current?.collapse()
+    rightPanelRef.current?.collapse()
+    setLeftBarVisible(false)
+    setRightBarVisible(false)
+  }
 
   const toggleLeftPanelVisible = () => {
     const panel = leftPanelRef.current
@@ -70,9 +79,20 @@ function Root() {
       id: 'app_toggleRightsidebarVisible',
       handler: toggleRightPanelVisible,
     })
+    useCommandStore.getState().addCommand({
+      id: 'app_reset_layout',
+      handler: () => {
+        localStorage.removeItem(RESIZE_PANEL_LOCAL_STORAGE_KEY)
+        window.location.reload()
+      },
+    })
+
+    const unsubscribeDocumentFocus = subscribeDocumentFocus(focusDocument)
 
     leftPanelRef.current?.isCollapsed() ? setLeftBarVisible(false) : setLeftBarVisible(true)
     rightPanelRef.current?.isCollapsed() ? setRightBarVisible(false) : setRightBarVisible(true)
+
+    return unsubscribeDocumentFocus
   }, [])
 
   useEffect(() => {
