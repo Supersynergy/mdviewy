@@ -1,127 +1,63 @@
-# mdviewy — Masterplan to 1.0
+# Roadmap to mdviewy 1.0
 
-Status: v0.90.1 (2026-06-02). Target: **1.0.0 GA**.
-Owner: Supersynergy. Last updated: 2026-06-15.
+Status: 0.92 release candidate. Updated 2026-07-15.
 
-Functionally close. The gap to 1.0 is **trust + distribution + narrative + brand**, not features.
+The product direction is fixed: a calm, local-first Markdown workspace. New work must improve file trust, reading fidelity, speed, or user control.
 
-## Progress (2026-06-05)
+## Shipped in 0.92
 
-- ✅ **Phase 0 done** — removed "reconstruction phase" notice (EN/ZH/JA), unified
-  name to lowercase `mdviewy` everywhere, pointed all metadata at GitHub
-  (`Supersynergy/mdviewy`), recorded both in ADR `2026-06-05-canonical-name-and-repo-home`.
-- ✅ **Phase 4 mostly done** — tarsier app icon rendered into all icon slots +
-  `public/logo.png`. Final raster polish optional.
-- 🟡 **Phase 3 started** — added Rust edge tests for file-type detection; full
-  suite green (Rust + 67 frontend tests).
-- 📄 **Phase 1 & 2 documented** — `docs/SIGNING.md` (Apple/Windows signing, the
-  real GA blocker) and ADR `2026-06-05-security-posture-1.0` (CSP plan, audit).
-- ⛔ **Phase 1 (signing) + Phase 5 (tag 1.0) need the owner** — Apple/Windows
-  certs cannot be provisioned from here; not tagging 1.0 until builds are signed.
+- [x] Finder, Explorer, CLI, and warm-instance file opens use a focused layout.
+- [x] Startup no longer suggests or indexes home, Claude, or Codex folders.
+- [x] Folder scans have entry and depth limits and return visible errors.
+- [x] Render failures show reload and safe-start recovery instead of a white screen.
+- [x] Paths with quotes or apostrophes cannot break new-window initialization.
+- [x] Saves use durable same-directory temporary files and atomic replacement.
+- [x] README files open in a sanitized GitHub-style preview with relative assets and safe links.
+- [x] GitHub-only constructs fail closed to Source mode when WYSIWYG would be lossy.
+- [x] Adaptive/focused/wide/full content widths and Print / Save as PDF.
+- [x] Smart Actions expose frontmatter, outline, word insights, document briefs, paths, repositories, and agent handoffs.
+- [x] CI runs frontend tests/build plus Rust fmt/check/clippy/tests with pinned actions.
 
-### Lean & speed audit (2026-06-06)
+## 1.0 release gates
 
-- **Speedtuning: already strong.** Release profile (`lto=fat`, `codegen-units=1`,
-  `panic=abort`, `strip`) + `.cargo/config.toml` (sccache, `-dead_strip`,
-  `target-cpu=apple-m1`) + lazy-loaded editor/AI + lodash purge. Gap: no
-  `criterion`/`divan` benches on hot paths (render/FTS).
-- **Leancode: gate now wired** (`just lean` / `just security` / `just pre-pr`).
-  Current state:
-  - `cargo machete`: ✅ **resolved** — 11 genuinely unused Rust dependencies
-    trimmed and false-positives documented in package metadata.
-  - `osv-scanner`: ✅ **resolved** — 41 → 0 actionable npm vulns (35 patched via
-    `resolutions` + `uuid`/`tar`/`vitest` major bumps, all test-verified). The 6
-    remaining have no released upstream fix (lodash/-es, `@ai-sdk/provider-utils`)
-    and are tracked in `osv-scanner.toml` with a 2026-09-06 review date.
-    `just security` passes clean.
-  - Frontend carries 5 AI-SDK libs (`@ai-sdk/{deepseek,google,openai}` + `ai` +
-    `ollama-ai-provider-v2`) and 3 markdown renderers (`rme`, `react-markdown`,
-    `@ant-design/x-markdown`) — review for overlap (judgment, not auto-delete).
+### File trust
 
----
+- [ ] Detect external edits and require an explicit reload/overwrite choice before saving.
+- [ ] Add persistent crash recovery or lightweight local revisions.
+- [ ] Exercise open → edit → save → reopen with desktop end-to-end tests.
+- [ ] Test large, empty, non-UTF8, permission-denied, and concurrent-save fixtures on all platforms.
 
-## Definition of Done (1.0 GA)
+### Distribution
 
-A user on macOS / Windows / Linux can:
-1. Download a **signed, notarized** build that opens without `xattr` workarounds.
-2. Open, edit, save, export Markdown (+ JSON/TXT) with no data-loss bug.
-3. Use built-in AI with clear key setup and graceful offline/error states.
-4. Get updates through a defined path (auto-update or documented manual).
-5. See one consistent brand (name, logo, repo home, links).
+- [ ] Sign and notarize macOS builds with an Apple Developer ID.
+- [ ] Sign Windows installers and document the SmartScreen reputation path.
+- [ ] Verify AppImage, deb, and rpm on clean Linux environments.
+- [ ] Decide between signed automatic updates and a documented manual-only update policy.
 
-Release gate: `just check` green · `tauri:build` all 3 OS · signing verified · README truthful · CHANGELOG cut.
+### Markdown fidelity
 
----
+- [ ] Add golden round-trip fixtures for tables, reference badges, alerts, tasks, footnotes, raw HTML, Mermaid, and math.
+- [x] Add GitHub alert presentation to the dedicated preview.
+- [ ] Add GitHub footnote presentation and golden fixtures.
+- [ ] Preserve unsupported syntax byte-for-byte across every edit-mode transition.
 
-## Phase 0 — Truth & Naming (0.5 day) — UNBLOCKS EVERYTHING
+### Security and privacy
 
-- [x] Remove "reconstruction phase / needs 3-6 months / no release" from `README.md` + `README.src.md`.
-- [x] Pick canonical name casing: **mdviewy** (lowercase). Fix `tauri.conf` `productName` "MDviewy" → align.
-- [x] Resolve naming churn: ADR `2026-05-26-rename-to-mdmaster.md` vs current "mdviewy" — superseded by `2026-06-05-canonical-name-and-repo-home.md`.
-- [x] Pick canonical repo home: GitHub `Supersynergy/mdviewy`. Make package.json / Cargo.toml / README badges / download links all agree.
-- Gate: no contradictory name/URL anywhere (`rg -i 'mdmaster|reconstruction'` clean).
+- [ ] Move AI provider keys into operating-system credential storage.
+- [ ] Narrow local asset access to the opened file/workspace without breaking standalone documents.
+- [ ] Re-run dependency, secret, and capability audits before the 1.0 tag.
 
-## Phase 1 — Distribution & Trust (3–5 days) — #1 REAL BLOCKER
+## Explicit non-goals for 1.0
 
-- [ ] macOS: Apple Developer ID signing + notarization in `tauri.conf` macOS block (`signingIdentity`, `entitlements`). Verify: `spctl -a -vv mdviewy.app` → "accepted".
-- [ ] Windows: code-signing cert wired into wix bundle. Verify SmartScreen reputation path.
-- [ ] Linux: AppImage/deb confirmed launching on clean box.
-- [x] Update path decision for 0.90.x: updater stays disabled; manual updates are documented through GitHub Releases. Revisit auto-update only after signing is configured.
-- Gate: fresh-machine install on all 3 OS opens with zero terminal workaround.
+- Account system, cloud sync, collaboration backend, or proprietary document format.
+- Automatic indexing of a home directory.
+- Hidden network calls or default-on AI.
+- Plugin machinery without a measured core workflow benefit.
 
-## Phase 2 — Security Hardening (1–2 days)
+## Release oracle
 
-- [ ] Replace `csp: null` with a real Content-Security-Policy.
-- [ ] Tighten `assetProtocol.scope.allow` from `["**/*"]` to opened-workspace dirs only.
-- [ ] Document the 20 allowed transitive `cargo audit` warnings in `docs/adr/` (why each is accepted).
-- [ ] AI key storage: confirm keys go to OS keychain, never plaintext config.
-- Gate: `smac-secscan .` + `gitleaks` + `cargo audit --no-fetch --stale` clean/accepted.
-
-## Phase 3 — Quality & Test Depth (3–4 days)
-
-- [ ] Frontend: add smoke/E2E for core flows — open file, edit, save, switch wysiwyg/source, export, ToC jump, command palette. (Currently ~0 component tests on 25k LOC TS.)
-- [ ] Rust: extend beyond 21 tests — file_search edge cases, large-file handling, path/encoding boundaries.
-- [ ] Manual QA matrix: huge file, empty file, non-UTF8, broken image paste, AI offline/timeout/bad-key, concurrent save.
-- [ ] Fix any P0/P1 from the matrix.
-- Gate: `just check` green + E2E green + QA matrix signed off.
-
-## Phase 4 — Brand & Polish (1–2 days)
-
-- [ ] Pick final mascot direction (see Brand below) and generate raster mascot art.
-- [ ] Replace `public/logo.png`, all `apps/desktop/src-tauri/icons/*` (.png/.icns/.ico + Square tiles), favicon.
-- [ ] Refresh social-preview with final logo.
-- [ ] Screenshots (`show-en.png` / `show-zh.png`) updated to current UI.
-- Gate: icon crisp at 16/32/128/1024px; macOS dock + Win taskbar + Linux look right.
-
-## Phase 5 — Release Engineering (1 day)
-
-- [ ] CI builds all 3 OS on tag; signing still needs owner-provided Apple/Windows certificates.
-- [ ] Cut CHANGELOG `1.0.0` section (move Unreleased).
-- [ ] Bump versions: tauri.conf, Cargo workspace, desktop package.json → `1.0.0`.
-- [ ] Release notes + launch copy (use `repo-release-excellence`).
-- [ ] Tag `v1.0.0`, publish, verify download links resolve.
-- Gate: clean download → install → run on all 3 OS from the published release.
-
----
-
-## Brand Decision (input ready)
-
-Concepts in `docs/brand/concepts-2026-06/` (+ `png/` previews).
-
-- **Recommended (Codex):** Tarsier app icon (`appicon-final-recommendation.svg`) — big eyes ownable, readable at 32px — + `mark-02-caret.svg` for favicon/tray/monochrome.
-- Alternatives: koala (existing direction, distinct grey), loris (sleepy-cute).
-- Palette: teal `#166870` / `#72D6C7` + gold `#F5C85F`.
-- Next step for final art: `banana-claude`/nanobanana with chosen SVG as reference, then render icon set.
-
----
-
-## Critical Path (fastest to GA)
-
-```
-Phase 0 (truth/naming)  →  Phase 1 (signing)  →  Phase 5 (release)
-                        ↘  Phase 2,3,4 parallel where staffed
-```
-
-Signing (Phase 1) is the longest-lead item (cert provisioning). Start it day 1, in parallel with Phase 0.
-
-Rough total: ~2–3 focused weeks solo, faster if signing certs already exist.
+1. `yarn workspace @mdviewy/desktop test` and production build pass.
+2. Rust fmt, check, clippy with warnings denied, and workspace tests pass.
+3. Security and secret scans pass with documented, time-bounded exceptions only.
+4. Signed packages install and open on clean macOS, Windows, and Linux systems.
+5. The open → edit → save → reopen fixture is byte-correct on each platform.

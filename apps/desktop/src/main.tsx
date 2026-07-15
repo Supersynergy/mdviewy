@@ -15,6 +15,7 @@ import { StrictMode, Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import App from './App'
+import { AppErrorBoundary } from './components/AppErrorBoundary'
 import { initErrorReporting } from './errorReporting'
 import './atom.css'
 import './normalize.css'
@@ -92,13 +93,15 @@ rootElement.addEventListener('drop', (event) => {
 ;(window as any).__mdm_log_boot('before-render')
 ReactDOM.createRoot(rootElement).render(
   <StrictMode>
-    <HoxRoot>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Main />
-        </BrowserRouter>
-      </QueryClientProvider>
-    </HoxRoot>
+    <AppErrorBoundary>
+      <HoxRoot>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <Main />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </HoxRoot>
+    </AppErrorBoundary>
   </StrictMode>,
 )
 requestAnimationFrame(() => {

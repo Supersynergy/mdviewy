@@ -77,7 +77,7 @@ export default function Index({
                 <HoverBorderGradient
                   onClick={() => {
                     window.open(
-                      'https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA',
+                      'https://github.com/Supersynergy/mdviewy/releases',
                     )
                   }}
                 >
@@ -183,8 +183,7 @@ export default function Index({
               <FooterLinkItem href='/privacy'>Privacy Policy</FooterLinkItem>
             </FooterLinksRow>
             <FooterCopyright>
-              ©2023 - present <Link href='https://github.com/drl990114'>drl990114</Link>. All
-              Rights Reserved.
+              ©2023 - present Supersynergy. Open source under AGPL-3.0-only.
             </FooterCopyright>
           </FooterContent>
         </Footer>

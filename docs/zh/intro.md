@@ -30,9 +30,9 @@ sidebar_position: 1
 > - 打开终端
 > - 进入 `Applications` 目录，例如 `/Applications`
 > - 运行 `xattr -cr mdviewy.app` 然后重新打开应用
-> - 请确保从 `github releases` 或 [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) 下载。
+> - 请仅从官方 GitHub Releases 下载。
 
-你可以从 [UpgradeLink 下载页面](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) 或 [GitHub Release](https://github.com/Supersynergy/mdviewy/releases) 下载
+请从 [GitHub Releases](https://github.com/Supersynergy/mdviewy/releases) 下载。
 
 ## 为什么
 

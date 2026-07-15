@@ -1,24 +1,18 @@
-<!--
-Thanks for submitting a pull request!
-We appreciate you spending the time to work on these changes.
--->
+## Outcome
 
-<!-- Language suggestions / 语言建议 -->
-<!--  You can use english to describe. -->
-<!-- 你可以使用中文来描述 -->
+<!-- What user-visible problem does this solve? -->
 
--   [ ] I read the contributing guide
--   [ ] I agree to follow the code of conduct
+## Root cause and approach
 
-## Summary
+<!-- Keep this concrete and bounded. -->
 
-<!--
- Explain the **motivation** for making this change. What existing problem does the pull request solve?
--->
+## Verification
 
-## How did you test this change?
+<!-- Exact commands, results, and screenshots for visual changes. -->
 
-<!--
-  Demonstrate the code is solid. Example: The exact commands you ran and their output, screenshots / videos if the pull request changes the user interface.
-  How exactly did you verify that your PR solves the issue you wanted to solve?
--->
+- [ ] I added or updated the regression test for this behavior.
+- [ ] Frontend tests and production build pass.
+- [ ] Relevant Rust format/check/clippy/tests pass.
+- [ ] I did not add telemetry, automatic indexing, or document uploads.
+- [ ] User files remain unchanged on failure paths.
+- [ ] I followed the Code of Conduct and contributing guide.

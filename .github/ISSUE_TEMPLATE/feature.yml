@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose a focused improvement to the Markdown workflow
+title: "[Feature]: "
+labels: [enhancement, "status: needs triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is the current friction?
+      description: Describe the job and the concrete problem before proposing UI.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: What becomes faster, safer, or clearer?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Suggested approach
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Product fit
+      options:
+        - label: This keeps files local-first and ordinary Markdown compatible.
+          required: true
+        - label: I searched the roadmap and existing issues.
+          required: true

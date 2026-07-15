@@ -1,3 +1,4 @@
+import { replaceFileObjects } from '@/helper/files'
 import { createFile, getFolderPathFromPath, isMdFile, type IFile } from '@/helper/filesys';
 import { isEmptyEditor } from '@/services/editor-file';
 import { invoke } from '@tauri-apps/api/core';
@@ -257,13 +258,17 @@ const useEditorStore = create<EditorStore>((set, get) => {
         return state
       }),
 
-    setFolderData: (folderData) =>
+    setFolderData: (folderData) => {
+      replaceFileObjects(folderData)
       set((state) => ({
         ...state,
         folderData,
         opened: [],
         activeId: undefined,
-      })),
+        editorCtxMap: new Map(),
+        editorDelegateMap: new Map(),
+      }))
+    },
 
     setFolderDataPure: (folderData) =>
       set((state) => ({

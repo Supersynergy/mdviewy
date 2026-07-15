@@ -31,12 +31,14 @@ export const isTextfileType = (fileTypeConfig: FileTypeConfig): boolean => {
 
 export function getFileTypeConfig(file: IFile): FileTypeConfig {
   const ext = extname(file.path || file.name || '')
+  const fileName = (file.path || file.name || '').split(/[\\/]/).pop() || ''
+  const isReadme = /^readme(?:\.[^.]+)?\.(?:md|markdown)$/i.test(fileName)
   const { settingData } = useAppSettingStore.getState()
 
   const markdownFileType: FileTypeConfig = {
     type: 'markdown',
     supportedModes: [VIEW_PREVIEW, VIEW_WYSIWYG, VIEW_SOURCECODE],
-    defaultMode: settingData.md_editor_default_mode || VIEW_WYSIWYG,
+    defaultMode: isReadme ? VIEW_PREVIEW : settingData.md_editor_default_mode || VIEW_WYSIWYG,
     exporters: ['Html', 'Image', 'Pdf'],
   }
 

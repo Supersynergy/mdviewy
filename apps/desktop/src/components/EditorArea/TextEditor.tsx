@@ -45,6 +45,7 @@ import {
 import { toast } from 'zens'
 import { createWysiwygDelegateOptions } from './createWysiwygDelegateOptions'
 import { EditorWrapper, normalizeEditorContentWidth } from './EditorWrapper'
+import { GitHubMarkdownPreview, requiresSourceSafeEditing } from './GitHubMarkdownPreview'
 import { WarningHeader } from './styles'
 
 type SaveHandlerParams = {
@@ -93,6 +94,9 @@ function TextEditor(props: TextEditorProps) {
   const { execute } = useCommandStore()
   const { t } = useTranslation()
   const { settingData } = useAppSettingStore()
+  const editorViewType = useEditorViewTypeStore(
+    (state) => state.editorViewTypeMap.get(id) ?? fileTypeConfig.defaultMode,
+  )
   const [content, setContent] = useState<string>()
   const [delegate, setDelegate] = useState(
     createDelegate(fileTypeConfig.defaultMode, fileTypeConfig.type),
@@ -251,28 +255,29 @@ function TextEditor(props: TextEditorProps) {
                 runFinally()
                 return
               }
-              const filename = getFileNameFromPath(path)
-              updateFileObject(curFile.id, { ...curFile, path, name: filename })
-              insertNodeToFolderData({
-                ...curFile,
-                name: filename,
-                content: fileContent,
-                path,
-              })
               invoke<FileSysResult>('write_file', { filePath: path, content: fileContent }).then(
                 (res) => {
                   if (res.code !== FileResultCode.Success) {
                     runFinally()
                     return toast.error(res.content)
                   }
+                  const filename = getFileNameFromPath(path)
+                  updateFileObject(curFile.id, { ...curFile, path, name: filename })
+                  insertNodeToFolderData({
+                    ...curFile,
+                    name: filename,
+                    content: fileContent,
+                    path,
+                  })
+                  setIdStateMap(curFile.id, {
+                    hasUnsavedChanges: false,
+                  })
+                  setContent(fileContent)
                   runSuccess()
                 },
               ).catch((error) => {
                 toast.error(String(error))
                 runFinally()
-              })
-              setIdStateMap(curFile.id, {
-                hasUnsavedChanges: false,
               })
             })
             .catch((error) => {
@@ -290,14 +295,13 @@ function TextEditor(props: TextEditorProps) {
               return toast.error(res.content)
             }
             setContent(fileContent)
+            setIdStateMap(curFile.id, {
+              hasUnsavedChanges: false,
+            })
             runSuccess()
           }).catch((error) => {
             toast.error(String(error))
             runFinally()
-          })
-
-          setIdStateMap(curFile.id, {
-            hasUnsavedChanges: false,
           })
         }
       } catch (error) {
@@ -356,18 +360,25 @@ function TextEditor(props: TextEditorProps) {
   useEffect(() => {
     const cb = throttle((payload: EditorViewType) => {
       if (active) {
+        const nextView =
+          payload === EditorViewType.WYSIWYG && requiresSourceSafeEditing(content || '')
+            ? EditorViewType.SOURCECODE
+            : payload
+        if (nextView !== payload) {
+          toast.error('This document uses GitHub syntax. Opened Source mode to preserve it safely.')
+        }
         if (editorTypeSwitchingRef.current) {
           return
         }
 
-        if (editorRef.current?.getType() === payload) {
+        if (editorRef.current?.getType() === nextView) {
           return
         }
 
         editorTypeSwitchingRef.current = true
         bus.emit(EVENT.app_save, {
           onSuccess: () => {
-            if (payload === EditorViewType.SOURCECODE) {
+            if (nextView === EditorViewType.SOURCECODE) {
               const sourceCodeDelegate = createSourceCodeDelegate({
                 disableAllBuildInShortcuts: true,
                 overrideShortcutMap: useEditorKeybindingStore.getState().editorKeybingMap,
@@ -381,7 +392,7 @@ function TextEditor(props: TextEditorProps) {
               })
               setEditorDelegate(curFile.id, sourceCodeDelegate)
               setDelegate(sourceCodeDelegate)
-            } else if (payload === EditorViewType.PREVIEW) {
+            } else if (nextView === EditorViewType.PREVIEW) {
               debounceRefreshToc()
             } else {
               const wysiwygDelegate = createWysiwygDelegate(
@@ -391,8 +402,8 @@ function TextEditor(props: TextEditorProps) {
               setDelegate(wysiwygDelegate)
               debounceRefreshToc()
             }
-            useEditorViewTypeStore.getState().setEditorViewType(curFile.id, payload)
-            editorRef.current?.toggleType(payload)
+            useEditorViewTypeStore.getState().setEditorViewType(curFile.id, nextView)
+            editorRef.current?.toggleType(nextView)
           },
           onFinally: () => {
             editorTypeSwitchingRef.current = false
@@ -407,7 +418,7 @@ function TextEditor(props: TextEditorProps) {
       cb.cancel()
       bus.detach('editor_toggle_type', cb)
     }
-  }, [active, curFile, execute, setEditorDelegate, getEditorContent, debounceRefreshToc])
+  }, [active, content, curFile, execute, setEditorDelegate, getEditorContent, debounceRefreshToc])
 
   useEffect(() => {
     const exportImageHandler = async () => {
@@ -715,7 +726,12 @@ function TextEditor(props: TextEditorProps) {
       active={active}
       onClick={handleWrapperClick}
     >
-      <MfEditor ref={editorRef} onChange={handleChange} {...editorProps} />
+      <div style={{ height: '100%', display: editorViewType === EditorViewType.PREVIEW ? 'none' : 'block' }}>
+        <MfEditor ref={editorRef} onChange={handleChange} {...editorProps} />
+      </div>
+      {editorViewType === EditorViewType.PREVIEW && (
+        <GitHubMarkdownPreview content={content} filePath={curFile.path} />
+      )}
     </EditorWrapper>
   )
 }

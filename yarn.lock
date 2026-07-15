@@ -3985,6 +3985,7 @@ __metadata:
     classnames: "npm:^2.5.1"
     color: "npm:^4.2.3"
     dayjs: "npm:^1.11.13"
+    dompurify: "npm:3.4.11"
     eslint: "npm:9.13.0"
     happy-dom: "npm:20.8.9"
     hox: "npm:^2.1.1"
@@ -3993,6 +3994,7 @@ __metadata:
     immer: "npm:^10.1.1"
     is-promise: "npm:^4.0.0"
     jsx-dom-cjs: "npm:^8.1.6"
+    marked: "npm:16.4.2"
     nanoid: "npm:^5.1.5"
     ollama-ai-provider-v2: "npm:^1.5.4"
     patch-package: "npm:^8.0.0"
@@ -4047,7 +4049,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@mdviewy/theme@workspace:packages/theme"
   dependencies:
-    "@drl990114/codemirror-themes": "npm:^0.0.1"
     "@lezer/highlight": "npm:^1.0.0"
     "@rollup/plugin-url": "npm:^8.0.2"
     "@types/codemirror": "npm:^5.60.15"
@@ -14719,21 +14720,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"marked@npm:16.4.2, marked@npm:^16.3.0":
+  version: 16.4.2
+  resolution: "marked@npm:16.4.2"
+  bin:
+    marked: bin/marked.js
+  checksum: 10/6e40e40661dce97e271198daa2054fc31e6445892a735e416c248fba046bdfa4573cafa08dc254529f105e7178a34485eb7f82573979cfb377a4530f66e79187
+  languageName: node
+  linkType: hard
+
 "marked@npm:^15.0.12":
   version: 15.0.12
   resolution: "marked@npm:15.0.12"
   bin:
     marked: bin/marked.js
   checksum: 10/deeb619405c0c46af00c99b18b3365450abeb309104b24e3658f46142344f6b7c4117608c3b5834084d8738e92f81240c19f596e6ee369260f96e52b3457eaee
-  languageName: node
-  linkType: hard
-
-"marked@npm:^16.3.0":
-  version: 16.4.2
-  resolution: "marked@npm:16.4.2"
-  bin:
-    marked: bin/marked.js
-  checksum: 10/6e40e40661dce97e271198daa2054fc31e6445892a735e416c248fba046bdfa4573cafa08dc254529f105e7178a34485eb7f82573979cfb377a4530f66e79187
   languageName: node
   linkType: hard
 

@@ -11,6 +11,16 @@ use tauri::TitleBarStyle;
 #[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
+pub(crate) fn opened_urls_initialization_script(opened_paths: &[String], notify: bool) -> String {
+    let escaped_urls = serde_json::to_string(opened_paths).unwrap_or_else(|_| "[]".to_string());
+    let assignment = format!("window.openedUrls = {escaped_urls};");
+    if notify {
+        format!("{assignment} window.dispatchEvent(new CustomEvent('mdviewy-opened-urls'));")
+    } else {
+        assignment
+    }
+}
+
 /// 获取所有窗口实例信息
 #[command]
 pub fn get_window_instances() -> Result<std::collections::HashMap<String, String>, String> {
@@ -95,19 +105,12 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
         .map(|p| vec![p.to_str().unwrap_or("").to_string()])
         .unwrap_or_default();
 
-    // 使用JSON序列化确保路径中的特殊字符被正确转义
-    let escaped_urls = serde_json::to_string(&opened_paths).unwrap_or_else(|_| "[]".to_string());
-
-    println!("opened_paths:{:?}", opened_paths);
-    println!("escaped_urls:{}", escaped_urls);
-    if let Some(path) = path.as_ref() {
-        println!("path:{}", path);
-    }
+    let initialization_script = opened_urls_initialization_script(&opened_paths, false);
+    let cleanup_label = window_label_clone.clone();
     tauri::async_runtime::spawn(async move {
         let mut new_win =
             WebviewWindowBuilder::new(&_app, window_label, WebviewUrl::App("index.html".into()))
-                .initialization_script(format!("window.openedUrls = {escaped_urls}"))
-                .initialization_script(format!("console.log('window.openedUrl:{}')", escaped_urls))
+                .initialization_script(initialization_script)
                 .title("mdviewy")
                 .resizable(true)
                 .fullscreen(false)
@@ -126,7 +129,16 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
         //     new_win = new_win.decorations(false);
         // }
 
-        let win = new_win.build().unwrap();
+        let win = match new_win.build() {
+            Ok(window) => window,
+            Err(error) => {
+                eprintln!("Failed to create window '{cleanup_label}': {error}");
+                if let Ok(mut instances) = WINDOW_INSTANCES.lock() {
+                    instances.remove(&cleanup_label);
+                }
+                return;
+            }
+        };
 
         #[cfg(target_os = "macos")]
         {
@@ -140,6 +152,31 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
     });
 
     Ok(window_label_clone)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::opened_urls_initialization_script;
+
+    #[test]
+    fn initialization_script_safely_serializes_special_paths() {
+        let paths = vec![r#"/tmp/mdviewy O'Brien/"README".md"#.to_string()];
+        let script = opened_urls_initialization_script(&paths, false);
+
+        assert_eq!(
+            script,
+            r#"window.openedUrls = ["/tmp/mdviewy O'Brien/\"README\".md"];"#
+        );
+        assert!(!script.contains("console.log"));
+    }
+
+    #[test]
+    fn notification_script_uses_a_fixed_browser_event() {
+        let script = opened_urls_initialization_script(&["/tmp/README.md".to_string()], true);
+
+        assert!(script.contains("new CustomEvent('mdviewy-opened-urls')"));
+        assert!(!script.contains("console.log"));
+    }
 }
 
 /// 更新窗口实例对应的路径

@@ -2,7 +2,7 @@
 name = "mfdev"
 version = "3.0.0"
 edition = "2021"
-authors = ["drl990114"]
+authors = ["Supersynergy"]
 
 [dependencies]
 toml = "0.8.23"

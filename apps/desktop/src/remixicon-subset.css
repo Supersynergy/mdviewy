@@ -27,7 +27,6 @@
 .ri-arrow-right-up-line:before { content: "\ea70"; }
 .ri-at-line:before { content: "\ea83"; }
 .ri-bold:before { content: "\ead1"; }
-.ri-book-2-line:before { content: "\ead3"; }
 .ri-bookmark-line:before { content: "\eae5"; }
 .ri-braces-line:before { content: "\eae9"; }
 .ri-chat-smile-ai-line:before { content: "\f56c"; }
@@ -41,7 +40,6 @@
 .ri-contract-up-down-line:before { content: "\f303"; }
 .ri-delete-bin-line:before { content: "\ec2a"; }
 .ri-double-quotes-l:before { content: "\ec51"; }
-.ri-download-cloud-2-line:before { content: "\ec56"; }
 .ri-edit-2-line:before { content: "\ec80"; }
 .ri-edit-box-line:before { content: "\ec82"; }
 .ri-equalizer-line:before { content: "\ec9d"; }
@@ -57,7 +55,6 @@
 .ri-file-list-2-line:before { content: "\eced"; }
 .ri-file-list-3-line:before { content: "\ecef"; }
 .ri-file-pdf-line:before { content: "\ecfd"; }
-.ri-file-text-line:before { content: "\ed0f"; }
 .ri-flashlight-line:before { content: "\ed3d"; }
 .ri-focus-3-line:before { content: "\ed4c"; }
 .ri-folder-3-fill:before { content: "\ed53"; }
@@ -99,9 +96,9 @@
 .ri-search-line:before { content: "\f0d1"; }
 .ri-separator:before { content: "\f0de"; }
 .ri-settings-3-line:before { content: "\f0e6"; }
+.ri-shield-check-line:before { content: "\f100"; }
 .ri-sparkling-2-line:before { content: "\f36b"; }
 .ri-sparkling-line:before { content: "\f36d"; }
-.ri-stack-line:before { content: "\f181"; }
 .ri-strikethrough:before { content: "\f1ab"; }
 .ri-terminal-box-line:before { content: "\f1f6"; }
 .ri-terminal-line:before { content: "\f1f8"; }

@@ -11,10 +11,10 @@ export interface SeoHeadProps {
 export default function SeoHead({
   canonical,
   children,
-  description = 'Modern Markdown editor.',
-  image = 'https://www.styled-components.com/atom.png',
+  description = 'A calm, fast, local-first Markdown workspace.',
+  image = 'https://raw.githubusercontent.com/Supersynergy/mdviewy/main/public/logo.png',
   title = 'mdviewy',
-  url = '',
+  url = 'https://github.com/Supersynergy/mdviewy',
 }: React.PropsWithChildren<SeoHeadProps>) {
   return (
     <NextHead>
@@ -23,10 +23,10 @@ export default function SeoHead({
       <meta name="description" content={description} />
 
       {/* Open Graph */}
-      <link itemProp="url" href="https://mdviewy.vercel.app/" />
+      <link itemProp="url" href={url} />
       <meta itemProp="name" content={title} />
       <meta itemProp="description" content={description} />
-      <meta itemProp="image" content="/atom.png" />
+      <meta itemProp="image" content={image} />
 
       <meta property="og:locale" content="en_US" />
       <meta property="og:type" content="website" />
@@ -40,8 +40,8 @@ export default function SeoHead({
 
       {children}
 
-      <link rel="shortcut icon" href="/atom.png" />
-      <link rel="icon" href="/atom.png" />
+      <link rel="shortcut icon" href="/favicon.png" />
+      <link rel="icon" href="/favicon.png" />
     </NextHead>
   );
 }

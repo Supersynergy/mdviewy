@@ -13,18 +13,9 @@ pub fn init(
     let _setup_start = std::time::Instant::now();
     eprintln!("[BOOT] setup::init start");
 
-    // JSON-escape so backticks / ${} / newlines in paths don't break the JS parse
-    // (Tauri #9690 / #10573: a malformed init_script silently aborts page init →
-    // blank webview).
-    let opened_paths_json =
-        serde_json::to_string(&opened_paths).unwrap_or_else(|_| "[]".to_string());
-
     // 首先检查是否已经存在窗口
     if let Some(existing_window) = window_manager::get_last_opened_window(&app_handle) {
-        let script = format!(
-            "window.openedUrls = {0}; console.log('[setup.rs] Updated openedUrls to: ' + {0});",
-            opened_paths_json
-        );
+        let script = window_manager::opened_urls_initialization_script(&opened_paths, true);
         let _ = existing_window.eval(&script);
         let _ = existing_window.emit("opened-urls", opened_paths.clone());
 
@@ -40,10 +31,9 @@ pub fn init(
         "main".to_string(),
         WebviewUrl::App("index.html".into()),
     )
-    .initialization_script(format!("window.openedUrls = {};", opened_paths_json))
-    .initialization_script(format!(
-        "console.log('[setup.rs] window.openedUrls set to: ' + {});",
-        opened_paths_json
+    .initialization_script(window_manager::opened_urls_initialization_script(
+        &opened_paths,
+        false,
     ))
     .title("mdviewy")
     .resizable(true)

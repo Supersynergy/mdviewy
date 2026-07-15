@@ -120,6 +120,10 @@ pub fn run() {
             |app_handle: &tauri::AppHandle, args: Vec<String>, _cwd: String| {
                 let opened_paths = opened_paths_from_args(args.iter().skip(1), &_cwd);
 
+                if let Some(state) = app_handle.try_state::<OpenedPaths>() {
+                    *state.0.lock().unwrap() = opened_paths.clone();
+                }
+
                 // 调用setup函数处理参数和窗口复用逻辑
                 if let Err(e) = crate::setup::init(app_handle.clone(), opened_paths) {
                     println!("单例参数处理失败: {:?}", e);
@@ -274,9 +278,10 @@ pub fn run() {
                     println!("Emitting to focused window: {}", window.label());
                     let _ = window.unminimize();
                     let _ = window.set_focus();
-                    if let Ok(paths_json) = serde_json::to_string(&opened_paths) {
-                        let _ = window.eval(format!("window.openedUrls = {paths_json};"));
-                    }
+                    let _ = window.eval(window_manager::opened_urls_initialization_script(
+                        &opened_paths,
+                        true,
+                    ));
                     let result = window.emit("opened-urls", opened_paths.clone());
                     println!("Emit result: {:?}", result);
                 } else {
@@ -289,9 +294,10 @@ pub fn run() {
                         // "nothing happened" (verified 2026-07-05).
                         let _ = window.unminimize();
                         let _ = window.set_focus();
-                        if let Ok(paths_json) = serde_json::to_string(&opened_paths) {
-                            let _ = window.eval(format!("window.openedUrls = {paths_json};"));
-                        }
+                        let _ = window.eval(window_manager::opened_urls_initialization_script(
+                            &opened_paths,
+                            true,
+                        ));
                         let result = window.emit("opened-urls", opened_paths.clone());
                         println!("Emit result: {:?}", result);
                     } else {

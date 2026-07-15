@@ -30,9 +30,9 @@ Available for Linux, macOS and Windows.
 > - Open your terminal
 > - Go to the `Applications` directory. .e.g `/Applications`.
 > - Run `xattr -cr mdviewy.app` and open the app again
-> - Please make sure you download from `github releases` or [UpgradeLink](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA).
+> - Download only from the official GitHub releases.
 
-You can download it from the [UpgradeLink download page](https://download.upgrade.toolsetlink.com/download?appKey=xpn68m4j5qU0Y1rfDYFHaA) or [GitHub Release](https://github.com/Supersynergy/mdviewy/releases)
+Download from [GitHub Releases](https://github.com/Supersynergy/mdviewy/releases).
 
 ## Why
 

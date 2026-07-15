@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible mdviewy problem
+title: "[Bug]: "
+labels: [bug, "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping make mdviewy more reliable. Remove private document content before posting.
+  - type: input
+    id: version
+    attributes:
+      label: mdviewy version
+      placeholder: 0.92.0
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [macOS Apple Silicon, macOS Intel, Windows, Linux]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Give the smallest sequence that reproduces the problem.
+      placeholder: |
+        1. Open ...
+        2. Click ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or logs
+      description: Do not attach API keys, personal paths, or private document text.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed secrets and private document content.
+          required: true
+        - label: I searched for an existing issue.
+          required: true

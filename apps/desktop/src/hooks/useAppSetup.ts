@@ -4,7 +4,7 @@ import { loadLocalThemeCss } from '@/helper/extensions'
 import { getFileObject, getFileObjectByPath, getSaveOpenedEditorEntries } from '@/helper/files'
 import { getFileNameFromPath, readDirectory } from '@/helper/filesys'
 import { logger } from '@/helper/logger'
-import { parseOpenedPaths, type OpenedUrlsPayload } from '@/helper/openedPaths'
+import { parseOpenedPaths } from '@/helper/openedPaths'
 import { requestDocumentFocus } from '@/helper/documentFocus'
 import { i18nInit } from '@/i18n'
 import { appSettingStoreSetup } from '@/services/app-setting'
@@ -121,6 +121,27 @@ async function handleOpenedPaths(openedPaths: string[]) {
   }
 }
 
+let openedPathIngress = Promise.resolve(false)
+
+function consumeOpenedPathIngress() {
+  const task = openedPathIngress.then(async () => {
+    const injectedPaths = parseOpenedPaths(window.openedUrls)
+    window.openedUrls = null
+    const queuedPaths = await invoke<string[]>('take_opened_paths').catch(() => [])
+    const openedPaths = Array.from(new Set([...injectedPaths, ...queuedPaths]))
+    if (openedPaths.length === 0) return false
+
+    await handleOpenedPaths(openedPaths)
+    return true
+  })
+
+  openedPathIngress = task.catch((error) => {
+    logger.error('Failed to consume opened paths', error)
+    return false
+  })
+  return task
+}
+
 async function appWorkspaceSetup() {
   const { setRecentWorkspaces } = useOpenedCacheStore.getState()
   const { setFolderData, addOpenedFile, setActiveId } = useEditorStore.getState()
@@ -136,17 +157,7 @@ async function appWorkspaceSetup() {
     const recentWorkspaces = getOpenedCacheRes.recent_workspaces
     setRecentWorkspaces(recentWorkspaces)
 
-    const queuedOpenedPaths = await invoke<string[]>('take_opened_paths').catch(() => [])
-    const openedPaths = Array.from(
-      new Set([...parseOpenedPaths(window.openedUrls), ...queuedOpenedPaths]),
-    )
-
-    if (openedPaths.length > 0) {
-      window.openedUrls = null
-
-      await handleOpenedPaths(openedPaths)
-      return
-    }
+    if (await consumeOpenedPathIngress()) return
 
     if (recentWorkspaces.length > 0) {
       const targetWorkspacePath = recentWorkspaces[0].path
@@ -323,20 +334,21 @@ const useAppSetup = () => {
       useCommandStore.getState().execute(payload)
     })
 
-    const unListenOpenedUrls = currentWindow.listen<OpenedUrlsPayload>('opened-urls', async ({ payload }) => {
-      logger.debug('Received opened-urls event:', payload)
-      const openedPaths = parseOpenedPaths(payload)
-      if (openedPaths.length > 0) {
-        await invoke('take_opened_paths').catch(() => undefined)
-        await handleOpenedPaths(openedPaths)
-        currentWindow.setFocus()
-      }
-    })
+    const consumeAndFocus = async () => {
+      if (await consumeOpenedPathIngress()) currentWindow.setFocus()
+    }
+    const unListenOpenedUrls = currentWindow.listen('opened-urls', consumeAndFocus)
+    const unListenWindowFocus = currentWindow.listen('tauri://focus', consumeAndFocus)
+    window.addEventListener('mdviewy-opened-urls', consumeAndFocus)
+    window.addEventListener('focus', consumeAndFocus)
 
     return () => {
       unListenMenu.then((fn) => fn())
       closeRequest.then((fn) => fn())
       unListenOpenedUrls.then((fn) => fn())
+      unListenWindowFocus.then((fn) => fn())
+      window.removeEventListener('mdviewy-opened-urls', consumeAndFocus)
+      window.removeEventListener('focus', consumeAndFocus)
       settingDataUpdate.then((fn) => fn())
     }
   }, [])

@@ -41,3 +41,17 @@ export function getFileObjectByPath(path?: string): undefined | IFile {
   }
   return pathEntries[path]
 }
+
+export function replaceFileObjects(files: IFile[]): void {
+  Object.keys(entries).forEach((id) => delete entries[id])
+  Object.keys(pathEntries).forEach((path) => delete pathEntries[path])
+  Object.keys(saveOpenedEditorEntries).forEach((id) => delete saveOpenedEditorEntries[id])
+
+  const add = (file: IFile) => {
+    entries[file.id] = file
+    if (file.path) pathEntries[file.path] = file
+    file.children?.forEach(add)
+  }
+
+  files.forEach(add)
+}

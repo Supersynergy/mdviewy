@@ -16,9 +16,3 @@ paths = [
   '''\.git/''',
   '''(^|/)(yarn\.lock|Cargo\.lock|package-lock\.json|pnpm-lock\.yaml)$''',
 ]
-# Public, non-secret identifiers that the entropy rule flags as generic-api-key.
-# `appKey=xpn68m4j5qU0Y1rfDYFHaA` is the UpgradeLink *public download* key that
-# ships in client-side download URLs (also published in the README) — not a credential.
-regexes = [
-  '''xpn68m4j5qU0Y1rfDYFHaA''',
-]

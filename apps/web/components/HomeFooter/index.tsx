@@ -17,7 +17,7 @@ export default function HomeFooter() {
           </LogoContainer>
           <AppName>mdviewy</AppName>
         </LogoLink>
-        <CopyrightText>Copyright © 2023-present drl990114</CopyrightText>
+        <CopyrightText>Copyright © 2023-present Supersynergy</CopyrightText>
       </LeftSection>
       <RightSection>
         <div>
@@ -29,8 +29,8 @@ export default function HomeFooter() {
           {'Made with '}
           <Heart />
           {' by '}
-          <FooterLink inline href='https://github.com/drl990114'>
-            @drl990114
+          <FooterLink inline href='https://github.com/Supersynergy'>
+            Supersynergy
           </FooterLink>
           {' and '}
           <FooterLink inline href='https://github.com/Supersynergy/mdviewy/graphs/contributors'>

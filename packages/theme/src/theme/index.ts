@@ -1,6 +1,22 @@
 export * from './darken-colors'
 
-import type { CreateThemeOptions } from '@drl990114/codemirror-themes'
+export type CodeMirrorThemeOptions = {
+  theme: 'light' | 'dark'
+  settings: {
+    background?: string
+    foreground?: string
+    caret?: string
+    selection?: string
+    selectionMatch?: string
+    lineHighlight?: string
+    gutterBackground?: string
+    gutterForeground?: string
+    gutterActiveForeground?: string
+    gutterBorder?: string
+    fontFamily?: string
+  }
+  styles: unknown[]
+}
 
 export type ThemeColors = typeof lightTheme
 export type ScThemeProps = { theme: ThemeColors }
@@ -22,7 +38,7 @@ export type MfTheme = {
   /**
    * Codemirror theme.
    */
-  codemirrorTheme?: CreateThemeOptions
+  codemirrorTheme?: CodeMirrorThemeOptions
   /**
    * @example
    * .example {

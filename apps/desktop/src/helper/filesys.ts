@@ -28,6 +28,7 @@ export enum FileResultCode {
   NotFound = 'NotFound',
   PermissionDenied = 'PermissionDenied',
   InvalidPath = 'InvalidPath',
+  TooLarge = 'TooLarge',
   UnknownError = 'UnknownError',
 }
 
@@ -36,18 +37,12 @@ export interface FileSysResult {
   content: string
 }
 
-const wrapFiles = (entries: FileEntry[]) => {
-  entries.forEach((entry) => {
-    ;(entry as IFile).id = getFileObjectByPath(entry.path)?.id || nanoid()
-
-    setFileObject((entry as IFile).id, entry as IFile)
-    setFileObjectByPath(entry.path!, entry as IFile)
-
-    if (entry.children) {
-      wrapFiles(entry.children)
-    }
-  })
-}
+const addFileIds = (entries: FileEntry[]): IFile[] =>
+  entries.map((entry) => ({
+    ...entry,
+    id: getFileObjectByPath(entry.path)?.id || nanoid(),
+    children: entry.children ? addFileIds(entry.children) : undefined,
+  }))
 
 export const createFile = (opt?: Partial<IFile>): IFile => {
   const file: IFile = {
@@ -78,60 +73,32 @@ export const createUntitledFile = (): IFile => {
   return createFile()
 }
 
-export const readDirectory = (folderPath: string): Promise<IFile[]> => {
-  return new Promise(async (resolve, reject) => {
-    
-    invoke<FileSysResult>('open_folder_async', { folderPath })
-      .then(async (message) => {
-        if (message.code !== FileResultCode.Success) {
-          return
-        }
-        const mess = message.content
-        const files = JSON.parse(mess)
-        const entries: IFile[] = []
+export const readDirectory = async (folderPath: string): Promise<IFile[]> => {
+  const message = await invoke<FileSysResult>('open_folder_async', { folderPath })
 
-        if (!files || !files.length) {
-          resolve([
-            {
-              id: nanoid(),
-              name: getFileNameFromPath(folderPath),
-              path: folderPath,
-              kind: 'dir',
-              children: entries,
-            },
-          ])
-          return
-        }
+  if (message.code !== FileResultCode.Success) {
+    throw new Error(message.content || `Could not open ${folderPath}`)
+  }
 
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i]
+  let files: FileEntry[]
+  try {
+    files = JSON.parse(message.content)
+  } catch {
+    throw new Error('The folder index returned invalid data')
+  }
 
-          entries.push(file)
-        }
+  const entries = addFileIds(Array.isArray(files) ? files : [])
+  const folderName = await invoke<string>('get_path_name', { path: folderPath })
 
-        wrapFiles(entries)
-
-        const folderName = await invoke<string>('get_path_name', {
-          path: folderPath,
-        })
-
-        const root: IFile = {
-          id: getFileObjectByPath(folderPath)?.id || nanoid(),
-          name: folderName,
-          path: folderPath,
-          kind: 'dir',
-          children: entries,
-        }
-
-        setFileObjectByPath(folderPath, root)
-        setFileObject(root.id, root)
-
-        resolve([root])
-      })
-      .catch((err) => {
-        reject(err)
-      })
-  })
+  return [
+    {
+      id: getFileObjectByPath(folderPath)?.id || nanoid(),
+      name: folderName || getFileNameFromPath(folderPath),
+      path: folderPath,
+      kind: 'dir',
+      children: entries,
+    },
+  ]
 }
 
 export function isMdFile(fileName?: string) {

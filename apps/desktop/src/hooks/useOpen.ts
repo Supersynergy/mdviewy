@@ -11,6 +11,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'zens'
 
 const useOpen = () => {
   const { addRecentWorkspaces } = useOpenedCacheStore()
@@ -31,6 +32,7 @@ const useOpen = () => {
               addRecentWorkspaces({ path: dir })
             } catch (error) {
               logger.error('Error creating new window:', error)
+              toast.error(`Could not open folder: ${String(error)}`)
             }
           },
           onClose: async () => {
@@ -60,11 +62,13 @@ const useOpen = () => {
               logger.info('Opening folder in current window:', dir)
             } catch (error) {
               logger.error('Error opening folder in current window:', error)
+              toast.error(`Could not open folder: ${String(error)}`)
             }
           },
         })
       } catch (error) {
         logger.error('Error showing folder open modal:', error)
+        toast.error(`Could not open folder: ${String(error)}`)
       }
     },
     [addRecentWorkspaces, t],

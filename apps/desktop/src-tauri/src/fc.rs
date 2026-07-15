@@ -5,6 +5,7 @@ use natural_sort_rs::Natural;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::future::Future;
+use std::io::{self, Write};
 use std::path::Path;
 
 use crate::task_system::error::SystemError;
@@ -28,6 +29,8 @@ const SKIPPED_DIRECTORY_NAMES: &[&str] = &[
     "target",
     "venv",
 ];
+const MAX_DIRECTORY_ENTRIES: usize = 25_000;
+const MAX_DIRECTORY_DEPTH: usize = 48;
 
 fn should_skip_directory(name: &str) -> bool {
     SKIPPED_DIRECTORY_NAMES.contains(&name)
@@ -59,6 +62,7 @@ pub enum FileResultCode {
     NotFound = -1,
     PermissionDenied = -2,
     InvalidPath = -3,
+    TooLarge = -4,
     UnknownError = -99,
 }
 
@@ -69,8 +73,27 @@ pub struct FileResult {
 }
 
 pub fn read_directory(dir_path: &str) -> Result<Vec<FileInfo>, FileResultCode> {
+    let mut visited = 0;
+    read_directory_limited(
+        Path::new(dir_path),
+        0,
+        &mut visited,
+        MAX_DIRECTORY_ENTRIES,
+        MAX_DIRECTORY_DEPTH,
+    )
+}
+
+fn read_directory_limited(
+    new_path: &Path,
+    depth: usize,
+    visited: &mut usize,
+    max_entries: usize,
+    max_depth: usize,
+) -> Result<Vec<FileInfo>, FileResultCode> {
     // 同步版本保留，作为兼容性接口
-    let new_path = Path::new(dir_path);
+    if depth > max_depth {
+        return Err(FileResultCode::TooLarge);
+    }
     let paths = match fs::read_dir(new_path) {
         Ok(paths) => paths,
         Err(e) => {
@@ -85,6 +108,11 @@ pub fn read_directory(dir_path: &str) -> Result<Vec<FileInfo>, FileResultCode> {
     let mut files: Vec<FileInfo> = Vec::new();
 
     for path in paths {
+        *visited += 1;
+        if *visited > max_entries {
+            return Err(FileResultCode::TooLarge);
+        }
+
         let path_unwrap = match path {
             Ok(p) => p,
             Err(_) => continue,
@@ -116,7 +144,17 @@ pub fn read_directory(dir_path: &str) -> Result<Vec<FileInfo>, FileResultCode> {
 
         if file_type.is_dir() {
             kind = String::from("dir");
-            children = read_directory(file_path.to_str().unwrap_or("")).ok();
+            children = match read_directory_limited(
+                &file_path,
+                depth + 1,
+                visited,
+                max_entries,
+                max_depth,
+            ) {
+                Ok(files) => Some(files),
+                Err(FileResultCode::TooLarge) => return Err(FileResultCode::TooLarge),
+                Err(_) => None,
+            };
         }
 
         let new_file_info = FileInfo {
@@ -287,6 +325,42 @@ mod tests {
             vec!["guide.md"]
         );
     }
+
+    #[test]
+    fn read_directory_stops_at_entry_budget() {
+        let tmp = tempfile::tempdir().unwrap();
+        for index in 0..5 {
+            fs::write(tmp.path().join(format!("{index}.md")), "# Test").unwrap();
+        }
+
+        let mut visited = 0;
+        let result = read_directory_limited(tmp.path(), 0, &mut visited, 3, 8);
+
+        assert!(matches!(result, Err(FileResultCode::TooLarge)));
+    }
+
+    #[test]
+    fn read_directory_stops_at_depth_budget() {
+        let tmp = tempfile::tempdir().unwrap();
+        fs::create_dir_all(tmp.path().join("a").join("b")).unwrap();
+
+        let mut visited = 0;
+        let result = read_directory_limited(tmp.path(), 0, &mut visited, 100, 1);
+
+        assert!(matches!(result, Err(FileResultCode::TooLarge)));
+    }
+
+    #[test]
+    fn write_file_replaces_existing_content_atomically() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("note.md");
+        fs::write(&path, "old").unwrap();
+
+        let result = write_file(path.to_str().unwrap(), "new content");
+
+        assert!(matches!(result.code, FileResultCode::Success));
+        assert_eq!(fs::read_to_string(path).unwrap(), "new content");
+    }
 }
 
 pub fn files_to_json(files: Vec<FileInfo>) -> FileResult {
@@ -322,10 +396,33 @@ pub fn read_file(path: &str) -> FileResult {
     }
 }
 
-// update file and create new file
+fn atomic_write(path: &Path, content: &[u8]) -> io::Result<()> {
+    let parent = path
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
+    let mut temporary = tempfile::NamedTempFile::new_in(parent)?;
+
+    if let Ok(metadata) = fs::metadata(path) {
+        temporary
+            .as_file()
+            .set_permissions(metadata.permissions())?;
+    }
+
+    temporary.write_all(content)?;
+    temporary.as_file_mut().sync_all()?;
+    temporary.persist(path).map_err(|error| error.error)?;
+
+    #[cfg(unix)]
+    fs::File::open(parent)?.sync_all()?;
+
+    Ok(())
+}
+
+// Update a file by replacing it atomically from a same-directory temporary file.
 pub fn write_file(path: &str, content: &str) -> FileResult {
     let file_path = Path::new(path);
-    match fs::write(file_path, content) {
+    match atomic_write(file_path, content.as_bytes()) {
         Ok(()) => FileResult {
             code: FileResultCode::Success,
             content: String::from("File written successfully"),
@@ -734,8 +831,8 @@ pub mod cmd {
 
     #[tauri::command]
     pub async fn open_folder_async(folder_path: String) -> FileResult {
-        match fc::read_directory_async(folder_path).await {
-            Ok(files) => {
+        match tokio::task::spawn_blocking(move || fc::read_directory(&folder_path)).await {
+            Ok(Ok(files)) => {
                 let json_data = fc::files_to_json(files);
                 let content = match json_data.code {
                     fc::FileResultCode::Success => json_data.content,
@@ -754,6 +851,16 @@ pub mod cmd {
                     content,
                 }
             }
+            Ok(Err(fc::FileResultCode::TooLarge)) => FileResult {
+                code: fc::FileResultCode::TooLarge,
+                content: String::from(
+                    "This folder is too large to open safely. Choose a smaller Markdown workspace.",
+                ),
+            },
+            Ok(Err(code)) => FileResult {
+                code,
+                content: String::from("Failed to read directory"),
+            },
             Err(_) => FileResult {
                 code: fc::FileResultCode::UnknownError,
                 content: String::from("Failed to read directory"),

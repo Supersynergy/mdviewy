@@ -4,17 +4,25 @@
 
 ### Fixed
 
+- Removed the startup folder suggestions that recursively opened large home, Claude, and Codex trees. Workspace scans are now bounded by entry count and depth, and failures reject visibly instead of leaving a pending promise.
+- Removed unsafe startup/new-window debug scripts that broke WebView initialization when a path contained an apostrophe, and added a queued browser-event fallback so Finder/CLI file opens survive missed native listener timing.
+- Added a top-level recovery boundary with Reload and Safe start actions so render failures no longer end in an unrecoverable white screen.
+- File writes now use a durable same-directory temporary file and atomic replacement. Dirty state clears only after the native write succeeds.
 - External single-file opens now enter focus mode and collapse stale left/right panel widths. This removes the blank sidebar area that survived earlier overflow-only whitespace fixes.
 - Replaced the fixed 980px editor column with configurable adaptive, focused, wide, and full-width modes; existing legacy full-width users keep their choice.
 
 ### Added
 
+- Added a dedicated GitHub-style README preview with sanitized HTML, GFM tables/tasks/alerts, heading anchors, relative local assets, safe in-app Markdown links, and browser-routed web links.
+- README files now default to Preview. GitHub-only constructs that cannot survive the visual editor round trip fail closed into Source mode.
 - Added `Print / Save as PDF` to every editor action menu. Print CSS isolates the active document from application chrome and preserves page-break styling.
 - Smart Actions now surface frontmatter titles/tags and can copy a deterministic document brief with file metadata, word count, and a bounded heading outline.
 - Added `app_reset_layout` to the command palette for one-step recovery from stale persisted panel sizes.
 
 ### Changed
 
+- Replaced the generated multilingual README set with one canonical, outcome-first project page, current screenshot, honest signing status, and a verified feature matrix.
+- Consolidated GitHub automation into one least-privilege CI workflow and one release workflow with immutable action pins; refreshed issue forms, contribution guidance, security policy, repository metadata, and release notes.
 - Replaced the misleading “Copy as Wiki link” label with “Copy wiki-style text” and an explicit no-backlink-index note.
 - New installations now enable autosave by default; existing explicit preferences remain unchanged during config migration.
 - Rebuilt the README feature list from verified code paths and refreshed the gap analysis; unsupported backlinks, DOCX, and direct PDF file export remain clearly open.
@@ -27,7 +35,10 @@
 
 - `yarn workspace @mdviewy/desktop test`
 - `yarn workspace @mdviewy/desktop build`
-- `cargo check -p mdviewy --all-targets`
+- `yarn workspace @mdviewy/web build:prod`
+- `cargo test --workspace`
+- `cargo clippy --workspace --all-targets --all-features -- -D warnings`
+- `just security`
 - `yarn translate:check`
 
 ## 0.91.0 - 2026-07-05
@@ -71,7 +82,7 @@
 - Applied the new tarsier app icon across all `apps/desktop/src-tauri/icons/*` (png/icns/ico + Square/Store tiles) and `public/logo.png`.
 - Added `docs/SIGNING.md` (Apple Developer ID + notarization and Windows Authenticode steps — the #1 GA blocker) and ADR `docs/adr/2026-06-05-security-posture-1.0.md` (CSP plan, assetProtocol rationale, audit policy).
 - Added Rust edge tests for file-type detection (case-insensitive, dotfiles, suffix-not-substring) in `mdviewy-utils`.
-- Wired lean + security gates into `justfile`: `just lean` (cargo-machete unused-dep scan), `just security` (gitleaks secret scan + osv-scanner lockfile vuln scan), `just ci` (= check), `just pre-pr` (check + lean + security). Added `.gitleaks.toml` (skips build/vendor trees; allowlists the public UpgradeLink download key).
+- Wired lean + security gates into `justfile`: `just lean` (cargo-machete unused-dep scan), `just security` (gitleaks secret scan + osv-scanner lockfile vuln scan), `just ci` (= check), `just pre-pr` (check + lean + security).
 
 ### Security
 
@@ -80,11 +91,11 @@
 
 ### Changed
 
-- Reworked GitHub release automation for the mdviewy rename: removed the stale MarkFlowy artifact names, removed the disabled updater/UpgradeLink release tail, switched Actions to Node 24-compatible pins, and made offline Windows installer assets distinct.
+- Reworked GitHub release automation for the mdviewy rename: removed stale artifact names and the disabled third-party updater tail, switched Actions to Node 24-compatible pins, and made offline Windows installer assets distinct.
 - Aligned root/desktop license metadata with the AGPL root license and clarified public security reporting.
 - Hardened release CI by avoiding a missing macOS `sccache` wrapper during Tauri builds and removing the stale contributor-list workflow that failed on GitHub token permissions.
 - Trimmed 11 genuinely-unused Rust dependencies across 5 crates (verified by grep + `cargo check --all-features`): `mfdev` (anyhow/env_logger/log/os_pipe), `mdviewy-core` (serde_json/parking_lot/thiserror), `download_npm` (mdviewy-utils), `file_search` (dirs/toml), `mdviewy-utils` (regex). Added `cargo-machete` ignores for the two false-positives (`syntect` feature-gated, `log` macro-only) so `just lean` is clean.
-- Removed the inherited "reconstruction phase / 3-6 months / will not be released" notice from `README.md`, `README.src.md`, `README_CN.md`, `README_JA.md`; replaced with a Status section linking the roadmap.
+- Removed inherited prerelease disclaimers that contradicted the active release roadmap.
 - Unified the product name to lowercase `mdviewy` everywhere user/tooling-visible (Tauri `productName`, window title, `APP_NAME`, locale `app_name`, HTML title, empty-state title, crate metadata).
 - Pointed all package/manifest metadata at the canonical GitHub home (`package.json`, `Cargo.toml`); recorded the name + repo-home decision in ADR `docs/adr/2026-06-05-canonical-name-and-repo-home.md`.
 
