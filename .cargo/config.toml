@@ -7,6 +7,3 @@ rustflags = [
   "-C", "link-arg=-Wl,-no_compact_unwind",
   "-C", "target-cpu=apple-m1",
 ]
-
-[build]
-rustc-wrapper = "sccache"

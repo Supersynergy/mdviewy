@@ -26,6 +26,7 @@
 - Consolidated GitHub automation into one least-privilege CI workflow and one release workflow with immutable action pins; refreshed issue forms, contribution guidance, security policy, repository metadata, and release notes.
 - Replaced the misleading “Copy as Wiki link” label with “Copy wiki-style text” and an explicit no-backlink-index note.
 - New installations now enable autosave by default; existing explicit preferences remain unchanged during config migration.
+- Removed the project-wide `sccache` requirement so clean CI runners and source builds work with the standard Rust toolchain.
 - Rebuilt the README feature list from verified code paths and refreshed the gap analysis; unsupported backlinks, DOCX, and direct PDF file export remain clearly open.
 
 ### Security
