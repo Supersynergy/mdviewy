@@ -29,7 +29,7 @@
 
 ### Security
 
-- Updated mature transitive fixes for DOMPurify, linkify-it, protobufjs, undici, and quinn-proto. The remaining OpenTelemetry advisory is isolated to the web-docs build and time-bounded in `osv-scanner.toml`; three newly published Rust fixes stay quarantined until their 14-day package-age floor on 2026-07-22, with exact impact and removal steps in the security ADR.
+- Updated mature transitive fixes for DOMPurify, linkify-it, protobufjs, undici, quinn-proto, anyhow, and memmap2. Yarn is now 4.17.0 with a repository-enforced 14-day package age gate. The remaining OpenTelemetry advisory is isolated to the web-docs build and time-bounded in `osv-scanner.toml`; three newly published Rust fixes stay quarantined until their 14-day package-age floor on 2026-07-22, with exact impact and removal steps in the security ADR.
 
 ### Verified
 
