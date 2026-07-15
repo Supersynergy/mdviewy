@@ -80,6 +80,10 @@ jobs:
           RUSTC_WRAPPER: ""
         run: yarn build:desktop --target ${{ matrix.target }}
 
+      - name: Seal and verify macOS prerelease bundle
+        if: matrix.os == 'macos-latest'
+        run: scripts/prepare-macos-prerelease.sh ./target/${{ matrix.target }}/release/bundle
+
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: matrix.os == 'ubuntu-24.04'
         with:
@@ -282,7 +286,7 @@ jobs:
 
           ### macOS
 
-          These prerelease builds are not notarized yet. If macOS blocks first launch, open System Settings > Privacy & Security and allow the app, or run:
+          The app bundle carries a CI-verified ad-hoc seal, but these prerelease builds are not Developer ID signed or notarized yet. If macOS blocks first launch, open System Settings > Privacy & Security and allow the app, or run:
 
           ```bash
           xattr -cr /Applications/mdviewy.app

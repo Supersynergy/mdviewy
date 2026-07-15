@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Supersynergy/mdviewy/releases/tag/v0.92.0"><img alt="Release" src="https://img.shields.io/badge/release-v0.92.0-70d4c5?style=flat-square"></a>
+  <a href="https://github.com/Supersynergy/mdviewy/releases/tag/v0.92.1"><img alt="Release" src="https://img.shields.io/badge/release-v0.92.1-70d4c5?style=flat-square"></a>
   <a href="https://github.com/Supersynergy/mdviewy/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/Supersynergy/mdviewy/ci.yml?branch=main&style=flat-square&label=checks"></a>
   <a href="LICENSE"><img alt="AGPL-3.0-only" src="https://img.shields.io/badge/license-AGPL--3.0--only-6366f1?style=flat-square"></a>
 </p>
@@ -40,9 +40,9 @@ Open a file and read. Open a folder when you want a workspace. mdviewy does not 
 
 README files open in the dedicated preview automatically. If a document contains GitHub-only syntax that the visual editor cannot round-trip safely, mdviewy opens Source mode instead of silently changing the file.
 
-## Download 0.92.0
+## Download 0.92.1
 
-Choose your platform on the [v0.92.0 release page](https://github.com/Supersynergy/mdviewy/releases/tag/v0.92.0).
+Choose your platform on the [v0.92.1 release page](https://github.com/Supersynergy/mdviewy/releases/tag/v0.92.1).
 
 | Platform | Recommended package |
 | --- | --- |

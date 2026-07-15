@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.92.1 - 2026-07-15
+
+### Fixed
+
+- macOS prerelease builds now seal the complete `.app` bundle with a valid ad-hoc CodeResources signature before rebuilding each DMG. The release job mounts the rebuilt image and runs strict deep signature verification, preventing green CI from publishing a structurally invalid app bundle.
+
+### Verified
+
+- `scripts/prepare-macos-prerelease.sh target/release/bundle`
+- Downloaded-release DMG checksum, mount, bundle identifier, architecture, version, and `codesign --verify --deep --strict`
+
 ## 0.92.0 - 2026-07-15
 
 ### Fixed

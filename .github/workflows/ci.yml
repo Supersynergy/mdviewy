@@ -54,6 +54,9 @@ jobs:
       - name: Translation integrity
         run: node scripts/translate-check.js
 
+      - name: Release script syntax
+        run: bash -n scripts/prepare-macos-prerelease.sh
+
       - name: Rust formatting
         run: cargo fmt --all -- --check
 
