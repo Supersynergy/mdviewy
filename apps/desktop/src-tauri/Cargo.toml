@@ -1,11 +1,14 @@
 [package]
 name = "mdviewy"
-version = "0.92.1"
+version = "0.93.0"
 description = "A Markdown Editor App"
 authors = ["Supersynergy"]
 license = "AGPL-3.0-only"
 repository = "https://github.com/Supersynergy/mdviewy"
 edition = "2021"
+
+[package.metadata.cargo-machete]
+ignored = ["log"]
 
 [lib]
 name = "mdviewy"
@@ -107,9 +110,6 @@ features = [
     "devtools",
 ]
 
-[target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
-window-vibrancy = "0.5.0"
-
 [dependencies.mdviewy-utils]
 path = "../../../crates/utils"
 
@@ -122,6 +122,12 @@ path = "../../../crates/download_npm"
 [dependencies.mdviewy-core]
 path = "../../../crates/core"
 features = ["full"]
+
+[target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
+window-vibrancy = "0.5.0"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-single-instance = "2"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
@@ -161,10 +167,3 @@ features = ["no-env-filter"]
 [dev-dependencies.uuid]
 version = "1.16.0"
 features = ["serde"]
-
-[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-plugin-single-instance = "2"
-
-# `log` is used via the `log::` macros; cargo-machete's import scan misses it.
-[package.metadata.cargo-machete]
-ignored = ["log"]
