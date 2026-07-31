@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.95.0 - 2026-07-31
+
+Supersedes tags `v0.93.0` and `v0.93.1`, which carried this same work.
 
 ### Fixed
 
@@ -26,6 +28,8 @@
 
 - Prose blocks use `text-wrap: pretty` and headings `text-wrap: balance` where the WebView supports it, so line breaks avoid orphans.
 - Tables have a rounded frame, single-line borders, and even row padding.
+
+## 0.92.1 - 2026-07-15
 
 ### Fixed
 
