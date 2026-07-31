@@ -1,6 +1,6 @@
 import { MODAL_INFO_ID } from '@/components/Modal'
 import { MfIconLabelButton } from '@/components/ui-v2/Button/icon-label-button'
-import { showContextMenu } from '@/components/ui-v2/ContextMenu'
+import { toggleContextMenu } from '@/components/ui-v2/ContextMenu'
 import useBookMarksStore from '@/extensions/bookmarks/useBookMarksStore'
 import bus from '@/helper/eventBus'
 import { getFileObject } from '@/helper/files'
@@ -91,7 +91,7 @@ export const SourceCodeMenuButton = memo(() => {
     const { findMark } = useBookMarksStore.getState()
     const curBookMark = findMark(curFile?.path || '')
 
-    showContextMenu({
+    toggleContextMenu({
       x: rect.x,
       y: rect.y + rect.height,
       items: [

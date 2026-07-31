@@ -1,8 +1,57 @@
 use crate::app::conf::AppConf;
 use crate::app::keybindings::Keybindings;
+use crate::app::opened_cache::OpenedCache;
 use crate::app::window_manager::get_focused_window;
 use tauri::menu::{Menu, MenuEvent, MenuItemBuilder, PredefinedMenuItem, Submenu};
-use tauri::{App, AppHandle, Emitter};
+use tauri::{App, AppHandle, Emitter, Manager, Runtime};
+
+/// Prefix of the menu ids that carry a path, e.g. `app_openRecent:/docs/a.md`.
+pub const OPEN_RECENT_PREFIX: &str = "app_openRecent:";
+const MAX_MENU_RECENT_ENTRIES: usize = 20;
+
+/// Builds `File ▸ Open Recent` from the persisted recent lists.
+fn build_open_recent_submenu<R: Runtime, M: Manager<R>>(
+    manager: &M,
+) -> Result<Submenu<R>, Box<dyn std::error::Error>> {
+    let cache = OpenedCache::read();
+    let mut entries: Vec<tauri::menu::MenuItem<R>> = Vec::new();
+
+    for document in cache
+        .recent_documents()
+        .iter()
+        .take(MAX_MENU_RECENT_ENTRIES)
+    {
+        entries.push(
+            MenuItemBuilder::new(&document.name)
+                .id(format!("{OPEN_RECENT_PREFIX}{}", document.path))
+                .build(manager)?,
+        );
+    }
+
+    let mut items: Vec<&dyn tauri::menu::IsMenuItem<R>> = Vec::new();
+    let empty_item;
+
+    if entries.is_empty() {
+        empty_item = MenuItemBuilder::new("No recent documents")
+            .id("app_noRecentDocuments")
+            .enabled(false)
+            .build(manager)?;
+        items.push(&empty_item);
+    } else {
+        for entry in &entries {
+            items.push(entry);
+        }
+    }
+
+    let separator = PredefinedMenuItem::separator(manager)?;
+    let clear_item = MenuItemBuilder::new("Clear Recent")
+        .id("app_clearRecentDocuments")
+        .build(manager)?;
+    items.push(&separator);
+    items.push(&clear_item);
+
+    Ok(Submenu::with_items(manager, "Open Recent", true, &items)?)
+}
 
 pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     let _app_conf = AppConf::read_with_app(app.handle());
@@ -39,6 +88,13 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                 .expect("failed to emit");
 
             // 处理特定的菜单事件
+            if let Some(path) = menu_id.strip_prefix(OPEN_RECENT_PREFIX) {
+                app.emit_to(focused_window_label, "native:open_recent", path)
+                    .map_err(|err| println!("{:?}", err))
+                    .ok();
+                return;
+            }
+
             match menu_id {
                 "About" => {
                     app.emit_to(focused_window_label, "app_about", ())
@@ -57,7 +113,24 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let menu_items = Menu::with_items(
+    let menu_items = build_menu(app)?;
+
+    app.set_menu(menu_items).expect("failed to set menu");
+
+    app.on_menu_event(menu_handler);
+
+    Ok(())
+}
+
+/// Rebuilds and applies the menubar, e.g. after the recent lists changed.
+pub fn refresh_menu(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
+    let menu = build_menu(app)?;
+    app.set_menu(menu)?;
+    Ok(())
+}
+
+fn build_menu<R: Runtime, M: Manager<R>>(app: &M) -> Result<Menu<R>, Box<dyn std::error::Error>> {
+    Ok(Menu::with_items(
         app,
         &[
             &Submenu::with_items(
@@ -99,6 +172,11 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                         .id("app_openFolder")
                         .accelerator("CmdOrCtrl+O")
                         .build(app)?,
+                    &MenuItemBuilder::new("Open File...")
+                        .id("app_openFile")
+                        .accelerator("CmdOrCtrl+Shift+P")
+                        .build(app)?,
+                    &build_open_recent_submenu(app)?,
                     &MenuItemBuilder::new("Quick Open")
                         .id("app_openCommandPalette")
                         .accelerator("CmdOrCtrl+P")
@@ -111,6 +189,17 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                     &MenuItemBuilder::new("Save As...")
                         .id("app_saveAs")
                         .accelerator("CmdOrCtrl+Shift+S")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Export as HTML")
+                        .id("editor_export_html")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Export as Image")
+                        .id("editor_export_image")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Print / Save as PDF")
+                        .id("editor_print_pdf")
+                        .accelerator("CmdOrCtrl+Shift+D")
                         .build(app)?,
                     &PredefinedMenuItem::separator(app)?,
                     &MenuItemBuilder::new("Close Tab")
@@ -136,8 +225,8 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                     &PredefinedMenuItem::paste(app, None)?,
                     &PredefinedMenuItem::select_all(app, None)?,
                     &PredefinedMenuItem::separator(app)?,
-                    &MenuItemBuilder::new("Find")
-                        .id("app_find")
+                    &MenuItemBuilder::new("Find and Replace")
+                        .id("app_findReplaceEditor")
                         .accelerator("CmdOrCtrl+F")
                         .build(app)?,
                     &MenuItemBuilder::new("Find in Files...")
@@ -175,12 +264,44 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                     &PredefinedMenuItem::separator(app)?,
                     &MenuItemBuilder::new("Toggle Editor Mode")
                         .id("app_toggleEditorType")
-                        .accelerator("CmdOrCtrl+Shift+E")
+                        .accelerator("CmdOrCtrl+Shift+M")
                         .build(app)?,
-                    &MenuItemBuilder::new("Refresh TOC")
+                    &Submenu::with_items(
+                        app,
+                        "Editor Mode",
+                        true,
+                        &[
+                            &MenuItemBuilder::new("Source")
+                                .id("app_viewSourceCode")
+                                .build(app)?,
+                            &MenuItemBuilder::new("Pretty")
+                                .id("app_viewWysiwyg")
+                                .build(app)?,
+                            &MenuItemBuilder::new("Preview")
+                                .id("app_viewPreview")
+                                .build(app)?,
+                        ],
+                    )?,
+                    &MenuItemBuilder::new("Refresh Table of Contents")
                         .id("app:toc_refresh")
                         .build(app)?,
                     &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Zoom In")
+                        .id("app_zoomIn")
+                        .accelerator("CmdOrCtrl+Plus")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Zoom Out")
+                        .id("app_zoomOut")
+                        .accelerator("CmdOrCtrl+-")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Actual Size")
+                        .id("app_zoomReset")
+                        .accelerator("CmdOrCtrl+0")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Reset Layout")
+                        .id("app_reset_layout")
+                        .build(app)?,
                     &PredefinedMenuItem::fullscreen(app, None)?,
                 ],
             )?,
@@ -207,9 +328,17 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                         .accelerator("CmdOrCtrl+Alt+Left")
                         .build(app)?,
                     &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Next Heading")
+                        .id("app_nextHeading")
+                        .accelerator("CmdOrCtrl+Down")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Previous Heading")
+                        .id("app_prevHeading")
+                        .accelerator("CmdOrCtrl+Up")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
                     &MenuItemBuilder::new("Recent Files")
                         .id("app_showRecent")
-                        .accelerator("CmdOrCtrl+R")
                         .build(app)?,
                 ],
             )?,
@@ -220,6 +349,13 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                 &[
                     &PredefinedMenuItem::minimize(app, None)?,
                     &PredefinedMenuItem::maximize(app, None)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Toggle Left Sidebar")
+                        .id("app_toggleLeftsidebarVisible")
+                        .build(app)?,
+                    &MenuItemBuilder::new("Toggle Right Sidebar")
+                        .id("app_toggleRightsidebarVisible")
+                        .build(app)?,
                 ],
             )?,
             &Submenu::with_items(
@@ -232,6 +368,10 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                         .build(app)?,
                     &MenuItemBuilder::new("Report Issue")
                         .id("app_reportIssue")
+                        .build(app)?,
+                    &PredefinedMenuItem::separator(app)?,
+                    &MenuItemBuilder::new("Keyboard Shortcuts")
+                        .id("app_openSetting")
                         .build(app)?,
                 ],
             )?,
@@ -249,11 +389,5 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
             //     ],
             // )?,
         ],
-    )?;
-
-    app.set_menu(menu_items).expect("failed to set menu");
-
-    app.on_menu_event(menu_handler);
-
-    Ok(())
+    )?)
 }

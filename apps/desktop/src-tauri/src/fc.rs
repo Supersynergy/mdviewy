@@ -83,6 +83,11 @@ pub fn read_directory(dir_path: &str) -> Result<Vec<FileInfo>, FileResultCode> {
     )
 }
 
+/// Walks a workspace tree within a budget.
+///
+/// Hitting the budget truncates the walk instead of failing the whole open:
+/// a large folder (Documents, a home directory) still opens, it just stops
+/// descending once the budget is spent. Only unreadable roots return an error.
 fn read_directory_limited(
     new_path: &Path,
     depth: usize,
@@ -92,7 +97,7 @@ fn read_directory_limited(
 ) -> Result<Vec<FileInfo>, FileResultCode> {
     // 同步版本保留，作为兼容性接口
     if depth > max_depth {
-        return Err(FileResultCode::TooLarge);
+        return Ok(Vec::new());
     }
     let paths = match fs::read_dir(new_path) {
         Ok(paths) => paths,
@@ -110,7 +115,7 @@ fn read_directory_limited(
     for path in paths {
         *visited += 1;
         if *visited > max_entries {
-            return Err(FileResultCode::TooLarge);
+            break;
         }
 
         let path_unwrap = match path {
@@ -152,7 +157,6 @@ fn read_directory_limited(
                 max_depth,
             ) {
                 Ok(files) => Some(files),
-                Err(FileResultCode::TooLarge) => return Err(FileResultCode::TooLarge),
                 Err(_) => None,
             };
         }
@@ -327,27 +331,46 @@ mod tests {
     }
 
     #[test]
-    fn read_directory_stops_at_entry_budget() {
+    fn read_directory_truncates_at_entry_budget_instead_of_failing() {
         let tmp = tempfile::tempdir().unwrap();
         for index in 0..5 {
             fs::write(tmp.path().join(format!("{index}.md")), "# Test").unwrap();
         }
 
         let mut visited = 0;
-        let result = read_directory_limited(tmp.path(), 0, &mut visited, 3, 8);
+        let files = read_directory_limited(tmp.path(), 0, &mut visited, 3, 8).unwrap();
 
-        assert!(matches!(result, Err(FileResultCode::TooLarge)));
+        assert_eq!(files.len(), 3);
     }
 
     #[test]
-    fn read_directory_stops_at_depth_budget() {
+    fn read_directory_truncates_at_depth_budget_instead_of_failing() {
         let tmp = tempfile::tempdir().unwrap();
         fs::create_dir_all(tmp.path().join("a").join("b")).unwrap();
+        fs::write(tmp.path().join("a").join("top.md"), "# Top").unwrap();
 
         let mut visited = 0;
-        let result = read_directory_limited(tmp.path(), 0, &mut visited, 100, 1);
+        let files = read_directory_limited(tmp.path(), 0, &mut visited, 100, 1).unwrap();
 
-        assert!(matches!(result, Err(FileResultCode::TooLarge)));
+        let a = files.iter().find(|file| file.name == "a").unwrap();
+        let a_children = a.children.as_ref().unwrap();
+        let b = a_children.iter().find(|file| file.name == "b").unwrap();
+
+        // Depth 1 still lists `a`'s entries; everything below stops empty.
+        assert!(a_children.iter().any(|file| file.name == "top.md"));
+        assert_eq!(b.children.as_ref().map(Vec::len), Some(0));
+    }
+
+    #[test]
+    fn read_directory_opens_a_folder_larger_than_the_budget() {
+        let tmp = tempfile::tempdir().unwrap();
+        for index in 0..40 {
+            fs::write(tmp.path().join(format!("{index}.md")), "# Test").unwrap();
+        }
+
+        let files = read_directory(tmp.path().to_str().unwrap()).unwrap();
+
+        assert_eq!(files.len(), 40);
     }
 
     #[test]

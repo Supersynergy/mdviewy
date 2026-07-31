@@ -47,7 +47,13 @@
     "quote": "引用",
     "bulletList": "箇条書き",
     "orderedList": "番号付きリスト",
-    "taskList": "タスクリスト"
+    "taskList": "タスクリスト",
+    "table": "表",
+    "codeBlock": "コードブロック",
+    "horizontalRule": "区切り線",
+    "findReplace": "検索と置換",
+    "leftSidebar": "左サイドバー",
+    "rightSidebar": "右サイドバー"
   },
   "action": {
     "bookmark": "ブックマーク",
@@ -521,5 +527,16 @@
     "codeBlocks": "コードブロック",
     "tables": "表",
     "frontmatter": "フロントマター"
+  },
+  "menu": {
+    "find_replace": "検索と置換",
+    "command_palette": "コマンドパレット",
+    "left_sidebar": "左サイドバー",
+    "right_sidebar": "右サイドバー",
+    "reset_layout": "レイアウトをリセット",
+    "save_now": "今すぐ保存",
+    "settings": "設定",
+    "recent_documents": "最近のドキュメント",
+    "no_recent_documents": "最近のドキュメントはありません"
   }
 }

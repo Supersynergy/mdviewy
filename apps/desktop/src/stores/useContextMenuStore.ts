@@ -7,11 +7,12 @@ const useContextMenuStore = create<ContextMenuStore>((set) => {
     y: 0,
     open: false,
     items: [],
+    lastHiddenAt: 0,
     show: ({ x, y, items }) => {
       set({ x, y, items, open: true })
     },
     hide: () => {
-      set({ x: 0, y: 0, items: [], open: false })
+      set({ x: 0, y: 0, items: [], open: false, lastHiddenAt: Date.now() })
     },
   }
 })
@@ -27,6 +28,8 @@ interface ContextMenuStore {
   y: number
   open: boolean
   items: MenuItemData[]
+  /** Timestamp of the last close, so a trigger button can tell a dismiss from a fresh open. */
+  lastHiddenAt: number
   show: (params: IShowContextMenuParams) => void
   hide: () => void
 }

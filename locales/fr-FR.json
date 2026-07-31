@@ -47,7 +47,13 @@
     "quote": "Citation",
     "bulletList": "Liste à puces",
     "orderedList": "Liste numérotée",
-    "taskList": "Liste de tâches"
+    "taskList": "Liste de tâches",
+    "table": "Tableau",
+    "codeBlock": "Bloc de code",
+    "horizontalRule": "Ligne de séparation",
+    "findReplace": "Rechercher et remplacer",
+    "leftSidebar": "Barre latérale gauche",
+    "rightSidebar": "Barre latérale droite"
   },
   "action": {
     "bookmark": "favori",
@@ -521,5 +527,16 @@
     "codeBlocks": "blocs de code",
     "tables": "tableaux",
     "frontmatter": "métadonnées"
+  },
+  "menu": {
+    "find_replace": "Rechercher et remplacer",
+    "command_palette": "Palette de commandes",
+    "left_sidebar": "Barre latérale gauche",
+    "right_sidebar": "Barre latérale droite",
+    "reset_layout": "Réinitialiser la disposition",
+    "save_now": "Enregistrer maintenant",
+    "settings": "Paramètres",
+    "recent_documents": "Documents récents",
+    "no_recent_documents": "Aucun document récent"
   }
 }

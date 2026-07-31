@@ -2,11 +2,32 @@ import { useCommandStore } from '@/stores'
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import type { FindReplaceOpenRequest } from './editorToolBar/FindReplace/find-replace'
 
+const importFindReplace = () => import('./editorToolBar/FindReplace/find-replace')
+
 const FindReplace = lazy(() =>
-  import('./editorToolBar/FindReplace/find-replace').then((mod) => ({
+  importFindReplace().then((mod) => ({
     default: mod.FindReplace,
   })),
 )
+
+/**
+ * Warms the Find/Replace chunk once the app is idle. It stays out of the
+ * startup bundle, but Cmd+F no longer waits for the module to be fetched,
+ * parsed, and mounted before the panel appears.
+ */
+const prefetchFindReplace = () => {
+  const warm = () => {
+    void importFindReplace()
+  }
+
+  if (typeof requestIdleCallback === 'function') {
+    const handle = requestIdleCallback(warm, { timeout: 3000 })
+    return () => cancelIdleCallback(handle)
+  }
+
+  const timer = setTimeout(warm, 1500)
+  return () => clearTimeout(timer)
+}
 
 export default function DeferredEditorSurfaces() {
   const [findReplaceVisible, setFindReplaceVisible] = useState(false)
@@ -23,6 +44,8 @@ export default function DeferredEditorSurfaces() {
   const handleFindReplaceReady = useCallback(() => {
     setFindReplaceReady(true)
   }, [])
+
+  useEffect(prefetchFindReplace, [])
 
   useEffect(() => {
     if (findReplaceReady) return

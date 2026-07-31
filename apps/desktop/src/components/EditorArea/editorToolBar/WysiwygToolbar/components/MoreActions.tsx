@@ -5,7 +5,7 @@ import { useCommandStore, useEditorStore } from '@/stores'
 import { useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MfIconButton } from '../../../../ui-v2/Button'
-import { showContextMenu } from '../../../../ui-v2/ContextMenu'
+import { toggleContextMenu } from '../../../../ui-v2/ContextMenu'
 
 export const MoreActions = () => {
   const { activeId } = useEditorStore()
@@ -21,7 +21,7 @@ export const MoreActions = () => {
     const { findMark } = useBookMarksStore.getState()
     const curBookMark = findMark(curFile?.path || '')
 
-    showContextMenu({
+    toggleContextMenu({
       x: rect.x,
       y: rect.y + rect.height,
       items: [

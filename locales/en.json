@@ -47,7 +47,13 @@
     "quote": "Blockquote",
     "bulletList": "Bullet List",
     "orderedList": "Ordered List",
-    "taskList": "Task List"
+    "taskList": "Task List",
+    "table": "Table",
+    "codeBlock": "Code block",
+    "horizontalRule": "Divider line",
+    "findReplace": "Find and replace",
+    "leftSidebar": "Left sidebar",
+    "rightSidebar": "Right sidebar"
   },
   "action": {
     "bookmark": "bookmark",
@@ -521,5 +527,16 @@
   "ai": {
     "capabilities": "Function",
     "export_conversation": "one-click export dialog content to md file"
+  },
+  "menu": {
+    "find_replace": "Find and replace",
+    "command_palette": "Command palette",
+    "left_sidebar": "Left sidebar",
+    "right_sidebar": "Right sidebar",
+    "reset_layout": "Reset layout",
+    "save_now": "Save now",
+    "settings": "Settings",
+    "recent_documents": "Recent documents",
+    "no_recent_documents": "No recent documents"
   }
 }

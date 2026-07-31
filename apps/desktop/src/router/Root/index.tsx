@@ -7,6 +7,7 @@ import { useRefreshAIProvidersModels } from '@/extensions/ai/useAiChatStore'
 import useBookMarksStore from '@/extensions/bookmarks/useBookMarksStore'
 import { useCommandInit } from '@/hooks/useCommandInit'
 import { useExternalLinks } from '@/hooks/useExternalLinks'
+import { useNativeMenuCommands } from '@/hooks/useNativeMenuCommands'
 import { subscribeDocumentFocus } from '@/helper/documentFocus'
 import { appInfoStoreSetup } from '@/services/app-info'
 import { useCommandStore } from '@/stores'
@@ -68,6 +69,7 @@ function Root() {
 
   useCommandInit()
   useExternalLinks()
+  useNativeMenuCommands()
 
   useEffect(() => {
     appInfoStoreSetup()

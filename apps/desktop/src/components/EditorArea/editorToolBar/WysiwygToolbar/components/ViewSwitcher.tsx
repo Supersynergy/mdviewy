@@ -7,7 +7,7 @@ import { useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EditorViewType } from 'rme'
 import { MfIconButton } from '../../../../ui-v2/Button'
-import { showContextMenu } from '../../../../ui-v2/ContextMenu'
+import { toggleContextMenu } from '../../../../ui-v2/ContextMenu'
 
 export const ViewSwitcher = () => {
   const { activeId } = useEditorStore()
@@ -24,6 +24,12 @@ export const ViewSwitcher = () => {
     preview: 'ri-eye-line',
   }
 
+  const viewTypeLabelMap: Record<string, string> = {
+    sourceCode: t('view.source_code'),
+    wysiwyg: t('view.wysiwyg'),
+    preview: t('view.preview'),
+  }
+
   const handleViewClick = useCallback(() => {
     const rect = ref.current?.getBoundingClientRect()
     if (rect === undefined) return
@@ -31,7 +37,7 @@ export const ViewSwitcher = () => {
     const { getFileTypeConfigById } = useFileTypeConfigStore.getState()
     const curFileTypeConfig = getFileTypeConfigById(curFile?.id || '')
 
-    showContextMenu({
+    toggleContextMenu({
       x: rect.x,
       y: rect.y + rect.height,
       items: [
@@ -67,6 +73,10 @@ export const ViewSwitcher = () => {
       rounded='smooth'
       iconRef={ref}
       icon={viewTypeIconMap[editorViewType]}
+      ariaLabel={t('view.label')}
+      tooltipProps={{
+        title: `${t('view.label')}: ${viewTypeLabelMap[editorViewType] ?? editorViewType}`,
+      }}
       onClick={handleViewClick}
     />
   )

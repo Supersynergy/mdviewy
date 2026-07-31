@@ -23,7 +23,6 @@ describe('GlobalStyles editor chrome overrides', () => {
     const source = readFileSync(join(currentDir, 'globalStyles.ts'), 'utf8')
 
     expect(source).toContain('.markdown-body table')
-    expect(source).toContain('overflow-x: auto;')
     expect(source).toContain('white-space: normal;')
     expect(source).toContain('.markdown-body a')
     expect(source).toContain('color: inherit !important;')
@@ -32,12 +31,42 @@ describe('GlobalStyles editor chrome overrides', () => {
     expect(source).toContain('break-after: page;')
   })
 
+  it('lets tables use the available width and wrap their cells', () => {
+    const currentDir = dirname(fileURLToPath(import.meta.url))
+    const source = readFileSync(join(currentDir, 'globalStyles.ts'), 'utf8')
+
+    expect(source).toContain('.markdown-body.markdown-body table {\n    display: table;')
+    expect(source).toContain('table-layout: auto;')
+    expect(source).not.toContain('\n    width: max-content;')
+    // Doubled class outranks the RME cell rule without !important.
+    expect(source).toContain('.markdown-body.markdown-body table :is(th, td)')
+    expect(source).toContain('min-width: 0;')
+    // Cells break long words but keep their longest word as a column minimum.
+    expect(source).toContain('overflow-wrap: break-word;')
+  })
+
+  it('collapses source whitespace in headings, not only in paragraphs', () => {
+    const currentDir = dirname(fileURLToPath(import.meta.url))
+    const source = readFileSync(join(currentDir, 'globalStyles.ts'), 'utf8')
+
+    const normalizeRule = source
+      .split('.markdown-body :where(p, li, blockquote,')[1]
+      ?.split('}')[0]
+
+    expect(normalizeRule).toBeDefined()
+    for (const selector of ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'dt', 'dd', 'summary', 'caption']) {
+      expect(normalizeRule).toContain(selector)
+    }
+    expect(normalizeRule).not.toContain('pre')
+    expect(normalizeRule).not.toContain('code')
+  })
+
   it('does not normalize whitespace inside code blocks', () => {
     const currentDir = dirname(fileURLToPath(import.meta.url))
     const source = readFileSync(join(currentDir, 'globalStyles.ts'), 'utf8')
 
-    expect(source).toContain('.markdown-body :where(p, li, blockquote, td, th, figcaption)')
-    expect(source).not.toContain('.markdown-body :where(p, li, blockquote, td, th, figcaption, pre, code)')
+    expect(source).toContain('.markdown-body :where(p, li, blockquote, td, th, figcaption,')
+    expect(source).not.toContain('pre, code) {\n    white-space: normal;')
     expect(source).not.toContain('.markdown-body pre {\n    white-space: normal;')
     expect(source).not.toContain('.markdown-body code {\n    white-space: normal;')
   })

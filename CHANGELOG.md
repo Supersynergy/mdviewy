@@ -1,6 +1,31 @@
 # Changelog
 
-## 0.92.1 - 2026-07-15
+## Unreleased
+
+### Fixed
+
+- Tables now use the available width and wrap their cell text instead of sizing to their longest cell behind a horizontal scrollbar. Cells break long words but keep their longest word as a column minimum, so headers stay readable.
+- Headings, definition lists, `summary`, and table captions now collapse source whitespace like every other block. Runs of spaces in the Markdown source (`## NMN  (7)`) no longer leak into the rendered document; `pre`, `code`, `kbd`, and `samp` keep their whitespace.
+- Markdown is normalized as it is read from disk: a leading UTF-8 BOM is dropped (it kept the first `#` from parsing as a heading), CRLF/CR becomes LF, and U+2028/U+2029 become real line breaks. Non-breaking spaces are preserved as document content. Saving such a file writes back the normalized text.
+- `adaptive` content width follows the window instead of stopping at a 1600px column, which left several hundred pixels of empty margin on each side of a wide display.
+- Large folders open again. The workspace scan now truncates at its budget instead of failing the whole open with “This folder is too large to open safely”.
+- Opening a folder no longer asks “current window or new window?” first. It opens in the current window; a folder already open elsewhere focuses that window.
+- Toolbar and status-bar menus toggle: clicking the trigger while its menu is open closes it instead of reopening it.
+- Find and Replace opens without a wait — its chunk is warmed while the app is idle instead of being fetched on the first Cmd+F.
+- Blockquotes render as a quiet rule with full text contrast instead of a grey box with washed-out text.
+- Native menu entries that emitted a command nothing handled now work: New File, New Window, Open File, Quick Open, Save As, Find in Files, next/previous tab, Close Window, GitHub, and Report Issue.
+
+### Added
+
+- Editor toolbar: view switcher (Source/Pretty/Preview), strikethrough, table, code block, divider line, and — on the trailing edge — find and replace plus left/right sidebar toggles that show their current state. Each button names its shortcut.
+- Editor menu: find and replace, command palette, sidebar toggles, reset layout, save now, recent documents, open folder, and settings, each with its keyboard shortcut in plain text.
+- Recent documents: the last 20 opened files are remembered across restarts, listed in the editor menu and in the native `File ▸ Open Recent` submenu (with `Clear Recent`). Recent folders now keep 20 entries instead of 12.
+- Native menubar: `Open Recent`, `Open File…`, export as HTML/image, print/PDF, an `Editor Mode` submenu, zoom in/out/actual size, reset layout, next/previous heading, sidebar toggles, and keyboard shortcuts.
+
+### Changed
+
+- Prose blocks use `text-wrap: pretty` and headings `text-wrap: balance` where the WebView supports it, so line breaks avoid orphans.
+- Tables have a rounded frame, single-line borders, and even row padding.
 
 ### Fixed
 

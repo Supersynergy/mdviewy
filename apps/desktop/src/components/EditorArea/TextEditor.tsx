@@ -17,6 +17,7 @@ import {
 import { FileTypeConfig } from '@/helper/fileTypeHandler'
 import { logger } from '@/helper/logger'
 import { analyzeMarkdownContent } from '@/helper/markdownInsights'
+import { normalizeMarkdownSource } from '@/helper/markdownText'
 import { printActiveDocument } from '@/helper/printDocument'
 import { debounce, type DebouncedFunc, throttle } from '@/helper/timing'
 import { useEditorKeybindingStore } from '@/hooks/useKeyboard'
@@ -24,6 +25,7 @@ import { useCommandStore, useEditorStateStore, useEditorStore } from '@/stores'
 import useAppSettingStore from '@/stores/useAppSettingStore'
 import useEditorCounterStore from '@/stores/useEditorCounterStore'
 import useEditorViewTypeStore from '@/stores/useEditorViewTypeStore'
+import useOpenedCacheStore from '@/stores/useOpenedCacheStore'
 import { invoke } from '@tauri-apps/api/core'
 import { save } from '@tauri-apps/plugin-dialog'
 import classNames from 'classnames'
@@ -54,6 +56,8 @@ type SaveHandlerParams = {
    * when active is false, saveHandler will save when editor is active.
    */
   active?: boolean
+  /** Always ask for a destination, even when the file already has a path. */
+  saveAs?: boolean
   onSuccess?: () => void
   onFinally?: () => void
 }
@@ -173,11 +177,17 @@ function TextEditor(props: TextEditorProps) {
           toast.error(res.content)
           return
         }
-        setContent(res.content)
-        updateEditorCounter(res.content)
+        const normalized = normalizeMarkdownSource(res.content)
+        setContent(normalized)
+        updateEditorCounter(normalized)
+        void useOpenedCacheStore.getState().addRecentDocument({
+          path: file.path,
+          name: file.name || getFileNameFromPath(file.path) || file.path,
+        })
       } else if (file.content !== undefined) {
-        setContent(file.content)
-        updateEditorCounter(file.content)
+        const normalized = normalizeMarkdownSource(file.content)
+        setContent(normalized)
+        updateEditorCounter(normalized)
       }
 
       if (!cancelled) {
@@ -219,7 +229,7 @@ function TextEditor(props: TextEditorProps) {
 
       const curEditorState = idStateMap.get(curFile.id)
 
-      if (!curEditorState?.hasUnsavedChanges) {
+      if (!curEditorState?.hasUnsavedChanges && !params.saveAs) {
         runSuccess()
         return
       }
@@ -237,7 +247,7 @@ function TextEditor(props: TextEditorProps) {
       logger.info('editorContent', fileContent)
 
       try {
-        if (!curFile.path) {
+        if (!curFile.path || params.saveAs) {
           if (noFileSaveingRef.current === true) {
             runFinally()
             return
@@ -535,6 +545,12 @@ function TextEditor(props: TextEditorProps) {
         id: 'app_save',
         handler: () => {
           saveHandler()
+        },
+      })
+      useCommandStore.getState().addCommand({
+        id: 'app_saveAs',
+        handler: () => {
+          saveHandler({ saveAs: true })
         },
       })
     }

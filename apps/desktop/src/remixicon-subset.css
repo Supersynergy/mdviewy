@@ -33,6 +33,7 @@
 .ri-check-fill:before { content: "\eb7a"; }
 .ri-checkbox-line:before { content: "\eb85"; }
 .ri-close-line:before { content: "\eb99"; }
+.ri-code-box-line:before { content: "\eba7"; }
 .ri-code-line:before { content: "\eba9"; }
 .ri-code-s-slash-line:before { content: "\ebad"; }
 .ri-collapse-vertical-fill:before { content: "\f52d"; }
@@ -100,6 +101,7 @@
 .ri-sparkling-2-line:before { content: "\f36b"; }
 .ri-sparkling-line:before { content: "\f36d"; }
 .ri-strikethrough:before { content: "\f1ab"; }
+.ri-table-2:before { content: "\f1da"; }
 .ri-terminal-box-line:before { content: "\f1f6"; }
 .ri-terminal-line:before { content: "\f1f8"; }
 .ri-text:before { content: "\f201"; }

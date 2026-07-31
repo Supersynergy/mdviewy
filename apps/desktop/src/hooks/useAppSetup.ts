@@ -14,7 +14,7 @@ import { getFileContent } from '@/services/file-info'
 import { createNewWindow, currentWindow } from '@/services/windows'
 import { useCommandStore, useEditorStore } from '@/stores'
 import useAppSettingStore from '@/stores/useAppSettingStore'
-import type { WorkspaceInfo } from '@/stores/useOpenedCacheStore'
+import type { DocumentInfo, WorkspaceInfo } from '@/stores/useOpenedCacheStore'
 import useOpenedCacheStore from '@/stores/useOpenedCacheStore'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
@@ -158,7 +158,7 @@ window.__mdviewyOpenPaths = (paths) => {
 }
 
 async function appWorkspaceSetup() {
-  const { setRecentWorkspaces } = useOpenedCacheStore.getState()
+  const { setRecentWorkspaces, setRecentDocuments } = useOpenedCacheStore.getState()
   const { setFolderData, addOpenedFile, setActiveId } = useEditorStore.getState()
   logger.debug('=== appWorkspaceSetup: Checking window.openedUrls ===')
   logger.debug('window.openedUrls', window.openedUrls)
@@ -166,11 +166,13 @@ async function appWorkspaceSetup() {
   try {
     const cacheStore = await new LazyStore('.mdviewy_workspaces.dat')
 
-    const getOpenedCacheRes = await invoke<{ recent_workspaces: WorkspaceInfo[] }>(
-      'get_opened_cache',
-    )
+    const getOpenedCacheRes = await invoke<{
+      recent_workspaces: WorkspaceInfo[]
+      recent_documents?: DocumentInfo[]
+    }>('get_opened_cache')
     const recentWorkspaces = getOpenedCacheRes.recent_workspaces
     setRecentWorkspaces(recentWorkspaces)
+    setRecentDocuments(getOpenedCacheRes.recent_documents ?? [])
 
     if (await consumeOpenedPathIngress()) return
 

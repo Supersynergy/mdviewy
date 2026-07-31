@@ -15,8 +15,42 @@ impl WorkspaceInfo {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct DocumentInfo {
+    pub path: String,
+    pub name: String,
+}
+
+impl DocumentInfo {
+    pub fn new(path: String, name: String) -> Self {
+        Self { path, name }
+    }
+}
+
+/// How many entries the recent lists keep.
+const MAX_RECENT_ENTRIES: usize = 20;
+
+/// Puts `entry` at the front of a most-recently-used list, dropping an older
+/// occurrence of the same key and anything past the cap.
+fn promote_recent<T, F>(mut list: Vec<T>, entry: T, key: F) -> Vec<T>
+where
+    F: Fn(&T) -> &str,
+{
+    let entry_key = key(&entry).to_string();
+    if let Some(index) = list.iter().position(|item| key(item) == entry_key) {
+        list.remove(index);
+    }
+
+    list.insert(0, entry);
+    list.truncate(MAX_RECENT_ENTRIES);
+    list
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OpenedCache {
     recent_workspaces: Vec<WorkspaceInfo>,
+    /// Added after the first releases, so older cache files deserialize without it.
+    #[serde(default)]
+    recent_documents: Vec<DocumentInfo>,
 }
 
 impl OpenedCache {
@@ -28,7 +62,12 @@ impl OpenedCache {
 
         Self {
             recent_workspaces: vec![],
+            recent_documents: vec![],
         }
+    }
+
+    pub fn recent_documents(&self) -> &[DocumentInfo] {
+        &self.recent_documents
     }
 
     pub fn get_path() -> PathBuf {
@@ -36,25 +75,30 @@ impl OpenedCache {
     }
 
     pub fn add_recent_workspace(mut self, workspace: WorkspaceInfo) -> Self {
-        let workspace_path = workspace.path.clone();
-        let mut recent_workspaces = self.recent_workspaces.clone();
-        if recent_workspaces.len() > 12 {
-            recent_workspaces.pop();
-        }
-        if let Some(index) = recent_workspaces
-            .iter()
-            .position(|his| his.path == workspace_path)
-        {
-            recent_workspaces.remove(index);
-        }
-
-        recent_workspaces.insert(0, WorkspaceInfo::new(workspace_path));
-        self.recent_workspaces = recent_workspaces;
+        self.recent_workspaces = promote_recent(
+            std::mem::take(&mut self.recent_workspaces),
+            workspace,
+            |item| item.path.as_str(),
+        );
         self.write()
     }
 
     pub fn clear_recent_workspaces(mut self) -> Self {
         self.recent_workspaces = vec![];
+        self.write()
+    }
+
+    pub fn add_recent_document(mut self, document: DocumentInfo) -> Self {
+        self.recent_documents = promote_recent(
+            std::mem::take(&mut self.recent_documents),
+            document,
+            |item| item.path.as_str(),
+        );
+        self.write()
+    }
+
+    pub fn clear_recent_documents(mut self) -> Self {
+        self.recent_documents = vec![];
         self.write()
     }
 
@@ -64,6 +108,10 @@ impl OpenedCache {
                 if let Ok(mut v2) = serde_json::from_str::<OpenedCache>(&v) {
                     v2.recent_workspaces
                         .retain(|item| exists(Path::new(&item.path)));
+                    v2.recent_documents
+                        .retain(|item| exists(Path::new(&item.path)));
+                    v2.recent_workspaces.truncate(MAX_RECENT_ENTRIES);
+                    v2.recent_documents.truncate(MAX_RECENT_ENTRIES);
                     v2.write()
                 } else {
                     Self::default()
@@ -95,7 +143,7 @@ impl Default for OpenedCache {
 }
 
 pub mod cmd {
-    use super::{OpenedCache, WorkspaceInfo};
+    use super::{DocumentInfo, OpenedCache, WorkspaceInfo};
     use tauri::command;
 
     #[command]
@@ -111,5 +159,55 @@ pub mod cmd {
     #[command]
     pub fn clear_recent_workspaces() -> OpenedCache {
         OpenedCache::read().clear_recent_workspaces()
+    }
+
+    #[command]
+    pub fn add_recent_document(document: DocumentInfo) -> OpenedCache {
+        OpenedCache::read().add_recent_document(document)
+    }
+
+    #[command]
+    pub fn clear_recent_documents() -> OpenedCache {
+        OpenedCache::read().clear_recent_documents()
+    }
+
+    /// Rebuilds the native menubar so `File ▸ Open Recent` matches the cache.
+    #[command]
+    pub fn refresh_native_menu(app: tauri::AppHandle) {
+        if let Err(err) = crate::menu::refresh_menu(&app) {
+            println!("failed to refresh menu: {:?}", err);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{promote_recent, DocumentInfo, MAX_RECENT_ENTRIES};
+
+    fn doc(name: &str) -> DocumentInfo {
+        DocumentInfo::new(format!("/docs/{name}"), name.to_string())
+    }
+
+    #[test]
+    fn promote_recent_keeps_the_newest_entries_up_to_the_cap() {
+        let mut list = Vec::new();
+
+        for index in 0..(MAX_RECENT_ENTRIES + 5) {
+            list = promote_recent(list, doc(&format!("{index}.md")), |item| item.path.as_str());
+        }
+
+        assert_eq!(list.len(), MAX_RECENT_ENTRIES);
+        assert_eq!(list[0].name, format!("{}.md", MAX_RECENT_ENTRIES + 4));
+        assert!(!list.iter().any(|item| item.name == "0.md"));
+    }
+
+    #[test]
+    fn promote_recent_moves_a_known_entry_to_the_front_without_duplicating_it() {
+        let list = vec![doc("a.md"), doc("b.md")];
+
+        let list = promote_recent(list, doc("b.md"), |item| item.path.as_str());
+
+        let paths: Vec<_> = list.iter().map(|item| item.path.as_str()).collect();
+        assert_eq!(paths, vec!["/docs/b.md", "/docs/a.md"]);
     }
 }

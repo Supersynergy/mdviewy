@@ -47,7 +47,13 @@
     "quote": "Cita",
     "bulletList": "Lista de viñetas",
     "orderedList": "Lista numerada",
-    "taskList": "Lista de tareas"
+    "taskList": "Lista de tareas",
+    "table": "Tabla",
+    "codeBlock": "Bloque de código",
+    "horizontalRule": "Línea divisoria",
+    "findReplace": "Buscar y reemplazar",
+    "leftSidebar": "Barra lateral izquierda",
+    "rightSidebar": "Barra lateral derecha"
   },
   "action": {
     "bookmark": "marcador",
@@ -521,5 +527,16 @@
     "codeBlocks": "bloques de código",
     "tables": "tablas",
     "frontmatter": "metadatos"
+  },
+  "menu": {
+    "find_replace": "Buscar y reemplazar",
+    "command_palette": "Paleta de comandos",
+    "left_sidebar": "Barra lateral izquierda",
+    "right_sidebar": "Barra lateral derecha",
+    "reset_layout": "Restablecer diseño",
+    "save_now": "Guardar ahora",
+    "settings": "Ajustes",
+    "recent_documents": "Documentos recientes",
+    "no_recent_documents": "Sin documentos recientes"
   }
 }

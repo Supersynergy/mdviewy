@@ -17,8 +17,11 @@ export const normalizeEditorContentWidth = (
   return legacyFullWidth ? 'full' : 'adaptive'
 }
 
+/* 'adaptive' follows the window instead of parking the document in a 1600px
+   column: on a wide display that cap left several hundred pixels of empty
+   margin on each side. 'wide' and 'focused' stay fixed measures for prose. */
 const maxWidthByMode: Record<EditorContentWidth, string> = {
-  adaptive: 'min(100%, clamp(1120px, 90vw, 1600px))',
+  adaptive: 'min(100%, max(1120px, 96vw))',
   focused: 'min(100%, 920px)',
   wide: 'min(100%, 1320px)',
   full: '100%',

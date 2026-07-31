@@ -8,7 +8,7 @@ import NiceModal from '@ebay/nice-modal-react'
 import { useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { InputConfirmModalProps, MODAL_INPUT_ID } from '../../../../Modal'
-import { showContextMenu } from '../../../../ui-v2/ContextMenu'
+import { toggleContextMenu } from '../../../../ui-v2/ContextMenu'
 
 export const AIButton = () => {
   const { activeId, getEditorContent } = useEditorStore()
@@ -68,7 +68,7 @@ ${res}
     const rect = ref.current?.getBoundingClientRect()
     if (rect === undefined) return
 
-    showContextMenu({
+    toggleContextMenu({
       x: rect.x,
       y: rect.y + rect.height,
       items: [

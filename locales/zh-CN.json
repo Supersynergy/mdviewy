@@ -47,7 +47,13 @@
     "quote": "引用",
     "bulletList": "符号列表",
     "orderedList": "有序列表",
-    "taskList": "任务列表"
+    "taskList": "任务列表",
+    "table": "表格",
+    "codeBlock": "代码块",
+    "horizontalRule": "分隔线",
+    "findReplace": "查找和替换",
+    "leftSidebar": "左侧栏",
+    "rightSidebar": "右侧栏"
   },
   "action": {
     "bookmark": "收藏",
@@ -521,5 +527,16 @@
   "ai": {
     "capabilities": "功能",
     "export_conversation": "一键导出对话内容为 md 文件"
+  },
+  "menu": {
+    "find_replace": "查找和替换",
+    "command_palette": "命令面板",
+    "left_sidebar": "左侧栏",
+    "right_sidebar": "右侧栏",
+    "reset_layout": "重置布局",
+    "save_now": "立即保存",
+    "settings": "设置",
+    "recent_documents": "最近的文档",
+    "no_recent_documents": "没有最近的文档"
   }
 }

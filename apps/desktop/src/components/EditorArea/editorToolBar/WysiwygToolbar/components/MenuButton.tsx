@@ -1,10 +1,16 @@
 import { MfIconLabelButton } from '@/components/ui-v2/Button/icon-label-button'
+import EVENT from '@/constants/event'
 import useBookMarksStore from '@/extensions/bookmarks/useBookMarksStore'
 import bus from '@/helper/eventBus'
 import { getFileObject } from '@/helper/files'
+import { shortcutFor } from '@/helper/keybindingLabel'
 import { debounce } from '@/helper/timing'
+import useGlobalKeyboard from '@/hooks/useKeyboard'
 import { currentWindow } from '@/services/windows'
 import { useCommandStore, useEditorStateStore, useEditorStore } from '@/stores'
+import useLayoutStore from '@/stores/useLayoutStore'
+import useOpenedCacheStore from '@/stores/useOpenedCacheStore'
+import { openRecentDocument } from '@/services/recent-documents'
 import useEditorViewTypeStore from '@/stores/useEditorViewTypeStore'
 import useFileTypeConfigStore from '@/stores/useFileTypeConfigStore'
 import NiceModal from '@ebay/nice-modal-react'
@@ -14,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { EditorViewType } from 'rme'
 import { Space, toast } from 'zens'
 import { MODAL_INFO_ID } from '../../../../Modal'
-import { showContextMenu } from '../../../../ui-v2/ContextMenu'
+import { toggleContextMenu } from '../../../../ui-v2/ContextMenu'
 
 type FileNormalInfo = {
   size: string
@@ -30,6 +36,9 @@ export const MenuButton = memo(() => {
   const { activeId } = useEditorStore()
   const { execute } = useCommandStore()
   const { editorViewTypeMap } = useEditorViewTypeStore()
+  const { keyboardInfos } = useGlobalKeyboard()
+  const { leftBar, rightBar } = useLayoutStore()
+  const { recentDocuments } = useOpenedCacheStore()
   const { t } = useTranslation()
   const ref = useRef<any>(null)
 
@@ -91,7 +100,7 @@ export const MenuButton = memo(() => {
     const { findMark } = useBookMarksStore.getState()
     const curBookMark = findMark(curFile?.path || '')
 
-    showContextMenu({
+    toggleContextMenu({
       x: rect.x,
       y: rect.y + rect.height,
       items: [
@@ -123,6 +132,50 @@ export const MenuButton = memo(() => {
         },
         {
           type: 'divider' as const,
+        },
+        {
+          label: t('menu.find_replace'),
+          value: 'find_replace',
+          shortcut: shortcutFor(keyboardInfos, 'app_findReplaceEditor'),
+          handler: () => execute('app_findReplaceEditor'),
+        },
+        {
+          label: t('menu.command_palette'),
+          value: 'command_palette',
+          shortcut: 'Cmd+K',
+          handler: () =>
+            window.dispatchEvent(new CustomEvent('mf:cmd_palette:open', { detail: 'all' })),
+        },
+        {
+          type: 'divider' as const,
+        },
+        {
+          label: t('menu.left_sidebar'),
+          value: 'toggle_left_sidebar',
+          checked: leftBar.visible,
+          shortcut: shortcutFor(keyboardInfos, 'app_toggleLeftsidebarVisible'),
+          handler: () => execute('app_toggleLeftsidebarVisible'),
+        },
+        {
+          label: t('menu.right_sidebar'),
+          value: 'toggle_right_sidebar',
+          checked: rightBar.visible,
+          shortcut: shortcutFor(keyboardInfos, 'app_toggleRightsidebarVisible'),
+          handler: () => execute('app_toggleRightsidebarVisible'),
+        },
+        {
+          label: t('menu.reset_layout'),
+          value: 'reset_layout',
+          handler: () => execute('app_reset_layout'),
+        },
+        {
+          type: 'divider' as const,
+        },
+        {
+          label: t('menu.save_now'),
+          value: 'save_now',
+          shortcut: shortcutFor(keyboardInfos, EVENT.app_save),
+          handler: () => execute(EVENT.app_save),
         },
         {
           label: t('file.info'),
@@ -166,6 +219,40 @@ export const MenuButton = memo(() => {
           type: 'divider' as const,
         },
         {
+          label: t('menu.recent_documents'),
+          value: 'recent_documents',
+          children:
+            recentDocuments.length > 0
+              ? recentDocuments.slice(0, 20).map((document) => ({
+                  label: document.name,
+                  value: `recent_document:${document.path}`,
+                  handler: () => {
+                    void openRecentDocument(document.path)
+                  },
+                }))
+              : [
+                  {
+                    label: t('menu.no_recent_documents'),
+                    value: 'recent_documents_empty',
+                  },
+                ],
+        },
+        {
+          label: t('file.openDir'),
+          value: 'open_folder',
+          shortcut: shortcutFor(keyboardInfos, EVENT.app_openFolder),
+          handler: () => execute(EVENT.app_openFolder),
+        },
+        {
+          label: t('menu.settings'),
+          value: 'open_settings',
+          shortcut: shortcutFor(keyboardInfos, EVENT.app_openSetting),
+          handler: () => execute(EVENT.app_openSetting),
+        },
+        {
+          type: 'divider' as const,
+        },
+        {
           value: 'export_html',
           label: t('contextmenu.editor_tab.export_html'),
           handler: () => {
@@ -188,7 +275,17 @@ export const MenuButton = memo(() => {
         },
       ],
     })
-  }, [curFile, editorViewType, t, execute, fileNormalInfo])
+  }, [
+    curFile,
+    editorViewType,
+    t,
+    execute,
+    fileNormalInfo,
+    keyboardInfos,
+    leftBar.visible,
+    rightBar.visible,
+    recentDocuments,
+  ])
 
   if (!curFile) return null
 

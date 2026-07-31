@@ -1,5 +1,5 @@
 import { MfIconLabelButton } from '@/components/ui-v2/Button/icon-label-button'
-import { showContextMenu } from '@/components/ui-v2/ContextMenu'
+import { toggleContextMenu } from '@/components/ui-v2/ContextMenu'
 import { getFileObject } from '@/helper/files'
 import {
   buildAgentHandoffPrompt,
@@ -72,7 +72,7 @@ export const SmartActionsButton = () => {
       limit: 8,
     }).filter((ref) => ref.kind === 'path')
 
-    showContextMenu({
+    toggleContextMenu({
       x: rect.x,
       y: rect.y + rect.height,
       items: [

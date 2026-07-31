@@ -158,13 +158,30 @@ export const GlobalStyles = createGlobalStyle`
     font-size: 0.88em;
   }
 
+  /* A quote is emphasis, not a grey box: a quiet rule on the left, full text
+     contrast, no fill. */
   blockquote {
     border-left: 3px solid ${(props) => props.theme.accentColor};
-    margin: 0.6em 0;
-    padding: 0.2em 1em;
-    color: ${(props) => props.theme.labelFontColor};
-    background: ${(props) => props.theme.hoverColor};
-    border-radius: 0 8px 8px 0;
+    margin: 1em 0;
+    padding: 0.1em 0 0.1em 1.1em;
+    color: inherit;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .markdown-body.markdown-body blockquote {
+    border-left: 3px solid ${(props) => props.theme.accentColor};
+    background: transparent;
+    color: inherit;
+    padding: 0.1em 0 0.1em 1.1em;
+  }
+
+  .markdown-body.markdown-body blockquote > :is(p, ul, ol):first-child {
+    margin-top: 0;
+  }
+
+  .markdown-body.markdown-body blockquote > :is(p, ul, ol):last-child {
+    margin-bottom: 0;
   }
 
   hr {
@@ -194,9 +211,21 @@ export const GlobalStyles = createGlobalStyle`
     overflow-wrap: break-word;
   }
 
-  .markdown-body :where(p, li, blockquote, td, th, figcaption) {
+  /* Source whitespace is markup, not layout. The RME root ships
+     'white-space: pre-wrap', which leaks literal runs of spaces from the file
+     into rendered blocks (e.g. '## NMN  (7)'). Collapse it everywhere text is
+     prose; pre/code/kbd/samp keep their own whitespace. */
+  .markdown-body :where(p, li, blockquote, td, th, figcaption, caption, dt, dd, summary, h1, h2, h3, h4, h5, h6) {
     white-space: normal;
     overflow-wrap: anywhere;
+  }
+
+  .markdown-body :where(p, li, blockquote, dd) {
+    text-wrap: pretty;
+  }
+
+  .markdown-body :where(h1, h2, h3, h4, h5, h6) {
+    text-wrap: balance;
   }
 
   .markdown-body :where(img, video, canvas, svg) {
@@ -204,12 +233,80 @@ export const GlobalStyles = createGlobalStyle`
     height: auto;
   }
 
-  .markdown-body table {
-    display: block;
-    width: max-content;
+  /* Adaptive tables: fit the container, wrap the text. RME ships
+     '& table { display: block; width: max-content; overflow: auto }', which
+     sizes a table to its longest cell and pushes the rest behind a horizontal
+     scrollbar. Doubling the class outranks it without !important. */
+  .markdown-body.markdown-body table {
+    display: table;
+    table-layout: auto;
+    width: 100%;
     max-width: 100%;
-    overflow-x: auto;
+    margin: 1.25em 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid ${(props) => props.theme.borderColor};
+    border-radius: 10px;
     white-space: normal;
+  }
+
+  /* One border per edge: cells own the inner grid, the table owns the frame.
+     RME draws a row border of its own, which would double up. */
+  .markdown-body.markdown-body table tr {
+    border-top: 0;
+  }
+
+  /* Doubled class beats the RME styled-component rule
+     ('& table th, & table td { min-width: 60px; padding: 6px 20px }')
+     without !important, so narrow columns can actually shrink. */
+  /* 'break-word' instead of 'anywhere': a cell still breaks a word that cannot
+     fit, but its longest word keeps counting towards the column's minimum
+     width, so headers stay readable ('Vorschlag', not 'Vorsc hlag'). */
+  .markdown-body.markdown-body table :is(th, td) {
+    min-width: 0;
+    max-width: 72ch;
+    padding: 9px 14px;
+    vertical-align: top;
+    line-height: 1.45;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: manual;
+    border: 0;
+    border-inline-end: 1px solid ${(props) => props.theme.borderColor};
+    border-block-end: 1px solid ${(props) => props.theme.borderColor};
+  }
+
+  .markdown-body.markdown-body table :is(th, td):last-child {
+    border-inline-end: 0;
+  }
+
+  .markdown-body.markdown-body table tr:last-child :is(th, td) {
+    border-block-end: 0;
+  }
+
+  /* Round the frame without clipping: RME forces 'overflow: visible' on tables
+     so its column handles stay reachable, so the corner cells carry the radius. */
+  .markdown-body.markdown-body table tr:first-child :is(th, td):first-child {
+    border-start-start-radius: 10px;
+  }
+
+  .markdown-body.markdown-body table tr:first-child :is(th, td):last-child {
+    border-start-end-radius: 10px;
+  }
+
+  .markdown-body.markdown-body table tr:last-child :is(th, td):first-child {
+    border-end-start-radius: 10px;
+  }
+
+  .markdown-body.markdown-body table tr:last-child :is(th, td):last-child {
+    border-end-end-radius: 10px;
+  }
+
+  /* Markdown table cells hold inline content only, so the paragraph margins
+     RME applies to block content just make rows uneven. */
+  .markdown-body.markdown-body table :is(th, td) > * {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .markdown-body a {
