@@ -149,16 +149,8 @@ fn read_directory_limited(
 
         if file_type.is_dir() {
             kind = String::from("dir");
-            children = match read_directory_limited(
-                &file_path,
-                depth + 1,
-                visited,
-                max_entries,
-                max_depth,
-            ) {
-                Ok(files) => Some(files),
-                Err(_) => None,
-            };
+            children =
+                read_directory_limited(&file_path, depth + 1, visited, max_entries, max_depth).ok();
         }
 
         let new_file_info = FileInfo {
