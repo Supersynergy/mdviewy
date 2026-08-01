@@ -19,6 +19,17 @@ describe('editor content width', () => {
     expect(normalizeEditorContentWidth(undefined, true)).toBe('full')
   })
 
+  it('keeps adaptive on the window instead of a centred column', () => {
+    expect(source).toContain("adaptive: '100%'")
+    // A `max(…px, …vw)` floor re-centres the document and reopens side gutters.
+    expect(source).not.toMatch(/adaptive: '[^']*max\(/)
+  })
+
+  it('keeps the edge margin small and lets full width go edge to edge', () => {
+    expect(source).toContain("'clamp(9px, 1.25vw, 24px)'")
+    expect(source).toContain("props.contentWidth === 'full' ? '0px'")
+  })
+
   it('keeps parsed Markdown delimiters hidden in Pretty mode', () => {
     expect(source).toContain('& .md-mark')
     expect(source).toContain('display: none !important')

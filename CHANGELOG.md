@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.97.0 - 2026-08-01
+
+### Fixed
+
+- Halved the margin around the document and removed the last cause of side whitespace: `adaptive` had a `max(1120px, …)` floor, so on any window narrower than ~1130px the document was capped at 1120px and re-centred with gutters. It now follows the window, `full` runs edge to edge, and the padding shrank from `clamp(18px, 2.5vw, 48px)` to `clamp(9px, 1.25vw, 24px)`.
+- Native menubar coverage is complete: all 40 menu ids resolve to a handler (`Go ▸ Go to Heading` included). Verified by a wiring audit over menu ids, registered commands, and bus listeners.
+
+### Changed
+
+- Menu commands live in one place. `useCommandInit` registered `Quick Open`, `Find in Files`, `Recent Files`, tab cycling, GitHub, and Report Issue; `useNativeMenuCommands` registered them again with different behaviour. The duplicates are gone and the surviving handlers open links in the system browser instead of the WebView.
+
+### Note
+
+- The 0.95.0 entry overstated the menu fix: `Quick Open`, `Find in Files`, next/previous tab, GitHub, and Report Issue already had handlers. Genuinely dead before 0.95.0 were New File, New Window, Open File, Save As, and Close Window.
+
 ## 0.96.0 - 2026-08-01
 
 ### Fixed

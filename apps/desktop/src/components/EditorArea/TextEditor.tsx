@@ -597,7 +597,9 @@ function TextEditor(props: TextEditorProps) {
       sourceCodeTextContainerProps: {
         spellCheck: settingData.source_code_editor_spellcheck,
       },
-      offset: { top: 10, left: 16 },
+      // Halved with the wrapper padding: the document should sit close to the
+      // window edge, not behind a wide gutter.
+      offset: { top: 6, left: 8 },
       styleToken: {
         id,
         rootFontSize: `${settingData.editor_root_font_size}px`,

@@ -17,11 +17,12 @@ export const normalizeEditorContentWidth = (
   return legacyFullWidth ? 'full' : 'adaptive'
 }
 
-/* 'adaptive' follows the window instead of parking the document in a 1600px
-   column: on a wide display that cap left several hundred pixels of empty
-   margin on each side. 'wide' and 'focused' stay fixed measures for prose. */
+/* 'adaptive' follows the window and keeps a small, even margin — a fixed cap
+   parked the document in a column and left the rest of a wide display empty,
+   and a `max(1120px, …)` floor re-centred it with gutters on mid-size windows.
+   'wide' and 'focused' stay fixed measures for prose; 'full' goes edge to edge. */
 const maxWidthByMode: Record<EditorContentWidth, string> = {
-  adaptive: 'min(100%, max(1120px, 96vw))',
+  adaptive: '100%',
   focused: 'min(100%, 920px)',
   wide: 'min(100%, 1320px)',
   full: '100%',
@@ -56,8 +57,7 @@ export const EditorWrapper = styled.div.attrs<EditorWrapperProps>((props) => pro
       ? css({
           maxWidth: maxWidthByMode[props.contentWidth],
           margin: '0 auto',
-          paddingInline:
-            props.contentWidth === 'full' ? '24px' : 'clamp(18px, 2.5vw, 48px)',
+          paddingInline: props.contentWidth === 'full' ? '0px' : 'clamp(9px, 1.25vw, 24px)',
           paddingBottom: '3rem',
           marginInlineStart: 'auto',
           marginInlineEnd: 'auto',
