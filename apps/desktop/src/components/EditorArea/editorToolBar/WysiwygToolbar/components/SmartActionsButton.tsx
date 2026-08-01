@@ -12,20 +12,9 @@ import { useEditorStore } from '@/stores'
 import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { Command } from '@tauri-apps/plugin-shell'
+import { openTerminalAt } from '@/helper/terminal'
 import { useCallback, useRef } from 'react'
 import { toast } from 'zens'
-
-const openInOsTerminal = async (dir: string) => {
-  const isMac = navigator.platform.toLowerCase().includes('mac')
-  const isWin = navigator.platform.toLowerCase().includes('win')
-  if (isMac) {
-    await runShell('open', ['-a', 'Terminal', dir])
-  } else if (isWin) {
-    await runShell('cmd', ['/c', 'start', '', 'cmd', '/k', `cd /d "${dir}"`])
-  } else {
-    await runShell('xdg-open', [dir])
-  }
-}
 
 const openFolder = async (dir: string) => {
   const isMac = navigator.platform.toLowerCase().includes('mac')
@@ -41,6 +30,24 @@ const openFolder = async (dir: string) => {
 
 const openPathOrUrl = async (value: string) => {
   await openFolder(value)
+}
+
+/**
+ * Starts an agent CLI in the preferred terminal. Terminals that cannot take a
+ * command fall back to the clipboard, so the user still gets one paste.
+ */
+const runAgent = async (dir: string, agent: 'claude' | 'codex') => {
+  if (!dir) return
+  const command = `cd "${dir}" && ${agent}`
+  const launch = await openTerminalAt(dir, command)
+
+  if (launch.ranCommand) {
+    toast.success(`${agent} started in ${launch.id}`)
+    return
+  }
+
+  await writeText(command)
+  toast.success(`${launch.id} opened; command on clipboard`)
 }
 
 const runShell = async (program: string, args: string[]) => {
@@ -76,6 +83,17 @@ export const SmartActionsButton = () => {
       x: rect.x,
       y: rect.y + rect.height,
       items: [
+        {
+          label: 'Reveal in Finder',
+          value: 'reveal',
+          handler: async () => {
+            if (!path) return
+            await revealItemInDir(path)
+          },
+        },
+        {
+          type: 'divider' as const,
+        },
         {
           label: 'Copy absolute path',
           value: 'copy-path',
@@ -145,14 +163,6 @@ export const SmartActionsButton = () => {
           },
         },
         {
-          label: 'Reveal in Finder',
-          value: 'reveal',
-          handler: async () => {
-            if (!path) return
-            await revealItemInDir(path)
-          },
-        },
-        {
           label: 'Open containing folder',
           value: 'open-folder',
           handler: async () => {
@@ -161,32 +171,23 @@ export const SmartActionsButton = () => {
           },
         },
         {
-          label: 'Open Terminal here',
+          label: 'Open terminal here',
           value: 'terminal',
           handler: async () => {
             if (!dir) return
-            await openInOsTerminal(dir)
+            const launch = await openTerminalAt(dir)
+            toast.success(`Opened ${launch.id}`)
           },
         },
         {
           label: 'Open folder in Claude Code',
           value: 'claude',
-          handler: async () => {
-            if (!dir) return
-            await openInOsTerminal(dir)
-            await writeText(`cd "${dir}" && claude`)
-            toast.success('Terminal opened; command on clipboard')
-          },
+          handler: () => runAgent(dir, 'claude'),
         },
         {
           label: 'Open folder in Codex',
           value: 'codex',
-          handler: async () => {
-            if (!dir) return
-            await openInOsTerminal(dir)
-            await writeText(`cd "${dir}" && codex`)
-            toast.success('Terminal opened; command on clipboard')
-          },
+          handler: () => runAgent(dir, 'codex'),
         },
         {
           label: 'Copy "Improve this file" prompt',

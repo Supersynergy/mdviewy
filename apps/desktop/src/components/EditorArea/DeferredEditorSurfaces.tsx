@@ -50,10 +50,13 @@ export default function DeferredEditorSurfaces() {
   useEffect(() => {
     if (findReplaceReady) return
 
-    useCommandStore.getState().addCommand({
-      id: 'app_findReplaceEditor',
-      handler: openFindReplace,
-    })
+    const { addCommand } = useCommandStore.getState()
+
+    addCommand({ id: 'app_findReplaceEditor', handler: openFindReplace })
+    // Find Next/Previous before the panel exists: open it, then the mounted
+    // panel replaces these with the real step handlers.
+    addCommand({ id: 'app_findNext', handler: openFindReplace })
+    addCommand({ id: 'app_findPrev', handler: openFindReplace })
 
     window.addEventListener('mf:find_replace:open', openFindReplace)
     return () => {

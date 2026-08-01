@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.96.0 - 2026-08-01
+
+### Fixed
+
+- The code-block copy button no longer looks like it vanishes after a copy. `ri-check-line` was missing from the generated Remixicon subset, so the success icon rendered as nothing; RME's runtime icons are now part of the subset and the button spells out `Copied!`.
+- `Edit ▸ Find Next` and `Find Previous` do something: they step through matches, and open the find panel first when it is closed.
+
+### Changed
+
+- `Open terminal here` and the Claude Code / Codex handoffs use the terminal you actually installed — cmux, Ghostty, WezTerm, kitty, Alacritty, iTerm, Warp, then Terminal.app. Terminals that accept a command start the agent directly; the others still open the folder and put the command on the clipboard.
+- `Reveal in Finder` sits at the top of the Smart menu, the Smart panel, and the file-tree context menu, where the most valuable action belongs.
+
 ## 0.95.0 - 2026-07-31
 
 Supersedes tags `v0.93.0` and `v0.93.1`, which carried this same work.

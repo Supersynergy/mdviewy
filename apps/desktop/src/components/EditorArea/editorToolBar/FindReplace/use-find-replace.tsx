@@ -100,7 +100,21 @@ export function useFindReplace(ctx: EditorContext): UseFindReplaceReturn {
         stopFind()
       }
     })
-  }, [addCommand, stopFind])
+    // `Edit ▸ Find Next / Find Previous` in the native menubar emit these ids;
+    // without handlers those entries did nothing.
+    addCommand({
+      id: 'app_findNext',
+      handler: () => {
+        findNext()
+      },
+    })
+    addCommand({
+      id: 'app_findPrev',
+      handler: () => {
+        findPrev()
+      },
+    })
+  }, [addCommand, stopFind, findNext, findPrev])
 
   useEffect(() => {
     find()

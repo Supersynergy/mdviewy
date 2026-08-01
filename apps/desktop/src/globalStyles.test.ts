@@ -71,6 +71,14 @@ describe('GlobalStyles editor chrome overrides', () => {
     expect(source).not.toContain('.markdown-body code {\n    white-space: normal;')
   })
 
+  it('confirms a code-block copy in words, not only by icon', () => {
+    const currentDir = dirname(fileURLToPath(import.meta.url))
+    const source = readFileSync(join(currentDir, 'globalStyles.ts'), 'utf8')
+
+    expect(source).toContain(".cm-copy-btn[title='Copied!']")
+    expect(source).toContain("content: 'Copied!';")
+  })
+
   it('prints only the active document without app chrome', () => {
     const currentDir = dirname(fileURLToPath(import.meta.url))
     const source = readFileSync(join(currentDir, 'globalStyles.ts'), 'utf8')

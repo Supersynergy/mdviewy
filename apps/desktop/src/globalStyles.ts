@@ -309,6 +309,33 @@ export const GlobalStyles = createGlobalStyle`
     margin-bottom: 0;
   }
 
+  /* Code-block copy button. RME swaps the icon and sets title="Copied!" on a
+     successful copy; spell that out so the confirmation is readable, and keep
+     the button in place instead of leaving an unlabelled chip behind. */
+  .markdown-body .cm-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    opacity: 0.75;
+    transition: opacity 120ms ease, color 120ms ease;
+  }
+
+  .markdown-body .cm-copy-btn:hover {
+    opacity: 1;
+  }
+
+  .markdown-body .cm-copy-btn[title='Copied!'] {
+    opacity: 1;
+    color: ${(props) => props.theme.successColor} !important;
+  }
+
+  .markdown-body .cm-copy-btn[title='Copied!']::after {
+    content: 'Copied!';
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
   .markdown-body a {
     color: inherit !important;
     text-decoration: none !important;

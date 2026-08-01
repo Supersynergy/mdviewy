@@ -17,6 +17,7 @@ import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { Command } from '@tauri-apps/plugin-shell'
 import { memo, useMemo } from 'react'
 import styled from 'styled-components'
+import { openTerminalAt } from '@/helper/terminal'
 import { toast } from 'zens'
 
 type ActionFn = (file: { path?: string; name: string; id: string }) => void | Promise<void>
@@ -29,17 +30,21 @@ type ActionItem = {
   disabled?: (file: { path?: string }) => boolean
 }
 
-const openInOsTerminal = async (dir: string) => {
-  const isMac = navigator.platform.toLowerCase().includes('mac')
-  const isWin = navigator.platform.toLowerCase().includes('win')
-  if (isMac) {
-    await runShell('open', ['-a', 'Terminal', dir])
-  } else if (isWin) {
-    await runShell('cmd', ['/c', 'start', '', 'cmd', '/k', `cd /d "${dir}"`])
-  } else {
-    // Linux — try common terminals via xdg-open of folder; user can launch term themselves.
-    await runShell('xdg-open', [dir])
+/**
+ * Starts an agent CLI in the preferred terminal (cmux, Ghostty, WezTerm, …).
+ * Terminals that cannot take a command fall back to the clipboard.
+ */
+const runAgentInTerminal = async (dir: string, agent: 'claude' | 'codex') => {
+  const command = `cd "${dir}" && ${agent}`
+  const launch = await openTerminalAt(dir, command)
+
+  if (launch.ranCommand) {
+    toast.success(`${agent} started in ${launch.id}`)
+    return
   }
+
+  await writeText(command)
+  toast.success(`${launch.id} opened; command on clipboard`)
 }
 
 const openFolder = async (dir: string) => {
@@ -71,6 +76,51 @@ const runShell = async (program: string, args: string[]) => {
 }
 
 const ACTION_GROUPS: ActionGroup[] = [
+  {
+    title: 'Reveal & Open',
+    items: [
+      {
+        icon: 'ri-eye-line',
+        label: 'Reveal in Finder',
+        run: async (f) => {
+          if (!f.path) return
+          await revealItemInDir(f.path)
+        },
+        disabled: (f) => !f.path,
+      },
+      {
+        icon: 'ri-folder-open-line',
+        label: 'Open containing folder',
+        run: async (f) => {
+          const dir = folderOf(f.path)
+          if (!dir) return
+          await openFolder(dir)
+        },
+        disabled: (f) => !f.path,
+      },
+      {
+        icon: 'ri-terminal-box-line',
+        label: 'Open terminal here',
+        hint: 'preferred terminal, cd to folder',
+        run: async (f) => {
+          const dir = folderOf(f.path)
+          if (!dir) return
+          const launch = await openTerminalAt(dir)
+          toast.success(`Opened ${launch.id}`)
+        },
+        disabled: (f) => !f.path,
+      },
+      {
+        icon: 'ri-code-s-slash-line',
+        label: 'Open in VS Code',
+        run: async (f) => {
+          if (!f.path) return
+          await runShell('code', [f.path])
+        },
+        disabled: (f) => !f.path,
+      },
+    ],
+  },
   {
     title: 'Clipboard',
     items: [
@@ -121,51 +171,6 @@ const ACTION_GROUPS: ActionGroup[] = [
     ],
   },
   {
-    title: 'Reveal & Open',
-    items: [
-      {
-        icon: 'ri-eye-line',
-        label: 'Reveal in Finder',
-        run: async (f) => {
-          if (!f.path) return
-          await revealItemInDir(f.path)
-        },
-        disabled: (f) => !f.path,
-      },
-      {
-        icon: 'ri-folder-open-line',
-        label: 'Open containing folder',
-        run: async (f) => {
-          const dir = folderOf(f.path)
-          if (!dir) return
-          await openFolder(dir)
-        },
-        disabled: (f) => !f.path,
-      },
-      {
-        icon: 'ri-terminal-box-line',
-        label: 'Open Terminal here',
-        hint: 'cd to folder',
-        run: async (f) => {
-          const dir = folderOf(f.path)
-          if (!dir) return
-          // macOS: open -a Terminal; Linux: gnome-terminal/xterm; Windows: wt
-          await openInOsTerminal(dir)
-        },
-        disabled: (f) => !f.path,
-      },
-      {
-        icon: 'ri-code-s-slash-line',
-        label: 'Open in VS Code',
-        run: async (f) => {
-          if (!f.path) return
-          await runShell('code', [f.path])
-        },
-        disabled: (f) => !f.path,
-      },
-    ],
-  },
-  {
     title: 'Assistant handoff',
     items: [
       {
@@ -175,10 +180,7 @@ const ACTION_GROUPS: ActionGroup[] = [
         run: async (f) => {
           const dir = folderOf(f.path)
           if (!dir) return
-          await openInOsTerminal(dir)
-          // Pre-fill prompt via cmux? — fallback: terminal opens, user types `claude`.
-          await writeText(`cd "${dir}" && claude`)
-          toast.success('Folder open + command copied: paste in terminal')
+          await runAgentInTerminal(dir, 'claude')
         },
         disabled: (f) => !f.path,
       },
@@ -189,9 +191,7 @@ const ACTION_GROUPS: ActionGroup[] = [
         run: async (f) => {
           const dir = folderOf(f.path)
           if (!dir) return
-          await openInOsTerminal(dir)
-          await writeText(`cd "${dir}" && codex`)
-          toast.success('Folder open + command copied')
+          await runAgentInTerminal(dir, 'codex')
         },
         disabled: (f) => !f.path,
       },
