@@ -1,5 +1,5 @@
 import { Flex } from 'antd'
-import { type FC } from 'react'
+import { type FC, useEffect } from 'react'
 import type { EditorContext } from 'rme'
 import { FindController } from './find-controller'
 import { FindInput } from './find-input'
@@ -10,9 +10,17 @@ import { useFindReplace } from './use-find-replace'
 export interface FindReplaceComponentProps {
   onDismiss?: () => void
   editorCtx: EditorContext
+  /** Search term to start from; re-applied whenever the nonce changes. */
+  initialQuery?: string
+  initialQueryNonce?: number
 }
 
-export const FindReplaceComponent: FC<FindReplaceComponentProps> = ({ onDismiss, editorCtx }) => {
+export const FindReplaceComponent: FC<FindReplaceComponentProps> = ({
+  onDismiss,
+  editorCtx,
+  initialQuery,
+  initialQueryNonce,
+}) => {
   const {
     query,
     setQuery,
@@ -28,6 +36,11 @@ export const FindReplaceComponent: FC<FindReplaceComponentProps> = ({ onDismiss,
     replace,
     replaceAll,
   } = useFindReplace(editorCtx)
+
+  useEffect(() => {
+    if (initialQuery) setQuery(initialQuery)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuery, initialQueryNonce])
 
   return (
     <Flex gap={8} vertical wrap={false}>

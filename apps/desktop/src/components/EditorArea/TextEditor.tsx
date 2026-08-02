@@ -27,6 +27,8 @@ import useEditorCounterStore from '@/stores/useEditorCounterStore'
 import useEditorViewTypeStore from '@/stores/useEditorViewTypeStore'
 import useOpenedCacheStore from '@/stores/useOpenedCacheStore'
 import { invoke } from '@tauri-apps/api/core'
+import { writeText } from '@tauri-apps/plugin-clipboard-manager'
+import { openPath, openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
 import { save } from '@tauri-apps/plugin-dialog'
 import classNames from 'classnames'
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -44,6 +46,8 @@ import {
   EditorProps as MfEditorProps,
 } from 'rme'
 import { toast } from 'zens'
+import { toggleContextMenu } from '@/components/ui-v2/ContextMenu'
+import { buildEditorContextMenu, readEditorContextTarget } from './editorContextMenu'
 import { createWysiwygDelegateOptions } from './createWysiwygDelegateOptions'
 import { createMdviewyWysiwygDelegate } from './createMdviewyWysiwygDelegate'
 import { EditorWrapper, normalizeEditorContentWidth } from './EditorWrapper'
@@ -583,6 +587,77 @@ function TextEditor(props: TextEditorProps) {
     [delegate.manager.view],
   )
 
+  /**
+   * Replaces the WebView's default menu (Look Up, Font, Speech, Substitutions,
+   * Services ...) with actions that act on the Markdown under the pointer.
+   */
+  const handleContextMenu: React.MouseEventHandler<HTMLDivElement> = useCallback(
+    (event) => {
+      const ctx = useEditorStore.getState().editorCtxMap.get(id)
+      const commands = (ctx?.commands ?? {}) as Record<string, (attrs?: unknown) => void>
+      const selection = window.getSelection()?.toString() ?? ''
+      const file = getFileObject(id)
+
+      const target = readEditorContextTarget(event, { selection, filePath: file?.path })
+
+      const items = buildEditorContextMenu(target, {
+        available: (command) => typeof commands[command] === 'function',
+        run: (command, attrs) => commands[command]?.(attrs),
+        copy: (text) => {
+          void writeText(text)
+          toast.success('Copied')
+        },
+        cut: () => {
+          // execCommand('cut') is unreliable in WKWebView; copy, then let the
+          // editor delete the selection it still owns.
+          void writeText(selection)
+          document.execCommand('delete')
+        },
+        paste: () => {
+          if (document.execCommand('paste')) return
+          void clipboardRead().then((clipboard) => {
+            const text = typeof clipboard === 'string' ? clipboard : clipboard?.text
+            if (text) document.execCommand('insertText', false, text)
+          })
+        },
+        pastePlainText: () => {
+          void clipboardRead().then((clipboard) => {
+            const text = typeof clipboard === 'string' ? clipboard : clipboard?.text
+            if (!text) return
+            document.execCommand('insertText', false, text)
+          })
+        },
+        findInDocument: (query) => {
+          window.dispatchEvent(new CustomEvent('mf:find_replace:open', { detail: { query } }))
+        },
+        openLink: (href) => {
+          if (/^(https?:|mailto:)/i.test(href)) {
+            void openUrl(href)
+          } else {
+            void openPath(href)
+          }
+        },
+        revealInFinder: () => {
+          if (file?.path) void revealItemInDir(file.path)
+        },
+        copyAiPrompt: (text) => {
+          const name = file?.name || file?.path || 'this document'
+          void writeText(
+            [`In ${name} I selected:`, '', text, '', 'Explain it, then propose a concrete improvement.'].join('\n'),
+          )
+          toast.success('Prompt copied')
+        },
+      })
+
+      if (!items.length) return
+
+      event.preventDefault()
+      event.stopPropagation()
+      toggleContextMenu({ x: event.clientX, y: event.clientY, items })
+    },
+    [id],
+  )
+
   const editorProps: MfEditorProps = useMemo(
     () => ({
       initialType: fileTypeConfig?.defaultMode,
@@ -743,6 +818,7 @@ function TextEditor(props: TextEditorProps) {
       data-mdviewy-active-editor={active ? 'true' : 'false'}
       active={active}
       onClick={handleWrapperClick}
+      onContextMenu={handleContextMenu}
     >
       <div style={{ height: '100%', display: editorViewType === EditorViewType.PREVIEW ? 'none' : 'block' }}>
         <MfEditor ref={editorRef} onChange={handleChange} {...editorProps} />

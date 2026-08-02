@@ -7,6 +7,8 @@ import { FindReplaceComponent } from './find-replace-component'
 
 export interface FindReplaceOpenRequest {
   nonce: number
+  /** Prefills the search box, e.g. from `Find “selection”` in the context menu. */
+  query?: string
 }
 
 interface FindReplaceProps {
@@ -97,7 +99,12 @@ export const FindReplace: FC<FindReplaceProps> = ({ openRequest, onReady }) => {
 
   return (
       <FindReplaceWrapper ref={ref}>
-        <FindReplaceComponent onDismiss={close} editorCtx={editorCtx} />
+        <FindReplaceComponent
+          onDismiss={close}
+          editorCtx={editorCtx}
+          initialQuery={openRequest?.query}
+          initialQueryNonce={openRequest?.nonce}
+        />
       </FindReplaceWrapper>
   )
 }

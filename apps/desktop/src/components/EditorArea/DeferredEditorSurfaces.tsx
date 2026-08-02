@@ -34,10 +34,16 @@ export default function DeferredEditorSurfaces() {
   const [findReplaceReady, setFindReplaceReady] = useState(false)
   const [findReplaceRequest, setFindReplaceRequest] = useState<FindReplaceOpenRequest | null>(null)
 
-  const openFindReplace = useCallback(() => {
+  const openFindReplace = useCallback((event?: Event) => {
+    const detail = (event as CustomEvent | undefined)?.detail
+    const query = typeof detail === 'object' && detail && 'query' in detail
+      ? String((detail as { query?: string }).query ?? '')
+      : undefined
+
     setFindReplaceVisible(true)
     setFindReplaceRequest((prev) => ({
       nonce: (prev?.nonce ?? 0) + 1,
+      query: query || undefined,
     }))
   }, [])
 

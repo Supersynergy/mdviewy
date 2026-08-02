@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.98.0 - 2026-08-03
+
+### Added
+
+- The editor has its own right-click menu. Until now the WebView's default menu appeared — Look Up, Translate, Spelling, Substitutions, Transformations, Font, Speech, Paragraph Direction, Selection Direction, Share, AutoFill, Services — sixteen entries, of which three did anything useful in a Markdown editor.
+- The menu reads what is under the pointer and offers only what applies there:
+  - **Link**: open it, copy the address, copy the link text.
+  - **Table cell**: row above/below, column left/right, delete row/column/table.
+  - **Image**: copy the image path.
+  - **Selection**: cut, copy, format (bold, italic, inline code, strikethrough), turn into (H1–H3, bullet/numbered/task list, quote, code block), find that text in the document, copy it as an AI prompt.
+  - **No selection**: paste, paste as plain text, insert table/code block/divider, find in document.
+  - **Always**: reveal the file in Finder, copy its path.
+- Entries are built from the commands the document actually has, so the menu cannot show a dead action. Shortcuts are printed next to the entries that have one.
+- `Find “<selection>”` opens the find panel with the term filled in.
+
 ## 0.97.0 - 2026-08-01
 
 ### Fixed
