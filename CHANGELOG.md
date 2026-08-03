@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.100.0 - 2026-08-03
+
+### Added
+
+- **Chatterbox voice clones in Speak selection.** Four locally cloned German voices — Maria (warm), Axel (deep), Conrad (calm), Emily (soft) — render through the Resemble Chatterbox model on the machine, free and offline. They appear only when the `chatterbox-say` wrapper is installed. Each entry says up front that the clone renders before it plays (~90 s model load); input is capped at ~2000 characters so a menu call stays interactive.
+- **Speak document.** Right-click with nothing selected reads the whole document aloud with any installed voice, using the rendered text rather than the Markdown source — no spoken asterisks or pipes.
+
+### Fixed
+
+- **Stop speaking now stops wrapper engines completely.** Speech runs in its own process group and stopping kills the group, so a renderer or player behind a wrapper script can no longer keep talking after its shell is gone.
+
 ## 0.99.0 - 2026-08-03
 
 ### Added

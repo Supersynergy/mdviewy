@@ -150,6 +150,29 @@ describe('buildEditorContextMenu', () => {
     expect(found).not.toContain('Speak selection')
   })
 
+  it('reads the whole document aloud when nothing is selected', () => {
+    const speak = vi.fn()
+    const items = buildEditorContextMenu(
+      target({ documentText: 'Ganzer Text des Dokuments.' }),
+      actions({ speak }),
+    )
+    const speech = items.find((item) => 'value' in item && item.value === 'speak-document')
+
+    expect(speech && 'children' in speech && labels(speech.children ?? [])).toEqual([
+      'System voice — macOS say, offline',
+      'Jarvis · German — Piper / Thorsten',
+      'Stop speaking',
+    ])
+
+    const speakSystem = speech && 'children' in speech ? speech.children?.[0] : undefined
+    if (speakSystem && 'handler' in speakSystem) speakSystem.handler?.()
+    expect(speak).toHaveBeenCalledWith('system', 'Ganzer Text des Dokuments.')
+  })
+
+  it('offers no document reading without document text', () => {
+    expect(labels(buildEditorContextMenu(target(), actions()))).not.toContain('Speak document')
+  })
+
   it('acts on paths found in the selection', () => {
     const revealPath = vi.fn()
     const items = buildEditorContextMenu(

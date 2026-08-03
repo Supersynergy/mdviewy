@@ -60,6 +60,36 @@ const ENGINES: &[EngineSpec] = &[
         ],
         args: &["say", "--en"],
     },
+    // Chatterbox voice clones render before they play — the model loads per
+    // call, so the first sound arrives late. The detail says so up front.
+    EngineSpec {
+        id: "chatterbox_maria",
+        label: "Chatterbox · Maria",
+        detail: "warm German clone · ~90 s",
+        candidates: &["~/.local/bin/chatterbox-say"],
+        args: &["--voice", "Maria"],
+    },
+    EngineSpec {
+        id: "chatterbox_axel",
+        label: "Chatterbox · Axel",
+        detail: "deep German clone · ~90 s",
+        candidates: &["~/.local/bin/chatterbox-say"],
+        args: &["--voice", "Axel"],
+    },
+    EngineSpec {
+        id: "chatterbox_conrad",
+        label: "Chatterbox · Conrad",
+        detail: "calm German clone · ~90 s",
+        candidates: &["~/.local/bin/chatterbox-say"],
+        args: &["--voice", "Conrad"],
+    },
+    EngineSpec {
+        id: "chatterbox_emily",
+        label: "Chatterbox · Emily",
+        detail: "soft German clone · ~90 s",
+        candidates: &["~/.local/bin/chatterbox-say"],
+        args: &["--voice", "Emily"],
+    },
 ];
 
 fn expand_home(path: &str) -> PathBuf {
@@ -96,6 +126,15 @@ pub fn available_engines() -> Vec<SpeechEngine> {
 fn stop_current() {
     if let Ok(mut guard) = CURRENT.lock() {
         if let Some(mut child) = guard.take() {
+            // Wrapper engines (chatterbox-say) fan out into a renderer and a
+            // player; the whole process group has to go, or the audio keeps
+            // playing after the shell in front of it is dead.
+            #[cfg(unix)]
+            {
+                let _ = Command::new("/bin/kill")
+                    .args(["-9", &format!("-{}", child.id())])
+                    .status();
+            }
             let _ = child.kill();
             let _ = child.wait();
         }
@@ -119,9 +158,15 @@ pub fn speak(engine_id: &str, text: &str) -> Result<(), String> {
     stop_current();
 
     // Text is passed as a single argument, never through a shell.
-    let child = Command::new(binary)
-        .args(spec.args)
-        .arg(spoken)
+    let mut command = Command::new(binary);
+    command.args(spec.args).arg(spoken);
+    // Own process group, so stopping can kill renderer + player together.
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        command.process_group(0);
+    }
+    let child = command
         .spawn()
         .map_err(|err| format!("could not start {}: {err}", spec.label))?;
 
@@ -205,5 +250,21 @@ mod tests {
     fn rejects_unknown_engines_and_empty_text() {
         assert!(speak("nope", "hello").is_err());
         assert!(speak("system", "   ").is_err());
+    }
+
+    #[test]
+    fn chatterbox_engines_pick_distinct_cloned_voices() {
+        let voices: Vec<&str> = ENGINES
+            .iter()
+            .filter(|spec| spec.id.starts_with("chatterbox_"))
+            .map(|spec| {
+                assert_eq!(spec.args[0], "--voice", "{} must select a voice", spec.id);
+                spec.args[1]
+            })
+            .collect();
+
+        assert_eq!(voices.len(), 4);
+        let unique: std::collections::HashSet<&&str> = voices.iter().collect();
+        assert_eq!(unique.len(), voices.len(), "voices must not repeat");
     }
 }

@@ -611,7 +611,14 @@ function TextEditor(props: TextEditorProps) {
         .map((candidate) => resolveAgainst(expandHome(candidate, home), baseDir))
         .map((path) => ({ label: pathLabel(path), path }))
 
-      const target = { ...readEditorContextTarget(event, { selection, filePath: file?.path }), paths }
+      // Rendered text reads far better aloud than Markdown source would.
+      const documentText =
+        event.currentTarget.querySelector('.ProseMirror, .cm-content')?.textContent ?? undefined
+
+      const target = {
+        ...readEditorContextTarget(event, { selection, filePath: file?.path, documentText }),
+        paths,
+      }
 
       const items = buildEditorContextMenu(target, {
         available: (command) => typeof commands[command] === 'function',

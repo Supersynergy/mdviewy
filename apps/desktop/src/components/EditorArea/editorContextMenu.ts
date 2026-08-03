@@ -14,6 +14,8 @@ export type EditorContextTarget = {
   filePath?: string
   /** Paths found in the selection or the clicked line, already resolved. */
   paths?: Array<{ label: string; path: string }>
+  /** Plain text of the whole document, for reading it aloud. */
+  documentText?: string
 }
 
 export type SpeechChoice = { id: string; label: string; detail?: string }
@@ -238,18 +240,22 @@ export const buildEditorContextMenu = (
     })
   }
 
-  if (hasSelection && actions.speechEngines.length > 0) {
-    const voices: MenuItemData[] = actions.speechEngines.map((engine) => ({
+  const voiceItems = (spoken: string): MenuItemData[] => [
+    ...actions.speechEngines.map((engine) => ({
       label: engine.detail ? `${engine.label} — ${engine.detail}` : engine.label,
       value: `speak-${engine.id}`,
-      handler: () => actions.speak(engine.id, target.selection),
-    }))
+      handler: () => actions.speak(engine.id, spoken),
+    })),
+    divider,
+    { label: 'Stop speaking', value: 'speak-stop', handler: actions.stopSpeaking },
+  ]
 
-    items.push({
-      label: 'Speak selection',
-      value: 'speak',
-      children: [...voices, divider, { label: 'Stop speaking', value: 'speak-stop', handler: actions.stopSpeaking }],
-    })
+  if (actions.speechEngines.length > 0) {
+    if (hasSelection) {
+      items.push({ label: 'Speak selection', value: 'speak', children: voiceItems(target.selection) })
+    } else if (target.documentText?.trim()) {
+      items.push({ label: 'Speak document', value: 'speak-document', children: voiceItems(target.documentText) })
+    }
   }
 
   if (hasSelection && actions.available('insertText')) {
@@ -347,7 +353,7 @@ export const buildEditorContextMenu = (
 /** Reads the right-click target out of the DOM event. */
 export const readEditorContextTarget = (
   event: { target: EventTarget | null },
-  options: { selection: string; filePath?: string },
+  options: { selection: string; filePath?: string; documentText?: string },
 ): EditorContextTarget => {
   const element = event.target instanceof Element ? event.target : null
   const anchor = element?.closest('a[href]') as HTMLAnchorElement | null
@@ -356,6 +362,7 @@ export const readEditorContextTarget = (
   return {
     selection: options.selection,
     filePath: options.filePath,
+    documentText: options.documentText,
     link: anchor ? { href: anchor.getAttribute('href') || '', text: anchor.textContent || '' } : undefined,
     image: image ? { src: image.getAttribute('src') || '' } : undefined,
     inCodeBlock: Boolean(element?.closest('.cm-editor, pre')),
