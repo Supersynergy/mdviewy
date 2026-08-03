@@ -20,7 +20,7 @@ use std::{collections::HashMap, sync::Mutex};
 #[cfg(target_os = "macos")]
 use app::window_manager;
 use app::{
-    bookmarks, conf, extensions, file_watcher, keybindings, opened_cache, process, themes,
+    bookmarks, conf, extensions, file_watcher, keybindings, opened_cache, process, speech, themes,
     workspace,
 };
 use lazy_static::lazy_static;
@@ -172,6 +172,9 @@ pub fn run() {
             opened_cache::cmd::add_recent_document,
             opened_cache::cmd::clear_recent_documents,
             opened_cache::cmd::refresh_native_menu,
+            speech::cmd::speech_engines,
+            speech::cmd::speech_speak,
+            speech::cmd::speech_stop,
             bookmarks::cmd::get_bookmarks,
             bookmarks::cmd::add_bookmark,
             bookmarks::cmd::edit_bookmark,

@@ -7,6 +7,7 @@ import {
 } from './editorContextMenu'
 
 const ALL_COMMANDS = new Set([
+  'insertText',
   'toggleStrong',
   'toggleEmphasis',
   'toggleCodeText',
@@ -37,6 +38,18 @@ const actions = (overrides: Partial<EditorContextActions> = {}): EditorContextAc
   openLink: vi.fn(),
   revealInFinder: vi.fn(),
   copyAiPrompt: vi.fn(),
+  speechEngines: [
+    { id: 'system', label: 'System voice', detail: 'macOS say, offline' },
+    { id: 'jarvis_de', label: 'Jarvis · German', detail: 'Piper / Thorsten' },
+  ],
+  speak: vi.fn(),
+  stopSpeaking: vi.fn(),
+  revealPath: vi.fn(),
+  openPath: vi.fn(),
+  openPathInTerminal: vi.fn(),
+  askAgent: vi.fn(),
+  replaceSelection: vi.fn(),
+  insertText: vi.fn(),
   ...overrides,
 })
 
@@ -115,6 +128,76 @@ describe('buildEditorContextMenu', () => {
     expect(labels(buildEditorContextMenu(target({ filePath: '/docs/a.md' }), actions()))).toContain(
       'Reveal in Finder',
     )
+  })
+
+  it('offers every installed voice plus a stop entry', () => {
+    const speak = vi.fn()
+    const items = buildEditorContextMenu(target({ selection: 'Vorlesen' }), actions({ speak }))
+    const speech = items.find((item) => 'value' in item && item.value === 'speak')
+
+    expect(speech && 'children' in speech && labels(speech.children ?? [])).toEqual([
+      'System voice — macOS say, offline',
+      'Jarvis · German — Piper / Thorsten',
+      'Stop speaking',
+    ])
+  })
+
+  it('hides the speech group when no voice is installed', () => {
+    const found = labels(
+      buildEditorContextMenu(target({ selection: 'x' }), actions({ speechEngines: [] })),
+    )
+
+    expect(found).not.toContain('Speak selection')
+  })
+
+  it('acts on paths found in the selection', () => {
+    const revealPath = vi.fn()
+    const items = buildEditorContextMenu(
+      target({ selection: 'see /repo/docs/SPEC.md', paths: [{ label: 'SPEC.md', path: '/repo/docs/SPEC.md' }] }),
+      actions({ revealPath }),
+    )
+    const entry = items.find((item) => 'value' in item && item.value === 'path-/repo/docs/SPEC.md')
+
+    expect(entry && 'label' in entry && entry.label).toBe('SPEC.md')
+    const reveal = entry && 'children' in entry ? entry.children?.[0] : undefined
+    if (reveal && 'handler' in reveal) reveal.handler?.()
+    expect(revealPath).toHaveBeenCalledWith('/repo/docs/SPEC.md')
+  })
+
+  it('offers line tools only for a multi-line selection', () => {
+    const single = labels(buildEditorContextMenu(target({ selection: 'one line' }), actions()))
+    const multi = labels(buildEditorContextMenu(target({ selection: 'b\na\nb' }), actions()))
+
+    expect(single).not.toContain('Sort A → Z')
+    expect(multi).toEqual(expect.arrayContaining(['Sort A → Z', 'Remove duplicates', 'Reverse']))
+  })
+
+  it('sorts and dedupes the selected lines', () => {
+    const replaceSelection = vi.fn()
+    const items = buildEditorContextMenu(
+      target({ selection: 'b\na\nb' }),
+      actions({ replaceSelection }),
+    )
+    const lines = items.find((item) => 'value' in item && item.value === 'lines')
+    const children = lines && 'children' in lines ? lines.children ?? [] : []
+
+    const sort = children.find((item) => 'value' in item && item.value === 'lines-sort')
+    if (sort && 'handler' in sort) sort.handler?.()
+    expect(replaceSelection).toHaveBeenCalledWith('a\nb\nb')
+
+    const dedupe = children.find((item) => 'value' in item && item.value === 'lines-dedupe')
+    if (dedupe && 'handler' in dedupe) dedupe.handler?.()
+    expect(replaceSelection).toHaveBeenCalledWith('b\na')
+  })
+
+  it('hands a selection to an agent', () => {
+    const askAgent = vi.fn()
+    const items = buildEditorContextMenu(target({ selection: 'why?' }), actions({ askAgent }))
+    const group = items.find((item) => 'value' in item && item.value === 'ask-agent')
+    const claude = group && 'children' in group ? group.children?.[0] : undefined
+
+    if (claude && 'handler' in claude) claude.handler?.()
+    expect(askAgent).toHaveBeenCalledWith('claude', 'why?')
   })
 
   it('leaves out the WebView default noise', () => {

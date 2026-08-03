@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.99.0 - 2026-08-03
+
+### Added
+
+- **Speak selection** in the right-click menu, with the voices installed on the machine: the macOS system voice (offline, always there), Jarvis · German (Piper / Thorsten), and Jarvis · English (Kokoro) — plus `Stop speaking`. Engines are detected by binary, so a voice you have not installed never appears. Speech runs through a native command with the text passed as one argument; no shell, no injection surface.
+- **Paths become actions.** Any path in the selection — absolute, `~/…`, or relative to the document — gets its own submenu: reveal in Finder, open, open a terminal there, copy. Relative paths resolve against the document's folder.
+- **Ask an agent** hands the selection to Claude Code or Codex in your preferred terminal, and falls back to the clipboard when the terminal cannot take a command.
+- **Line tools** for a multi-line selection: sort A→Z, sort Z→A, remove duplicates, reverse.
+- **Insert today's date** when nothing is selected.
+
 ## 0.98.0 - 2026-08-03
 
 ### Added

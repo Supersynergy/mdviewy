@@ -13,11 +13,15 @@ import {
   FileResultCode,
   FileSysResult,
   getFileNameFromPath,
+  getFolderPathFromPath,
 } from '@/helper/filesys'
 import { FileTypeConfig } from '@/helper/fileTypeHandler'
 import { logger } from '@/helper/logger'
 import { analyzeMarkdownContent } from '@/helper/markdownInsights'
 import { normalizeMarkdownSource } from '@/helper/markdownText'
+import { expandHome, findPathCandidates, pathLabel, resolveAgainst } from '@/helper/pathCandidates'
+import { speak, speechEngines, stopSpeaking, type SpeechEngine } from '@/helper/speech'
+import { openTerminalAt } from '@/helper/terminal'
 import { printActiveDocument } from '@/helper/printDocument'
 import { debounce, type DebouncedFunc, throttle } from '@/helper/timing'
 import { useEditorKeybindingStore } from '@/hooks/useKeyboard'
@@ -106,6 +110,7 @@ function TextEditor(props: TextEditorProps) {
     (state) => state.editorViewTypeMap.get(id) ?? fileTypeConfig.defaultMode,
   )
   const [content, setContent] = useState<string>()
+  const [voices, setVoices] = useState<SpeechEngine[]>([])
   const [delegate, setDelegate] = useState(
     createDelegate(fileTypeConfig.defaultMode, fileTypeConfig.type),
   )
@@ -144,6 +149,8 @@ function TextEditor(props: TextEditorProps) {
 
   useMount(async () => {
     setEditorDelegate(id, delegate)
+    // Voices are looked up once; the menu only lists what is installed.
+    setVoices(await speechEngines())
   })
 
   useUnmount(() => {
@@ -598,7 +605,13 @@ function TextEditor(props: TextEditorProps) {
       const selection = window.getSelection()?.toString() ?? ''
       const file = getFileObject(id)
 
-      const target = readEditorContextTarget(event, { selection, filePath: file?.path })
+      const baseDir = getFolderPathFromPath(file?.path)
+      const home = file?.path?.match(/^\/Users\/[^/]+/)?.[0]
+      const paths = findPathCandidates(selection)
+        .map((candidate) => resolveAgainst(expandHome(candidate, home), baseDir))
+        .map((path) => ({ label: pathLabel(path), path }))
+
+      const target = { ...readEditorContextTarget(event, { selection, filePath: file?.path }), paths }
 
       const items = buildEditorContextMenu(target, {
         available: (command) => typeof commands[command] === 'function',
@@ -640,6 +653,39 @@ function TextEditor(props: TextEditorProps) {
         revealInFinder: () => {
           if (file?.path) void revealItemInDir(file.path)
         },
+        speechEngines: voices,
+        speak: (engineId, text) => {
+          void speak(engineId, text).catch((error: unknown) => toast.error(String(error)))
+        },
+        stopSpeaking: () => {
+          void stopSpeaking()
+        },
+        revealPath: (path) => {
+          void revealItemInDir(path).catch(() => toast.error(`Not found: ${path}`))
+        },
+        openPath: (path) => {
+          void openPath(path).catch(() => toast.error(`Cannot open ${path}`))
+        },
+        openPathInTerminal: (path) => {
+          const dir = /\.[a-z0-9]+$/i.test(path) ? getFolderPathFromPath(path) : path
+          if (dir) void openTerminalAt(dir).catch((error: unknown) => toast.error(String(error)))
+        },
+        askAgent: (agent, text) => {
+          const dir = baseDir || home || '.'
+          const prompt = `Regarding ${file?.name ?? 'this document'}: ${text}`
+          void openTerminalAt(dir, `${agent} ${JSON.stringify(prompt)}`).then((launch) => {
+            if (!launch.ranCommand) {
+              void writeText(`${agent} ${JSON.stringify(prompt)}`)
+              toast.success(`${launch.id} opened; command on clipboard`)
+            }
+          })
+        },
+        replaceSelection: (text) => {
+          document.execCommand('insertText', false, text)
+        },
+        insertText: (text) => {
+          document.execCommand('insertText', false, text)
+        },
         copyAiPrompt: (text) => {
           const name = file?.name || file?.path || 'this document'
           void writeText(
@@ -655,7 +701,7 @@ function TextEditor(props: TextEditorProps) {
       event.stopPropagation()
       toggleContextMenu({ x: event.clientX, y: event.clientY, items })
     },
-    [id],
+    [id, voices],
   )
 
   const editorProps: MfEditorProps = useMemo(

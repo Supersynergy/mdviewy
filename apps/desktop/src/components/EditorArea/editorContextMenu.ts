@@ -12,7 +12,11 @@ export type EditorContextTarget = {
   inCodeBlock: boolean
   inTable: boolean
   filePath?: string
+  /** Paths found in the selection or the clicked line, already resolved. */
+  paths?: Array<{ label: string; path: string }>
 }
+
+export type SpeechChoice = { id: string; label: string; detail?: string }
 
 export type EditorContextActions = {
   /** Names of the editor commands that exist on this document. */
@@ -26,6 +30,16 @@ export type EditorContextActions = {
   openLink: (href: string) => void
   revealInFinder: () => void
   copyAiPrompt: (selection: string) => void
+  /** Voices installed on this machine; empty hides the speech group. */
+  speechEngines: SpeechChoice[]
+  speak: (engineId: string, text: string) => void
+  stopSpeaking: () => void
+  revealPath: (path: string) => void
+  openPath: (path: string) => void
+  openPathInTerminal: (path: string) => void
+  askAgent: (agent: 'claude' | 'codex', text: string) => void
+  replaceSelection: (text: string) => void
+  insertText: (text: string) => void
 }
 
 const divider = { type: 'divider' as const }
@@ -221,6 +235,101 @@ export const buildEditorContextMenu = (
       value: 'find',
       shortcut: `${mod}+F`,
       handler: () => actions.findInDocument(''),
+    })
+  }
+
+  if (hasSelection && actions.speechEngines.length > 0) {
+    const voices: MenuItemData[] = actions.speechEngines.map((engine) => ({
+      label: engine.detail ? `${engine.label} — ${engine.detail}` : engine.label,
+      value: `speak-${engine.id}`,
+      handler: () => actions.speak(engine.id, target.selection),
+    }))
+
+    items.push({
+      label: 'Speak selection',
+      value: 'speak',
+      children: [...voices, divider, { label: 'Stop speaking', value: 'speak-stop', handler: actions.stopSpeaking }],
+    })
+  }
+
+  if (hasSelection && actions.available('insertText')) {
+    const lines = target.selection.split('\n').filter((line) => line.trim().length > 0)
+    if (lines.length > 1) {
+      items.push({
+        label: 'Lines',
+        value: 'lines',
+        children: [
+          {
+            label: 'Sort A → Z',
+            value: 'lines-sort',
+            handler: () =>
+              actions.replaceSelection([...lines].sort((a, b) => a.localeCompare(b)).join('\n')),
+          },
+          {
+            label: 'Sort Z → A',
+            value: 'lines-sort-desc',
+            handler: () =>
+              actions.replaceSelection([...lines].sort((a, b) => b.localeCompare(a)).join('\n')),
+          },
+          {
+            label: 'Remove duplicates',
+            value: 'lines-dedupe',
+            handler: () => actions.replaceSelection([...new Set(lines)].join('\n')),
+          },
+          {
+            label: 'Reverse',
+            value: 'lines-reverse',
+            handler: () => actions.replaceSelection([...lines].reverse().join('\n')),
+          },
+        ],
+      })
+    }
+  }
+
+  if (hasSelection) {
+    items.push({
+      label: 'Ask an agent',
+      value: 'ask-agent',
+      children: [
+        {
+          label: 'Claude Code',
+          value: 'ask-claude',
+          handler: () => actions.askAgent('claude', target.selection),
+        },
+        {
+          label: 'Codex',
+          value: 'ask-codex',
+          handler: () => actions.askAgent('codex', target.selection),
+        },
+      ],
+    })
+  }
+
+  if (target.paths?.length) {
+    items.push(divider)
+    for (const entry of target.paths.slice(0, 5)) {
+      items.push({
+        label: entry.label,
+        value: `path-${entry.path}`,
+        children: [
+          { label: 'Reveal in Finder', value: 'path-reveal', handler: () => actions.revealPath(entry.path) },
+          { label: 'Open', value: 'path-open', handler: () => actions.openPath(entry.path) },
+          {
+            label: 'Open terminal here',
+            value: 'path-terminal',
+            handler: () => actions.openPathInTerminal(entry.path),
+          },
+          { label: 'Copy path', value: 'path-copy', handler: () => actions.copy(entry.path) },
+        ],
+      })
+    }
+  }
+
+  if (!hasSelection && actions.available('insertText')) {
+    items.push({
+      label: 'Insert today’s date',
+      value: 'insert-date',
+      handler: () => actions.insertText(new Date().toISOString().slice(0, 10)),
     })
   }
 
