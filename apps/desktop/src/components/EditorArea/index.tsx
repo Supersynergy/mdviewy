@@ -1,7 +1,6 @@
 import { EVENT } from '@/constants'
-import bus from '@/helper/eventBus'
 import { useCommandStore, useEditorStore } from '@/stores'
-import useEditorViewTypeStore from '@/stores/useEditorViewTypeStore'
+import useEditorViewTypeStore, { requestEditorViewType } from '@/stores/useEditorViewTypeStore'
 import useFileTypeConfigStore from '@/stores/useFileTypeConfigStore'
 import { lazy, memo, Suspense, useEffect } from 'react'
 import { EmptyState } from './EmptyState'
@@ -29,17 +28,22 @@ function EditorArea() {
         const fileTypeConfig = useFileTypeConfigStore.getState().getFileTypeConfigById(activeId)
         if (!fileTypeConfig) return
 
-        const supportsToggle =
-          fileTypeConfig.supportedModes.includes(SOURCECODE_VIEW_TYPE as any) &&
-          fileTypeConfig.supportedModes.includes(WYSIWYG_VIEW_TYPE as any)
-
-        if (!supportsToggle) return
-
+        const modes = fileTypeConfig.supportedModes
         const currentViewType = useEditorViewTypeStore.getState().getEditorViewType(activeId)
-        const targetViewType =
-          currentViewType === SOURCECODE_VIEW_TYPE ? WYSIWYG_VIEW_TYPE : SOURCECODE_VIEW_TYPE
 
-        bus.emit('editor_toggle_type', targetViewType)
+        // Markdown: the classic sourceCode ↔ wysiwyg toggle. Other dual-mode
+        // types (e.g. RTF = preview + sourceCode) toggle between their two
+        // supported modes so Cmd+Shift+M still does something sensible.
+        let targetViewType: string | undefined
+        if (modes.includes(SOURCECODE_VIEW_TYPE as any) && modes.includes(WYSIWYG_VIEW_TYPE as any)) {
+          targetViewType =
+            currentViewType === SOURCECODE_VIEW_TYPE ? WYSIWYG_VIEW_TYPE : SOURCECODE_VIEW_TYPE
+        } else if (modes.length === 2) {
+          targetViewType = modes.find((m) => m !== currentViewType)
+        }
+
+        if (!targetViewType) return
+        requestEditorViewType(activeId, targetViewType)
       },
     })
   }, [addCommand])

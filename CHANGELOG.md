@@ -1,5 +1,76 @@
 # Changelog
 
+## 0.101.0 - 2026-09-16
+
+mdviewy becomes a general local document workspace. It opens source code, RTF,
+PDF, and images next to Markdown, edits text with multiple cursors, follows
+local links, and takes files from Finder, shells, deep links, and agents.
+
+### Added
+
+- **Multi-cursor editing in Source mode.** `⌘-click` adds a caret (Ctrl-click
+  off macOS), `⌥-drag` makes a rectangular column selection, `⌘D` selects the
+  next occurrence, `⌃⌘G` selects every occurrence at once, `⌘⇧L` splits a
+  multi-line selection into one selection per line, `⌃⇧↑/↓` (or `⌥⌘↑/↓`) adds
+  a caret on the line above/below, `Esc` collapses to one cursor. Typing,
+  deleting, pasting, and undo apply to all carets as a single edit step.
+- **Sublime line ops in Source mode:** `⌘⇧D` duplicates the line, `⌘⇧K` deletes
+  it, `⌃⌘↑/↓` moves it, `⌘/` toggles comments, `⌘↩` opens a blank line below,
+  `⌃T` transposes characters.
+- **More formats open natively:**
+  - ~120 code extensions (`.py`, `.rs`, `.ts`, `.go`, `.sh`, `.sql`, …) open in
+    the source editor with syntax highlighting resolved via
+    `@codemirror/language-data` filename matching, plus dotfiles like
+    `.gitignore`, `.env`, `Dockerfile`, `Makefile`.
+  - `.rtf` renders as readable text via a built-in converter; `⌘⇧M` toggles to
+    the raw RTF source.
+  - `.pdf` renders page-by-page via pdf.js, loaded lazily on first use.
+  - Images: `.webp`, `.avif`, `.tiff`, `.bmp`, `.ico` in addition to
+    png/jpg/gif.
+  - The workspace file tree lists every openable type instead of only Markdown.
+- **Local links resolve and open.** `[x](./notes.md)`, `file://`, `~/…`, and
+  bare paths resolve against the document's folder and open inside mdviewy when
+  the type is renderable, else in the system application. Ways in: `⌘-click` in
+  the pretty editor, click in preview, the hover bar (now active in WYSIWYG
+  too), or right-click → *Open / Reveal in Finder / Open with default app /
+  Copy path*. Preview links use the accent color with a soft underline on hover
+  instead of `color: inherit`.
+- **Opening from outside the app.** `mdviewy://open?path=/abs/file` deep links,
+  `mdviewy <path>` argv handling on macOS (previously Linux/Windows only), a
+  `scripts/mdviewy` CLI wrapper, and file associations for code, RTF, PDF, and
+  images so `open -a mdviewy <file>` works from Finder, shells, and agents.
+  Paths that cannot be displayed surface a toast instead of failing silently.
+
+### Changed
+
+- **Faster boot and link.** The boot chunk no longer eagerly loads
+  remirror/mermaid through a stray `rme` value import; `crate-type` is
+  `rlib`-only (drops two fat-LTO links per release build); the dormant
+  `mdviewy-core` `full` feature (tantivy/syntect/comrak) is out of the app
+  binary; window state saves once at close instead of on every window event;
+  app config and the recent-files cache only write when something changed.
+
+### Fixed
+
+- **File associations reach the bundle.** The hand-maintained
+  `src-tauri/info.plist` overrode `CFBundleDocumentTypes` wholesale, so
+  `bundle.fileAssociations` never landed in the packaged app; the plist now
+  carries the full type list (folder, text, ~50 code extensions, PDF, images).
+- **Install script no longer copies a stale bundle.** It resolved
+  `./target/release` while this machine's cargo `target-dir` is
+  `~/.cargo-target`; it now asks `cargo metadata` for the effective target
+  directory. Release binary 19.99 MB → 15.68 MB.
+- **h2 0.4.19** (RUSTSEC-2026-0258) and **rustls 0.23.45** (RUSTSEC-2026-0285).
+
+### Verified
+
+- `yarn vitest`: 45 files, 181 tests
+- `yarn tsc --noEmit`
+- `cargo fmt --check` / `cargo clippy -D warnings` / `cargo nextest` (31 tests)
+- `cargo audit` clean
+- Boot to window: ~69 ms; `open "mdviewy://open?path=…"` and Finder
+  double-click route into the running instance
+
 ## 0.100.0 - 2026-08-03
 
 ### Added

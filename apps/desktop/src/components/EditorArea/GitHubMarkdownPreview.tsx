@@ -1,6 +1,5 @@
-import { getFolderPathFromPath, getFileNameFromPath } from '@/helper/filesys'
-import { addExistingMarkdownFileEdit } from '@/services/editor-file'
-import { getFileContent } from '@/services/file-info'
+import { getFolderPathFromPath } from '@/helper/filesys'
+import { resolveLocalHref } from '@/helper/localLink'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openPath, openUrl } from '@tauri-apps/plugin-opener'
 import DOMPurify from 'dompurify'
@@ -140,18 +139,15 @@ export function GitHubMarkdownPreview({ content, filePath }: Props) {
         return
       }
 
-      const localPath = resolveReadmeAsset(filePath, href)
-      if (/\.md(?:own)?$/i.test(localPath.split(/[?#]/, 1)[0])) {
-        const markdown = await getFileContent({ filePath: localPath })
-        if (markdown === null) return
-        await addExistingMarkdownFileEdit({
-          fileName: getFileNameFromPath(localPath) || 'README.md',
-          content: markdown,
-          path: localPath,
-        })
-        return
+      const localPath = resolveLocalHref(href, filePath)
+      // Any type the workspace can render opens in a tab; the system default
+      // app stays the fallback for the rest. Lazy import keeps the tauri
+      // store graph out of the preview chunk/test env.
+      if (localPath) {
+        const { openPathInApp } = await import('@/services/openPaths')
+        if (await openPathInApp(localPath)) return
+        await openPath(localPath)
       }
-      if (localPath) await openPath(localPath)
     } catch (error) {
       console.error('[mdviewy] Could not open README link', error)
     }

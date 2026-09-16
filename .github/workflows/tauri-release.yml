@@ -259,15 +259,15 @@ jobs:
           tee release.txt >/dev/null << 'EOF'
           # mdviewy ${{ env.release_tag }}
 
-          Calm, fast, local-first Markdown workspace for Windows, macOS, and Linux.
+          Fast, local-first document workspace for Windows, macOS, and Linux.
 
           ## Highlights
 
-          - Lean startup with no automatic home-folder indexing.
-          - Fixed blank-window paths and added recoverable UI failures.
-          - Atomic file saves and bounded workspace loading.
-          - GitHub-style README preview with safe links, HTML, tables, tasks, alerts, and relative assets.
-          - Adaptive focus layout, Smart Actions, and Print / Save as PDF.
+          - Universal workspace: Markdown, ~120 code extensions with syntax highlighting, RTF preview, PDF rendering, and images.
+          - Sublime-style source editing: multi-cursor, rectangular selection, next/all-occurrence selection, line ops.
+          - Local links and paths resolve and open in-app or in the right tool; right-click reveals files and folders in the file manager.
+          - Agent-ready opening: `mdviewy://open?path=…` deep links, CLI/Finder file associations, warm-instance routing.
+          - GitHub-style preview, adaptive focus layout, Smart Actions, speech voices, and Print / Save as PDF.
 
           ## Windows 11
 

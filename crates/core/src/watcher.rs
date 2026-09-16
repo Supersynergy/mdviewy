@@ -38,12 +38,98 @@ pub struct Watcher {
     pub rx: Receiver<WatchEvent>,
 }
 
-const MD_EXTS: &[&str] = &["md", "markdown", "mdx", "txt"];
+// Extensions worth surfacing in workspace scans/watches — mirrors
+// mdviewy-utils' supported set (text + code + documents + images).
+const SUPPORTED_EXTS: &[&str] = &[
+    "md",
+    "markdown",
+    "mdx",
+    "txt",
+    "text",
+    "rtf",
+    "pdf",
+    "json",
+    "log",
+    "csv",
+    "tsv",
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "bmp",
+    "avif",
+    "svg",
+    "js",
+    "mjs",
+    "cjs",
+    "jsx",
+    "ts",
+    "mts",
+    "cts",
+    "tsx",
+    "py",
+    "rs",
+    "go",
+    "java",
+    "c",
+    "h",
+    "cpp",
+    "cc",
+    "cxx",
+    "hpp",
+    "cs",
+    "rb",
+    "php",
+    "swift",
+    "kt",
+    "kts",
+    "scala",
+    "lua",
+    "pl",
+    "r",
+    "jl",
+    "dart",
+    "ex",
+    "exs",
+    "erl",
+    "hs",
+    "clj",
+    "cljs",
+    "html",
+    "htm",
+    "xml",
+    "css",
+    "scss",
+    "sass",
+    "less",
+    "vue",
+    "yaml",
+    "yml",
+    "toml",
+    "ini",
+    "cfg",
+    "conf",
+    "env",
+    "sh",
+    "bash",
+    "zsh",
+    "ps1",
+    "sql",
+    "diff",
+    "patch",
+    "dockerfile",
+    "cmake",
+    "graphql",
+    "proto",
+    "tf",
+    "hcl",
+];
 
 fn is_markdownish(p: &Path) -> bool {
     p.extension()
         .and_then(|e| e.to_str())
-        .map(|e| MD_EXTS.iter().any(|ext| ext.eq_ignore_ascii_case(e)))
+        .map(|e| SUPPORTED_EXTS.iter().any(|ext| ext.eq_ignore_ascii_case(e)))
         .unwrap_or(false)
 }
 
@@ -149,13 +235,15 @@ mod tests {
     use std::fs;
 
     #[test]
-    fn scan_finds_md_only() {
+    fn scan_finds_supported_files() {
         let tmp = tempfile::tempdir().unwrap();
         fs::write(tmp.path().join("a.md"), "# hi").unwrap();
-        fs::write(tmp.path().join("b.png"), b"binary").unwrap();
+        fs::write(tmp.path().join("b.rs"), "fn main() {}").unwrap();
+        fs::write(tmp.path().join("c.pdf"), b"binary").unwrap();
+        fs::write(tmp.path().join("d.bin"), b"binary").unwrap();
         let entries = scan(tmp.path()).unwrap();
         let files: Vec<_> = entries.iter().filter(|e| !e.is_dir).collect();
-        assert_eq!(files.len(), 1);
+        assert_eq!(files.len(), 3);
         assert!(files[0].path.ends_with("a.md"));
     }
 }

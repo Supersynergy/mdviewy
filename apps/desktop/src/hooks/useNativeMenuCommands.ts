@@ -1,4 +1,3 @@
-import bus from '@/helper/eventBus'
 import { logger } from '@/helper/logger'
 import { addEmptyEditorTab } from '@/services/editor-file'
 import { openRecentDocument } from '@/services/recent-documents'
@@ -6,12 +5,12 @@ import { currentWindow } from '@/services/windows'
 import { useCommandStore, useEditorStore } from '@/stores'
 import useAppSettingStore from '@/stores/useAppSettingStore'
 import useOpenedCacheStore from '@/stores/useOpenedCacheStore'
+import { requestEditorViewType } from '@/stores/useEditorViewTypeStore'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useEffect } from 'react'
-import { EditorViewType } from 'rme'
 import useOpen from './useOpen'
 
 const REPOSITORY_URL = 'https://github.com/Supersynergy/mdviewy'
@@ -55,18 +54,26 @@ export const useNativeMenuCommands = () => {
   useEffect(() => {
     const { addCommand } = useCommandStore.getState()
 
+    // EditorViewType values are plain strings ('sourceCode' | 'wysiwyg' |
+    // 'preview'). Importing the enum from 'rme' here pulled the whole
+    // remirror/prosemirror/mermaid graph into the entry chunk — the literals
+    // keep the boot bundle small.
+    const requestView = (target: string) => {
+      const { activeId } = useEditorStore.getState()
+      if (activeId) requestEditorViewType(activeId, target)
+    }
     addCommand({ id: 'app_openFile', handler: () => void openFile() })
     addCommand({
       id: 'app_viewSourceCode',
-      handler: () => bus.emit('editor_toggle_type', EditorViewType.SOURCECODE),
+      handler: () => requestView('sourceCode'),
     })
     addCommand({
       id: 'app_viewWysiwyg',
-      handler: () => bus.emit('editor_toggle_type', EditorViewType.WYSIWYG),
+      handler: () => requestView('wysiwyg'),
     })
     addCommand({
       id: 'app_viewPreview',
-      handler: () => bus.emit('editor_toggle_type', EditorViewType.PREVIEW),
+      handler: () => requestView('preview'),
     })
     addCommand({ id: 'app_zoomIn', handler: () => applyZoom((zoom) => zoom + ZOOM_STEP) })
     addCommand({ id: 'app_zoomOut', handler: () => applyZoom((zoom) => zoom - ZOOM_STEP) })

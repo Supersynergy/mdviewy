@@ -282,6 +282,9 @@ impl AppConf {
      * Generally used to be compatible with the original config when versions are different.
      */
     pub fn merge_conf(mut self, oldconf: AppConf, app: &AppHandle) -> Self {
+        // Snapshot before the merge — merge_options! moves fields out of
+        // oldconf. Used below to skip the store write when nothing changed.
+        let old_value = serde_json::to_value(&oldconf).ok();
         merge_options!(
             self,
             oldconf,
@@ -330,6 +333,12 @@ impl AppConf {
             upload_image_save_relative_path_rule
         );
 
+        // Only persist when the merge actually changed something (new keys
+        // after an upgrade). Boot calls read_with_app several times; before
+        // this guard each one rewrote mdviewy_store.bin on the main path.
+        if serde_json::to_value(&self).ok() == old_value {
+            return self;
+        }
         self.write_with_app(app)
     }
 

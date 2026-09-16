@@ -5,7 +5,6 @@
 #![allow(dead_code)]
 
 mod app;
-mod core_cmd;
 mod fc;
 mod font;
 mod menu;
@@ -51,6 +50,23 @@ fn opened_path_from_url(url: &url::Url) -> String {
         }
     }
 
+    // Deep links: `mdviewy://open?path=/abs/file.md` or `mdviewy:///abs/file.md`.
+    // Agents can generate these without shelling out.
+    if url.scheme() == "mdviewy" {
+        for (key, value) in url.query_pairs() {
+            if key == "path" {
+                return value.into_owned();
+            }
+        }
+        let host = url.host_str().unwrap_or_default();
+        let combined = format!("{}{}", host, url.path());
+        if !combined.is_empty() {
+            return urlencoding::decode(&combined)
+                .map(|s| s.into_owned())
+                .unwrap_or(combined);
+        }
+    }
+
     urlencoding::decode(url.as_str())
         .map(|s| s.into_owned())
         .unwrap_or_else(|_| url.as_str().to_string())
@@ -58,7 +74,10 @@ fn opened_path_from_url(url: &url::Url) -> String {
 
 fn opened_path_from_arg(arg: &str, cwd: &str) -> Option<String> {
     let value = arg.trim();
-    if value.is_empty() || value == "--" || value.starts_with("-psn_") {
+    // Skip CLI flags (-psn_ from Finder, --flags, -- separator). Without this,
+    // `mdviewy --help`-style invocations become bogus paths and open failure
+    // toasts in agents' hands.
+    if value.is_empty() || value == "--" || value.starts_with('-') {
         return None;
     }
 
@@ -118,6 +137,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_single_instance::init(
             |app_handle: &tauri::AppHandle, args: Vec<String>, _cwd: String| {
                 let opened_paths = opened_paths_from_args(args.iter().skip(1), &_cwd);
@@ -197,26 +217,19 @@ pub fn run() {
             app::clipboard::get_clipboard_html,
             app::clipboard::get_clipboard_text,
             take_opened_paths,
-            core_cmd::core_scan_folder,
-            core_cmd::core_extract_meta,
-            core_cmd::core_render_md,
-            core_cmd::core_watch_folder,
-            core_cmd::core_fts_index,
-            core_cmd::core_fts_search,
-            core_cmd::core_fts_delete,
         ])
         .setup(|app: &mut tauri::App| {
-            app.manage(core_cmd::CoreState::default());
-
             let home_dir_path = app.path().home_dir().expect("failed to get home dir");
             APP_DIR.lock().unwrap().insert(0, home_dir_path);
 
             let opened_paths: State<OpenedPaths> = app.state();
             let file_paths = opened_paths.inner().to_owned();
 
-            #[cfg(any(windows, target_os = "linux"))]
             {
                 // NOTICE: `args` may include URL protocol (`your-app-protocol://`) or arguments (`--`) if app supports them.
+                // Runs on macOS too — direct binary launches
+                // (`mdviewy file.md`, agent CLIs) must work; Finder opens
+                // still arrive via RunEvent::Opened below.
                 let cwd = std::env::current_dir()
                     .ok()
                     .and_then(|p| p.to_str().map(|s| s.to_string()))
@@ -254,8 +267,16 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
-            let app = window.app_handle();
-            let _ = app.save_window_state(StateFlags::all());
+            // Persist window geometry once at shutdown — the previous version
+            // wrote the state file on *every* window event (focus, move,
+            // resize), a synchronous disk write on the runtime hot path.
+            if matches!(
+                event,
+                tauri::WindowEvent::CloseRequested { .. } | tauri::WindowEvent::Destroyed
+            ) {
+                let app = window.app_handle();
+                let _ = app.save_window_state(StateFlags::all());
+            }
 
             if let tauri::WindowEvent::Destroyed = event {
                 let window_label = window.label();
@@ -314,4 +335,36 @@ pub fn run() {
                 }
             }
         });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn args_skip_flags_and_keep_paths() {
+        let paths = opened_paths_from_args(
+            vec!["--help", "-psn_0_12345", "note.md", "/abs/x.pdf", "--", ""],
+            "/cwd",
+        );
+        assert_eq!(paths, vec!["/cwd/note.md", "/abs/x.pdf"]);
+    }
+
+    #[test]
+    fn url_decoding_covers_file_and_deep_link() {
+        let file = url::Url::parse("file:///tmp/a%20b.md").unwrap();
+        assert_eq!(opened_path_from_url(&file), "/tmp/a b.md");
+
+        let deep = url::Url::parse("mdviewy://open?path=/tmp/x%20y.pdf").unwrap();
+        assert_eq!(opened_path_from_url(&deep), "/tmp/x y.pdf");
+
+        let deep2 = url::Url::parse("mdviewy:///tmp/plain.md").unwrap();
+        assert_eq!(opened_path_from_url(&deep2), "/tmp/plain.md");
+    }
+
+    #[test]
+    fn arg_accepts_deep_link_url() {
+        let paths = opened_paths_from_args(vec!["mdviewy://open?path=%2Ftmp%2Fdoc.rtf"], "/cwd");
+        assert_eq!(paths, vec!["/tmp/doc.rtf"]);
+    }
 }

@@ -12,7 +12,7 @@ function extname(p: string): string {
   return p.slice(last + 1)
 }
 
-export type FileType = 'markdown' | 'image' | 'json' | 'text' | 'unsupported'
+export type FileType = 'markdown' | 'image' | 'json' | 'text' | 'rtf' | 'pdf' | 'unsupported'
 
 const VIEW_PREVIEW = 'preview' as EditorViewType
 const VIEW_WYSIWYG = 'wysiwyg' as EditorViewType
@@ -29,8 +29,67 @@ export const isTextfileType = (fileTypeConfig: FileTypeConfig): boolean => {
   return ['markdown', 'json', 'text'].includes(fileTypeConfig.type)
 }
 
+// Text/code extensions that open in the source editor. Mirrors the extension
+// lists in @codemirror/language-data (kept static so this module stays free of
+// CodeMirror imports — it is loaded on the startup path).
+const CODE_EXTENSIONS = new Set([
+  'js', 'mjs', 'cjs', 'jsx', 'ts', 'mts', 'cts', 'tsx',
+  'py', 'pyw', 'pyx', 'rs', 'go', 'java', 'c', 'h', 'cpp', 'c++', 'cc', 'cxx',
+  'hpp', 'h++', 'hh', 'hxx', 'cs', 'fs', 'rb', 'rbx', 'php', 'php3', 'php4',
+  'php5', 'php7', 'phtml', 'swift', 'kt', 'kts', 'scala', 'sc', 'lua', 'pl',
+  'pm', 'r', 'jl', 'dart', 'ex', 'exs', 'erl', 'hrl', 'hs', 'clj', 'cljc',
+  'cljs', 'edn', 'elm', 'd', 'cr', 'groovy', 'gradle', 'hx', 'ml', 'mli',
+  'html', 'htm', 'xhtml', 'handlebars', 'hbs', 'xml', 'xsl', 'xsd', 'dtd',
+  'css', 'scss', 'sass', 'less', 'gss', 'styl', 'vue', 'liquid', 'j2',
+  'jinja', 'jinja2', 'jsonc', 'json5', 'jsonld', 'yaml', 'yml', 'toml',
+  'ini', 'cfg', 'conf', 'properties', 'env', 'sh', 'bash', 'zsh', 'ps1',
+  'bat', 'cmd', 'sql', 'cql', 'pls', 'prql', 'sparql', 'diff', 'patch',
+  'dockerfile', 'cmake', 'mk', 'wat', 'wast', 'tex', 'sty', 'v', 'sv',
+  'vhdl', 'lua', 'vim', 'feature', 'cypher', 'asn', 'asn1', 'e', 'forth',
+  'fth', '4th', 'f', 'for', 'f77', 'f90', 'f95', 's', 'cob', 'cpy', 'dylan',
+  'dyl', 'factor', 'lisp', 'cl', 'el', 'mrc', 'idl', 'ls', 'nsis', 'nsh',
+  'oz', 'pig', 'pas', 'pp', 'sol', 'tcl', 'vbs', 'vb', 'sieve', 'nt', 'brf',
+])
+
+// Plain-text extensions with no grammar — still worth a source view.
+const PLAIN_TEXT_EXTENSIONS = new Set([
+  'txt', 'text', 'mdx', 'log', 'csv', 'tsv', 'asc', 'me', 'nfo', 'out', 'err',
+  'lock', 'graphql', 'gql', 'prisma', 'proto', 'thrift', 'rego', 'bicep',
+  'tf', 'hcl', 'nomad', 'service', 'desktop', 'po', 'pot', 'rst', 'adoc',
+  'org', 'srt', 'vtt', 'ics', 'vcf', 'wkt', 'ndjson', 'jsonl',
+])
+
+// Extensionless names / dotfiles that resolve to a language or plain text.
+const FILE_NAME_LANGUAGES = new Set([
+  'dockerfile', 'makefile', 'gnumakefile', 'cmakelists.txt', 'rakefile',
+  'gemfile', 'podfile', 'brewfile', 'vagrantfile', 'justfile', 'procfile',
+  '.gitignore', '.dockerignore', '.gitattributes', '.gitmodules', '.npmrc',
+  '.editorconfig', '.env', '.zshrc', '.bashrc', '.zprofile', '.profile',
+  '.prettierrc', '.eslintrc', '.babelrc', 'license', 'licence', 'copying',
+  'changelog', 'authors', 'contributors', 'notice', 'readme',
+])
+
+const IMAGE_EXTENSIONS = new Set([
+  'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'avif', 'ico', 'tif', 'tiff',
+])
+
+// Extensions offered by the File ▸ Open dialog and used to decide whether an
+// arbitrary path can be opened as a document at all.
+export const OPEN_DIALOG_EXTENSIONS: string[] = [
+  'md', 'markdown', 'rtf', 'pdf',
+  ...IMAGE_EXTENSIONS,
+  ...CODE_EXTENSIONS,
+  ...PLAIN_TEXT_EXTENSIONS,
+]
+
+const textFileType = (): FileTypeConfig => ({
+  type: 'text',
+  supportedModes: [VIEW_SOURCECODE],
+  defaultMode: VIEW_SOURCECODE,
+})
+
 export function getFileTypeConfig(file: IFile): FileTypeConfig {
-  const ext = extname(file.path || file.name || '')
+  const ext = extname(file.path || file.name || '').toLowerCase()
   const fileName = (file.path || file.name || '').split(/[\\/]/).pop() || ''
   const isReadme = /^readme(?:\.[^.]+)?\.(?:md|markdown)$/i.test(fileName)
   const { settingData } = useAppSettingStore.getState()
@@ -42,49 +101,51 @@ export function getFileTypeConfig(file: IFile): FileTypeConfig {
     exporters: ['Html', 'Image', 'Pdf'],
   }
 
-  const fileTypeConfigs: Record<string, FileTypeConfig> = {
-    md: markdownFileType,
-    markdown: markdownFileType,
-    json: {
-      type: 'json',
-      supportedModes: [VIEW_SOURCECODE],
-      defaultMode: VIEW_SOURCECODE,
-    },
-    txt: {
-      type: 'text',
-      supportedModes: [VIEW_SOURCECODE],
-      defaultMode: VIEW_SOURCECODE,
-    },
-    jpg: {
-      type: 'image',
-      supportedModes: [VIEW_PREVIEW],
-      defaultMode: VIEW_PREVIEW,
-    },
-    jpeg: {
-      type: 'image',
-      supportedModes: [VIEW_PREVIEW],
-      defaultMode: VIEW_PREVIEW,
-    },
-    png: {
-      type: 'image',
-      supportedModes: [VIEW_PREVIEW],
-      defaultMode: VIEW_PREVIEW,
-    },
-    gif: {
-      type: 'image',
-      supportedModes: [VIEW_PREVIEW],
-      defaultMode: VIEW_PREVIEW,
-    },
+  switch (ext) {
+    case 'md':
+    case 'markdown':
+      return markdownFileType
+    case 'json':
+      return {
+        type: 'json',
+        supportedModes: [VIEW_SOURCECODE],
+        defaultMode: VIEW_SOURCECODE,
+      }
+    case 'rtf':
+      return {
+        type: 'rtf',
+        supportedModes: [VIEW_PREVIEW, VIEW_SOURCECODE],
+        defaultMode: VIEW_PREVIEW,
+      }
+    case 'pdf':
+      return {
+        type: 'pdf',
+        supportedModes: [VIEW_PREVIEW],
+        defaultMode: VIEW_PREVIEW,
+      }
   }
 
-  const tar = fileTypeConfigs[ext.toLowerCase()]
-  return (
-    tar || {
-      type: 'unsupported',
-      supportedModes: [VIEW_SOURCECODE],
-      defaultMode: VIEW_SOURCECODE,
+  if (IMAGE_EXTENSIONS.has(ext)) {
+    return {
+      type: 'image',
+      supportedModes: [VIEW_PREVIEW],
+      defaultMode: VIEW_PREVIEW,
     }
-  )
+  }
+
+  if (
+    CODE_EXTENSIONS.has(ext) ||
+    PLAIN_TEXT_EXTENSIONS.has(ext) ||
+    FILE_NAME_LANGUAGES.has(fileName.toLowerCase())
+  ) {
+    return textFileType()
+  }
+
+  return {
+    type: 'unsupported',
+    supportedModes: [VIEW_SOURCECODE],
+    defaultMode: VIEW_SOURCECODE,
+  }
 }
 
 export function isSupportedMode(config: FileTypeConfig, mode: string): boolean {

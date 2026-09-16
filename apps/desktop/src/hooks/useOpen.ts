@@ -1,4 +1,5 @@
 import { readDirectory } from '@/helper/filesys'
+import { getFileTypeConfig, isTextfileType, OPEN_DIALOG_EXTENSIONS } from '@/helper/fileTypeHandler'
 import { logger } from '@/helper/logger'
 import { addExistingMarkdownFileEdit } from '@/services/editor-file'
 import { getFileContent } from '@/services/file-info'
@@ -76,22 +77,30 @@ const useOpen = () => {
   const openFile = useCallback(async () => {
     const file = await open({
       multiple: false,
-      filters: [{ name: 'Markdown', extensions: ['md'] }],
+      filters: [
+        { name: 'Supported', extensions: OPEN_DIALOG_EXTENSIONS },
+        { name: 'All Files', extensions: ['*'] },
+      ],
     })
 
     if (typeof file !== 'string') return
 
-    const fileContent = await getFileContent({ filePath: file })
-
-    if (fileContent === null) return
-
     const fileName = file.split('/').pop() || 'new-file.md'
+    const config = getFileTypeConfig({ name: fileName, path: file } as any)
 
-    await addExistingMarkdownFileEdit({
-      fileName,
-      content: fileContent,
-      path: file,
-    })
+    // Binary preview types (pdf, image) have no text content to load — the
+    // preview reads bytes itself. Text/RTF/code files need the content up
+    // front so a read failure surfaces instead of opening an empty tab.
+    if (isTextfileType(config) || config.supportedModes.includes('sourceCode' as any)) {
+      const fileContent = await getFileContent({ filePath: file })
+      if (fileContent === null) {
+        toast.error(`Could not open ${fileName} — file is missing or not readable as text`)
+        return
+      }
+      await addExistingMarkdownFileEdit({ fileName, content: fileContent, path: file })
+    } else {
+      await addExistingMarkdownFileEdit({ fileName, content: '', path: file })
+    }
   }, [addRecentWorkspaces])
 
   return {

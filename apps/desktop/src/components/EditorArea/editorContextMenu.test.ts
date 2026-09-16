@@ -47,6 +47,7 @@ const actions = (overrides: Partial<EditorContextActions> = {}): EditorContextAc
   revealPath: vi.fn(),
   openPath: vi.fn(),
   openPathInTerminal: vi.fn(),
+  openInApp: vi.fn().mockResolvedValue(true),
   askAgent: vi.fn(),
   replaceSelection: vi.fn(),
   insertText: vi.fn(),
@@ -100,6 +101,36 @@ describe('buildEditorContextMenu', () => {
 
     expect('label' in items[0] && items[0].label).toContain('Open https://example.com')
     expect(labels(items)).toEqual(expect.arrayContaining(['Copy link address', 'Copy link text']))
+  })
+
+  it('offers app-open and Finder reveal for a resolvable local link', () => {
+    const openInApp = vi.fn().mockResolvedValue(true)
+    const revealPath = vi.fn()
+    const items = buildEditorContextMenu(
+      target({ link: { href: './a.md', text: 'A', resolvedPath: '/docs/a.md' } }),
+      actions({ openInApp, revealPath }),
+    )
+    const found = labels(items)
+
+    expect('label' in items[0] && items[0].label).toBe('Open /docs/a.md')
+    expect(found).toEqual(
+      expect.arrayContaining(['Reveal in Finder', 'Open with default app', 'Copy path']),
+    )
+
+    if ('handler' in items[0]) items[0].handler?.()
+    expect(openInApp).toHaveBeenCalledWith('/docs/a.md')
+  })
+
+  it('falls back to the system app when the path is not displayable', async () => {
+    const openInApp = vi.fn().mockResolvedValue(false)
+    const openPath = vi.fn()
+    const items = buildEditorContextMenu(
+      target({ link: { href: './a.xyz', text: 'A', resolvedPath: '/docs/a.xyz' } }),
+      actions({ openInApp, openPath }),
+    )
+
+    if ('handler' in items[0]) items[0].handler?.()
+    await vi.waitFor(() => expect(openPath).toHaveBeenCalledWith('/docs/a.xyz'))
   })
 
   it('offers row and column editing inside a table', () => {
