@@ -15,7 +15,7 @@ import {
   getFileNameFromPath,
   getFolderPathFromPath,
 } from '@/helper/filesys'
-import { FileTypeConfig } from '@/helper/fileTypeHandler'
+import { FileTypeConfig, isTextfileType } from '@/helper/fileTypeHandler'
 import { logger } from '@/helper/logger'
 import { analyzeMarkdownContent } from '@/helper/markdownInsights'
 import { normalizeMarkdownSource } from '@/helper/markdownText'
@@ -52,6 +52,9 @@ import {
 import { toast } from 'zens'
 import { toggleContextMenu } from '@/components/ui-v2/ContextMenu'
 import { buildEditorContextMenu, readEditorContextTarget } from './editorContextMenu'
+import { resolveLocalHref } from '@/helper/localLink'
+import { installSublimeSourceEditing } from './sublimeSourceEditing'
+import { applySourceLanguage } from './sourceLanguage'
 import { createWysiwygDelegateOptions } from './createWysiwygDelegateOptions'
 import { createMdviewyWysiwygDelegate } from './createMdviewyWysiwygDelegate'
 import { EditorWrapper, normalizeEditorContentWidth } from './EditorWrapper'
@@ -90,6 +93,8 @@ function TextEditor(props: TextEditorProps) {
           overrideShortcutMap: useEditorKeybindingStore.getState().editorKeybingMap,
           clipboardReadFunction: clipboardRead,
           onCodemirrorViewLoad: (cmView) => {
+            installSublimeSourceEditing(cmView)
+            applySourceLanguage(cmView, curFile.name)
             sourceCodeCodemirrorViewMap.set(id, cmView)
           },
         })
@@ -111,8 +116,13 @@ function TextEditor(props: TextEditorProps) {
   )
   const [content, setContent] = useState<string>()
   const [voices, setVoices] = useState<SpeechEngine[]>([])
-  const [delegate, setDelegate] = useState(
-    createDelegate(fileTypeConfig.defaultMode, fileTypeConfig.type),
+  const [delegate, setDelegate] = useState(() =>
+    // Non-textfile types (e.g. RTF) reach this editor only through an explicit
+    // sourceCode view — build the matching delegate, not the type's default.
+    createDelegate(
+      isTextfileType(fileTypeConfig) ? fileTypeConfig.defaultMode : editorViewType,
+      fileTypeConfig.type,
+    ),
   )
 
   const debounceSaveHandlerCacheRef = useRef<DebouncedFunc<() => Promise<void>>>(null)
@@ -168,8 +178,7 @@ function TextEditor(props: TextEditorProps) {
       const t0 = import.meta.env.DEV ? performance.now() : 0
       if (file.path) {
         // Single IPC roundtrip — `get_file_content` already returns NotFound
-        // for missing paths. Previously we did file_exists + get_file_content
-        // sequentially = 2× IPC latency per file open.
+        // for missing paths.
         const res = await invoke<FileSysResult>('get_file_content', {
           filePath: file.path,
         })
@@ -405,6 +414,8 @@ function TextEditor(props: TextEditorProps) {
                 overrideShortcutMap: useEditorKeybindingStore.getState().editorKeybingMap,
                 clipboardReadFunction: clipboardRead,
                 onCodemirrorViewLoad: (cmView) => {
+                  installSublimeSourceEditing(cmView)
+                  applySourceLanguage(cmView, curFile.name)
                   sourceCodeCodemirrorViewMap.set(curFile.id, cmView)
                   setTimeout(() => {
                     execute('app:toc_refresh')
@@ -584,6 +595,25 @@ function TextEditor(props: TextEditorProps) {
 
   const handleWrapperClick: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
+      const anchor = (e.target as HTMLElement).closest?.('a[href]') as HTMLAnchorElement | null
+      if (anchor && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        const href = anchor.getAttribute('href') || ''
+        if (/^(https?:|mailto:)/i.test(href)) {
+          void openUrl(href)
+        } else {
+          const localPath = resolveLocalHref(href, curFile?.path)
+          if (localPath) {
+            void import('@/services/openPaths').then(({ openPathInApp }) =>
+              openPathInApp(localPath).then((opened) => {
+                if (!opened)
+                  void openPath(localPath).catch(() => toast.error(`Cannot open ${localPath}`))
+              }),
+            )
+          }
+        }
+        return
+      }
       if (
         (e.target as HTMLElement)?.id === 'editorarea-wrapper' ||
         (e.target as HTMLElement).parentElement?.id === 'editorarea-wrapper'
@@ -591,7 +621,7 @@ function TextEditor(props: TextEditorProps) {
         delegate.manager.view.focus()
       }
     },
-    [delegate.manager.view],
+    [delegate.manager.view, curFile?.path],
   )
 
   /**
@@ -615,10 +645,22 @@ function TextEditor(props: TextEditorProps) {
       const documentText =
         event.currentTarget.querySelector('.ProseMirror, .cm-content')?.textContent ?? undefined
 
-      const target = {
-        ...readEditorContextTarget(event, { selection, filePath: file?.path, documentText }),
-        paths,
+      const target = readEditorContextTarget(event, {
+        selection,
+        filePath: file?.path,
+        documentText,
+      })
+
+      // A clicked link IS a path candidate: `[x](./a.md)` must offer the same
+      // Reveal/Terminal actions as a bare path in the text.
+      if (target.link) {
+        const resolved = resolveLocalHref(target.link.href, file?.path)
+        target.link.resolvedPath = resolved
+        if (resolved && !paths.some((p) => p.path === resolved)) {
+          paths.push({ label: pathLabel(resolved), path: resolved })
+        }
       }
+      target.paths = paths
 
       const items = buildEditorContextMenu(target, {
         available: (command) => typeof commands[command] === 'function',
@@ -653,10 +695,18 @@ function TextEditor(props: TextEditorProps) {
         openLink: (href) => {
           if (/^(https?:|mailto:)/i.test(href)) {
             void openUrl(href)
-          } else {
-            void openPath(href)
+            return
           }
+          const localPath = resolveLocalHref(href, file?.path)
+          if (!localPath) return
+          void import('@/services/openPaths').then(({ openPathInApp }) =>
+            openPathInApp(localPath).then((opened) => {
+              if (!opened)
+                void openPath(localPath).catch(() => toast.error(`Cannot open ${localPath}`))
+            }),
+          )
         },
+        openInApp: async (path) => (await import('@/services/openPaths')).openPathInApp(path),
         revealInFinder: () => {
           if (file?.path) void revealItemInDir(file.path)
         },
@@ -713,7 +763,7 @@ function TextEditor(props: TextEditorProps) {
 
   const editorProps: MfEditorProps = useMemo(
     () => ({
-      initialType: fileTypeConfig?.defaultMode,
+      initialType: isTextfileType(fileTypeConfig) ? fileTypeConfig?.defaultMode : editorViewType,
       content: content!,
       delegate,
       style: {

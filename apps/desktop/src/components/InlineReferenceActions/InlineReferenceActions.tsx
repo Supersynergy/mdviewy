@@ -27,7 +27,7 @@ type InlineContext = {
 
 type PathTargetKind = 'file' | 'folder' | 'unknown'
 
-const MARKDOWN_SCOPE = '.markdown-body'
+const MARKDOWN_SCOPE = '.markdown-body, .ProseMirror'
 const HIDE_DELAY_MS = 160
 
 const Bar = styled.div<{ $top: number; $left: number }>`
@@ -44,6 +44,18 @@ const Bar = styled.div<{ $top: number; $left: number }>`
   box-shadow: 0 8px 24px ${(p) => p.theme.boxShadowColor};
   z-index: 2147483000;
   user-select: none;
+  animation: mdv-inline-pop 130ms ease-out;
+
+  @keyframes mdv-inline-pop {
+    from {
+      opacity: 0;
+      transform: translateY(2px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 `
 
 const ActionButton = styled.button`
@@ -117,7 +129,13 @@ const getPathTargetKind = async (
 }
 
 const openReference = async (ref: InlineSmartReference) => {
-  await runOpenCommand(ref.value)
+  // Renderable types open in a tab; everything else goes to the system app.
+  const openInApp =
+    ref.kind === 'path' &&
+    (await import('@/services/openPaths')
+      .then(({ openPathInApp }) => openPathInApp(ref.value))
+      .catch(() => false))
+  if (!openInApp) await runOpenCommand(ref.value)
 }
 
 const openReferenceFolder = async (ref: InlineSmartReference) => {

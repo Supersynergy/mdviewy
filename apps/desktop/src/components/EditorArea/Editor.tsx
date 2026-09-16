@@ -3,11 +3,14 @@ import { getFileTypeConfig, isTextfileType } from '@/helper/fileTypeHandler'
 import { isEmptyEditor } from '@/services/editor-file'
 import useEditorViewTypeStore from '@/stores/useEditorViewTypeStore'
 import useFileTypeConfigStore from '@/stores/useFileTypeConfigStore'
+import type { EditorViewType } from 'rme'
 import { memo, useMemo } from 'react'
 import { EmptyState } from './EmptyState'
 import { PreviewContent } from './preview/PreviewContent'
 import TextEditor from './TextEditor'
 import { UnsupportedFileType } from './UnsupportedFileType'
+
+const SOURCECODE_VIEW_TYPE = 'sourceCode' as EditorViewType
 
 function Editor(props: EditorProps) {
   const { id, active } = props
@@ -25,6 +28,13 @@ function Editor(props: EditorProps) {
     return computed
   }, [id, curFile, getFileTypeConfigById, setFileTypeConfig])
 
+  // Non-markdown types can expose a sourceCode mode (e.g. RTF raw source) even
+  // though they aren't "textfile" types — routing must look at the live mode,
+  // not only the type.
+  const viewType = useEditorViewTypeStore(
+    (state) => state.editorViewTypeMap.get(id) ?? curFileTypeConfig.defaultMode,
+  )
+
   if (isEmptyEditor(curFile.id)) {
     if (active) {
       return <EmptyState />
@@ -35,11 +45,16 @@ function Editor(props: EditorProps) {
 
   if (!curFileTypeConfig) return null
 
+  const useTextEditor =
+    isTextfileType(curFileTypeConfig) ||
+    (viewType === SOURCECODE_VIEW_TYPE &&
+      curFileTypeConfig.supportedModes.includes(SOURCECODE_VIEW_TYPE))
+
   return (
     <div className={'code-contents'} style={active ? undefined : { display: 'none' }}>
       {curFileTypeConfig.type === 'unsupported' ? (
         <UnsupportedFileType />
-      ) : isTextfileType(curFileTypeConfig) ? (
+      ) : useTextEditor ? (
         <TextEditor fileTypeConfig={curFileTypeConfig} active={active} id={id} />
       ) : (
         <PreviewContent type={curFileTypeConfig.type} filePath={curFile.path} active={active} />

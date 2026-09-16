@@ -11,6 +11,11 @@
   "plugins": {
     "shell": {
       "open": true
+    },
+    "deep-link": {
+      "desktop": {
+        "schemes": ["mdviewy"]
+      }
     }
   },
   "bundle": {
@@ -22,12 +27,44 @@
           ".md",
           ".markdown",
           ".json",
-          ".txt"
+          ".txt",
+          ".text",
+          ".log",
+          ".rtf"
         ],
         "name": "Text Document",
         "description": "Text Document",
         "mimeType": "text/plain",
         "role": "Editor"
+      },
+      {
+        "ext": [
+          ".js", ".mjs", ".cjs", ".jsx", ".ts", ".mts", ".cts", ".tsx",
+          ".py", ".rs", ".go", ".java", ".c", ".h", ".cpp", ".cc", ".hpp",
+          ".cs", ".rb", ".php", ".swift", ".kt", ".scala", ".lua", ".pl",
+          ".r", ".jl", ".dart", ".html", ".htm", ".xml", ".css", ".scss",
+          ".sass", ".less", ".vue", ".yaml", ".yml", ".toml", ".ini",
+          ".sh", ".bash", ".zsh", ".ps1", ".sql", ".diff", ".patch",
+          ".env", ".cfg", ".conf"
+        ],
+        "name": "Source Code",
+        "description": "Source Code File",
+        "mimeType": "text/plain",
+        "role": "Editor"
+      },
+      {
+        "ext": [".pdf"],
+        "name": "PDF Document",
+        "description": "PDF Document",
+        "mimeType": "application/pdf",
+        "role": "Viewer"
+      },
+      {
+        "ext": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".avif", ".tif", ".tiff"],
+        "name": "Image",
+        "description": "Image File",
+        "mimeType": "image/*",
+        "role": "Viewer"
       }
     ],
     "createUpdaterArtifacts": false,

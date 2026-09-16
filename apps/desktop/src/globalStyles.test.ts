@@ -18,15 +18,15 @@ describe('GlobalStyles editor chrome overrides', () => {
     expect(source).toContain('pointer-events: none !important;')
   })
 
-  it('keeps markdown preview readable without clickable link styling', () => {
+  it('makes preview links visibly clickable with the accent color', () => {
     const currentDir = dirname(fileURLToPath(import.meta.url))
     const source = readFileSync(join(currentDir, 'globalStyles.ts'), 'utf8')
 
     expect(source).toContain('.markdown-body table')
     expect(source).toContain('white-space: normal;')
     expect(source).toContain('.markdown-body a')
-    expect(source).toContain('color: inherit !important;')
-    expect(source).not.toContain('.markdown-body a {\n    color: inherit !important;\n    text-decoration: none !important;\n    pointer-events: none;')
+    expect(source).toContain('props.theme.accentColor')
+    expect(source).not.toContain('color: inherit !important;')
     expect(source).toContain('.mdviewy-page-break')
     expect(source).toContain('break-after: page;')
   })

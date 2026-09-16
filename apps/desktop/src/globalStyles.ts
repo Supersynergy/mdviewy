@@ -337,8 +337,33 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   .markdown-body a {
-    color: inherit !important;
+    color: ${(props) => props.theme.accentColor} !important;
     text-decoration: none !important;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    border-radius: 2px;
+    transition:
+      text-decoration-color 140ms ease,
+      background-color 140ms ease;
+    cursor: pointer;
+  }
+
+  .markdown-body a:hover {
+    text-decoration: underline !important;
+    text-decoration-color: ${(props) => props.theme.accentColor} !important;
+  }
+
+  /* Same affordance in the WYSIWYG editor: a link reads as a link, ⌘-click opens it. */
+  .ProseMirror a {
+    color: ${(props) => props.theme.accentColor};
+    text-decoration: none;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 140ms ease;
+    cursor: pointer;
+  }
+
+  .ProseMirror a:hover {
+    text-decoration: underline;
   }
 
   .markdown-body .mdviewy-page-break {

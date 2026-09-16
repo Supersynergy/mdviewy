@@ -106,13 +106,20 @@ impl OpenedCache {
         match std::fs::read_to_string(Self::get_path()) {
             Ok(v) => {
                 if let Ok(mut v2) = serde_json::from_str::<OpenedCache>(&v) {
+                    let len_before = v2.recent_workspaces.len() + v2.recent_documents.len();
                     v2.recent_workspaces
                         .retain(|item| exists(Path::new(&item.path)));
                     v2.recent_documents
                         .retain(|item| exists(Path::new(&item.path)));
                     v2.recent_workspaces.truncate(MAX_RECENT_ENTRIES);
                     v2.recent_documents.truncate(MAX_RECENT_ENTRIES);
-                    v2.write()
+                    // Skip the rewrite when nothing was pruned — read() runs on
+                    // the startup path and used to rewrite the file every boot.
+                    if v2.recent_workspaces.len() + v2.recent_documents.len() == len_before {
+                        v2
+                    } else {
+                        v2.write()
+                    }
                 } else {
                     Self::default()
                 }

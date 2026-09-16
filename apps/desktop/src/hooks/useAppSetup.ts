@@ -2,16 +2,14 @@ import useAiChatStore from '@/extensions/ai/useAiChatStore'
 import bus from '@/helper/eventBus'
 import { loadLocalThemeCss } from '@/helper/extensions'
 import { getFileObject, getFileObjectByPath, getSaveOpenedEditorEntries } from '@/helper/files'
-import { getFileNameFromPath, readDirectory } from '@/helper/filesys'
+import { readDirectory } from '@/helper/filesys'
 import { logger } from '@/helper/logger'
 import { parseOpenedEvent, parseOpenedPaths } from '@/helper/openedPaths'
-import { requestDocumentFocus } from '@/helper/documentFocus'
 import { i18nInit } from '@/i18n'
 import { appSettingStoreSetup } from '@/services/app-setting'
 import { checkUnsavedFiles } from '@/services/checkUnsavedFiles'
-import { addExistingMarkdownFileEdit } from '@/services/editor-file'
-import { getFileContent } from '@/services/file-info'
-import { createNewWindow, currentWindow } from '@/services/windows'
+import { handleOpenedPaths } from '@/services/openPaths'
+import { currentWindow } from '@/services/windows'
 import { useCommandStore, useEditorStore } from '@/stores'
 import useAppSettingStore from '@/stores/useAppSettingStore'
 import type { DocumentInfo, WorkspaceInfo } from '@/stores/useOpenedCacheStore'
@@ -77,54 +75,6 @@ async function appThemeExtensionsSetup(curTheme: string) {
       useThemeStore.getState().setCurThemeByName(curTheme)
     }
   })
-}
-
-async function handleOpenedPaths(openedPaths: string[]) {
-  const { setFolderData, addOpenedFile, setActiveId } = useEditorStore.getState()
-
-  logger.debug('handleOpenedPaths', openedPaths)
-
-  const handleOpenedPath = async (openedPath: string) => {
-    const isDir = await invoke<boolean>('is_dir', { path: openedPath })
-
-    if (isDir) {
-      const rootPath = useEditorStore.getState().getRootPath()
-      if (openedPath === rootPath) {
-        return
-      }
-      if (rootPath || openedPaths.length > 1) {
-        await createNewWindow({ path: openedPath })
-      } else {
-        await readDirectory(openedPath).then((res) => {
-          setFolderData(res)
-        })
-      }
-      return false
-    } else {
-      const existingFile = getFileObjectByPath(openedPath)
-      if (existingFile) {
-        setActiveId(existingFile.id)
-        addOpenedFile(existingFile.id)
-      } else {
-        const fileContent = await getFileContent({ filePath: openedPath })
-        if (fileContent === null) return
-        const fileName = getFileNameFromPath(openedPath) || 'new-file.md'
-        await addExistingMarkdownFileEdit({
-          fileName,
-          content: fileContent,
-          path: openedPath,
-        })
-      }
-      return true
-    }
-  }
-
-  if (openedPaths.length === 1) {
-    const openedFile = await handleOpenedPath(openedPaths[0])
-    if (openedFile) requestDocumentFocus()
-  } else {
-    await Promise.all(openedPaths.map(handleOpenedPath))
-  }
 }
 
 let openedPathIngress = Promise.resolve(false)

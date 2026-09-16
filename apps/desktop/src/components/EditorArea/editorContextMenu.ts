@@ -7,7 +7,7 @@ import type { MenuItemData } from 'zens'
  */
 export type EditorContextTarget = {
   selection: string
-  link?: { href: string; text: string }
+  link?: { href: string; text: string; resolvedPath?: string | null }
   image?: { src: string }
   inCodeBlock: boolean
   inTable: boolean
@@ -39,6 +39,8 @@ export type EditorContextActions = {
   revealPath: (path: string) => void
   openPath: (path: string) => void
   openPathInTerminal: (path: string) => void
+  /** Opens a resolvable local path in a mdviewy tab; false = not displayable. */
+  openInApp: (path: string) => Promise<boolean> | boolean
   askAgent: (agent: 'claude' | 'codex', text: string) => void
   replaceSelection: (text: string) => void
   insertText: (text: string) => void
@@ -72,11 +74,30 @@ export const buildEditorContextMenu = (
   const hasSelection = target.selection.trim().length > 0
 
   if (target.link) {
-    const { href, text } = target.link
-    items.push(
-      { label: `Open ${truncate(href, 40)}`, value: 'link-open', handler: () => actions.openLink(href) },
-      { label: 'Copy link address', value: 'link-copy', handler: () => actions.copy(href) },
-    )
+    const { href, text, resolvedPath } = target.link
+    if (resolvedPath) {
+      const label = truncate(resolvedPath, 40)
+      items.push(
+        {
+          label: `Open ${label}`,
+          value: 'link-open-app',
+          handler: () =>
+            void Promise.resolve(actions.openInApp(resolvedPath)).then((ok) => {
+              if (!ok) actions.openPath(resolvedPath)
+            }),
+        },
+        { label: 'Reveal in Finder', value: 'link-reveal', handler: () => actions.revealPath(resolvedPath) },
+        {
+          label: 'Open with default app',
+          value: 'link-open-external',
+          handler: () => actions.openPath(resolvedPath),
+        },
+        { label: 'Copy path', value: 'link-copy-path', handler: () => actions.copy(resolvedPath) },
+      )
+    } else {
+      items.push({ label: `Open ${truncate(href, 40)}`, value: 'link-open', handler: () => actions.openLink(href) })
+    }
+    items.push({ label: 'Copy link address', value: 'link-copy', handler: () => actions.copy(href) })
     if (text.trim()) {
       items.push({ label: 'Copy link text', value: 'link-copy-text', handler: () => actions.copy(text) })
     }

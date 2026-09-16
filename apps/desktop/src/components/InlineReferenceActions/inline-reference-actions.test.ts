@@ -12,7 +12,7 @@ const linksIcon = 'ri-' + 'links-line'
 describe('InlineReferenceActions wiring', () => {
   it('mounts one global markdown reference action layer', () => {
     expect(appSource).toContain('<InlineReferenceActions />')
-    expect(componentSource).toContain("const MARKDOWN_SCOPE = '.markdown-body'")
+    expect(componentSource).toContain("const MARKDOWN_SCOPE = '.markdown-body, .ProseMirror'")
     expect(componentSource).toContain('data-inline-reference-actions')
   })
 

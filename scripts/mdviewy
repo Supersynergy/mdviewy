@@ -1,0 +1,53 @@
+#!/bin/sh
+# mdviewy CLI — open files/folders in mdviewy.app.
+#
+# Install:  ln -sf "$(pwd)/scripts/mdviewy" /usr/local/bin/mdviewy
+#
+# Usage:
+#   mdviewy <path> [more paths...]   open files or a folder workspace
+#   mdviewy .                        open current folder as workspace
+#   mdviewy mdviewy://open?path=/x   open via deep link
+#
+# Prefers launching the app binary directly so argv paths reach the app even
+# when LaunchServices would swallow them; falls back to `open -a`.
+set -eu
+
+APP=/Applications/mdviewy.app
+BIN="$APP/Contents/MacOS/mdviewy"
+
+if [ $# -eq 0 ]; then
+  echo "usage: mdviewy <path|mdviewy://url> [...]" >&2
+  exit 2
+fi
+
+# Resolve relative paths now — the app process may start with a different cwd.
+args=""
+for a in "$@"; do
+  case "$a" in
+    -*)
+      echo "mdviewy: ignoring flag '$a'" >&2
+      ;;
+    mdviewy://*|file://*|/*)
+      args="$args
+$a"
+      ;;
+    *)
+      args="$args
+$(cd "$(dirname "$a")" 2>/dev/null && pwd)/$(basename "$a")"
+      ;;
+  esac
+done
+
+if [ -x "$BIN" ]; then
+  for a in $args; do
+    "$BIN" "$a" &
+  done
+  wait
+elif [ -d "$APP" ]; then
+  for a in $args; do
+    open -a mdviewy "$a"
+  done
+else
+  echo "mdviewy: app not found at $APP" >&2
+  exit 1
+fi

@@ -3,7 +3,12 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SOURCE_APP="$ROOT_DIR/target/release/bundle/macos/mdviewy.app"
+# Cargo's effective target dir may be redirected (e.g. global ~/.cargo/config.toml
+# target-dir=/Users/master/.cargo-target). Ask cargo metadata instead of assuming
+# ./target — otherwise this script silently installs a stale bundle.
+TARGET_DIR="$(cargo metadata --format-version 1 --no-deps --manifest-path "$ROOT_DIR/Cargo.toml" 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin)["target_directory"])' 2>/dev/null || true)"
+TARGET_DIR="${TARGET_DIR:-${CARGO_TARGET_DIR:-$ROOT_DIR/target}}"
+SOURCE_APP="$TARGET_DIR/release/bundle/macos/mdviewy.app"
 # /Applications is where LaunchServices actually resolves `open -a mdviewy`,
 # Finder double-click, and the default .md handler — installing to
 # ~/Applications silently left the real app 2.5 weeks stale (verified

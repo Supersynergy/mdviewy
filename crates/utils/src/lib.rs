@@ -10,18 +10,245 @@ pub enum FileType {
     Image,
     Json,
     Txt,
+    Code,
+    Rtf,
+    Pdf,
     Directory,
 }
 
+const IMAGE_EXTS: &[&str] = &[
+    "jpg", "jpeg", "png", "gif", "webp", "bmp", "avif", "ico", "tif", "tiff",
+];
+
+// Kept in sync with the frontend's CODE_EXTENSIONS in
+// apps/desktop/src/helper/fileTypeHandler.ts — the workspace tree and the
+// editor must agree on what's openable.
+const CODE_EXTS: &[&str] = &[
+    "js",
+    "mjs",
+    "cjs",
+    "jsx",
+    "ts",
+    "mts",
+    "cts",
+    "tsx",
+    "py",
+    "pyw",
+    "pyx",
+    "rs",
+    "go",
+    "java",
+    "c",
+    "h",
+    "cpp",
+    "c++",
+    "cc",
+    "cxx",
+    "hpp",
+    "h++",
+    "hh",
+    "hxx",
+    "cs",
+    "fs",
+    "rb",
+    "rbx",
+    "php",
+    "php3",
+    "php4",
+    "php5",
+    "php7",
+    "phtml",
+    "swift",
+    "kt",
+    "kts",
+    "scala",
+    "sc",
+    "lua",
+    "pl",
+    "pm",
+    "r",
+    "jl",
+    "dart",
+    "ex",
+    "exs",
+    "erl",
+    "hrl",
+    "hs",
+    "clj",
+    "cljc",
+    "cljs",
+    "edn",
+    "elm",
+    "d",
+    "cr",
+    "groovy",
+    "gradle",
+    "hx",
+    "ml",
+    "mli",
+    "html",
+    "htm",
+    "xhtml",
+    "handlebars",
+    "hbs",
+    "xml",
+    "xsl",
+    "xsd",
+    "dtd",
+    "css",
+    "scss",
+    "sass",
+    "less",
+    "gss",
+    "styl",
+    "vue",
+    "liquid",
+    "j2",
+    "jinja",
+    "jinja2",
+    "jsonc",
+    "json5",
+    "jsonld",
+    "yaml",
+    "yml",
+    "toml",
+    "ini",
+    "cfg",
+    "conf",
+    "properties",
+    "env",
+    "sh",
+    "bash",
+    "zsh",
+    "ps1",
+    "bat",
+    "cmd",
+    "sql",
+    "cql",
+    "pls",
+    "prql",
+    "sparql",
+    "diff",
+    "patch",
+    "dockerfile",
+    "cmake",
+    "mk",
+    "wat",
+    "wast",
+    "tex",
+    "sty",
+    "v",
+    "sv",
+    "vhdl",
+    "vim",
+    "feature",
+    "cypher",
+    "asn",
+    "asn1",
+    "e",
+    "forth",
+    "fth",
+    "4th",
+    "f",
+    "for",
+    "f77",
+    "f90",
+    "f95",
+    "s",
+    "cob",
+    "cpy",
+    "dylan",
+    "dyl",
+    "factor",
+    "lisp",
+    "cl",
+    "el",
+    "mrc",
+    "idl",
+    "ls",
+    "nsis",
+    "nsh",
+    "oz",
+    "pig",
+    "pas",
+    "pp",
+    "sol",
+    "tcl",
+    "vbs",
+    "vb",
+    "sieve",
+    "nt",
+    "brf",
+];
+
+const PLAIN_TEXT_EXTS: &[&str] = &[
+    "txt", "text", "mdx", "log", "csv", "tsv", "asc", "me", "nfo", "out", "err", "lock", "graphql",
+    "gql", "prisma", "proto", "thrift", "rego", "bicep", "tf", "hcl", "nomad", "service",
+    "desktop", "po", "pot", "rst", "adoc", "org", "srt", "vtt", "ics", "vcf", "wkt", "ndjson",
+    "jsonl",
+];
+
+fn extension_of(file_name: &str) -> &str {
+    let name = file_name.rsplit(['/', '\\']).next().unwrap_or(file_name);
+    match name.rfind('.') {
+        Some(i) if i > 0 => &name[i + 1..],
+        _ => "",
+    }
+}
+
 pub fn get_file_type(file_name: &str) -> FileType {
+    let ext = extension_of(file_name).to_lowercase();
     let lower_name = file_name.to_lowercase();
-    if lower_name.ends_with(".md") || lower_name.ends_with(".markdown") {
+
+    if ext == "md" || ext == "markdown" {
         FileType::Markdown
-    } else if lower_name.ends_with(".jpg") || lower_name.ends_with(".png") {
+    } else if IMAGE_EXTS.contains(&ext.as_str()) {
         FileType::Image
-    } else if lower_name.ends_with(".json") {
+    } else if ext == "json" {
         FileType::Json
-    } else if lower_name.ends_with(".txt") {
+    } else if ext == "rtf" {
+        FileType::Rtf
+    } else if ext == "pdf" {
+        FileType::Pdf
+    } else if CODE_EXTS.contains(&ext.as_str()) {
+        FileType::Code
+    } else if PLAIN_TEXT_EXTS.contains(&ext.as_str())
+        || matches!(
+            lower_name.rsplit(['/', '\\']).next().unwrap_or(""),
+            "dockerfile"
+                | "makefile"
+                | "gnumakefile"
+                | "cmakelists.txt"
+                | "rakefile"
+                | "gemfile"
+                | "podfile"
+                | "brewfile"
+                | "vagrantfile"
+                | "justfile"
+                | "procfile"
+                | ".gitignore"
+                | ".dockerignore"
+                | ".gitattributes"
+                | ".gitmodules"
+                | ".npmrc"
+                | ".editorconfig"
+                | ".env"
+                | ".zshrc"
+                | ".bashrc"
+                | ".zprofile"
+                | ".profile"
+                | ".prettierrc"
+                | ".eslintrc"
+                | ".babelrc"
+                | "license"
+                | "licence"
+                | "copying"
+                | "changelog"
+                | "authors"
+                | "contributors"
+                | "notice"
+        )
+    {
         FileType::Txt
     } else {
         FileType::Unknown
@@ -87,11 +314,19 @@ mod tests {
         assert_eq!(get_file_type("PHOTO.PNG"), FileType::Image);
         assert_eq!(get_file_type("data.JSON"), FileType::Json);
         assert_eq!(get_file_type("log.TXT"), FileType::Txt);
+        // universal-workspace formats
+        assert_eq!(get_file_type("doc.RTF"), FileType::Rtf);
+        assert_eq!(get_file_type("paper.pdf"), FileType::Pdf);
+        assert_eq!(get_file_type("main.rs"), FileType::Code);
+        assert_eq!(get_file_type("app.TSX"), FileType::Code);
+        assert_eq!(get_file_type("notes.mdx"), FileType::Txt);
+        assert_eq!(get_file_type(".gitignore"), FileType::Txt);
+        assert_eq!(get_file_type("Dockerfile"), FileType::Txt);
         // non-file-ish / edge inputs must not misclassify
         assert_eq!(get_file_type(""), FileType::Unknown);
         assert_eq!(get_file_type("foo-bar-baz"), FileType::Unknown);
-        assert_eq!(get_file_type(".gitignore"), FileType::Unknown);
         assert_eq!(get_file_type("archive.tar.gz"), FileType::Unknown);
+        assert_eq!(get_file_type("a.exe"), FileType::Unknown);
         // extension must be a suffix, not a substring
         assert_eq!(get_file_type("md.notes"), FileType::Unknown);
     }
