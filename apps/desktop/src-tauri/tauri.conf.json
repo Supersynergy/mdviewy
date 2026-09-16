@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "mdviewy",
-  "version": "0.100.0",
+  "version": "0.101.0",
   "identifier": "com.supersynergy.mdviewy",
   "build": {
     "beforeDevCommand": "yarn dev",
@@ -14,7 +14,9 @@
     },
     "deep-link": {
       "desktop": {
-        "schemes": ["mdviewy"]
+        "schemes": [
+          "mdviewy"
+        ]
       }
     }
   },
@@ -39,13 +41,56 @@
       },
       {
         "ext": [
-          ".js", ".mjs", ".cjs", ".jsx", ".ts", ".mts", ".cts", ".tsx",
-          ".py", ".rs", ".go", ".java", ".c", ".h", ".cpp", ".cc", ".hpp",
-          ".cs", ".rb", ".php", ".swift", ".kt", ".scala", ".lua", ".pl",
-          ".r", ".jl", ".dart", ".html", ".htm", ".xml", ".css", ".scss",
-          ".sass", ".less", ".vue", ".yaml", ".yml", ".toml", ".ini",
-          ".sh", ".bash", ".zsh", ".ps1", ".sql", ".diff", ".patch",
-          ".env", ".cfg", ".conf"
+          ".js",
+          ".mjs",
+          ".cjs",
+          ".jsx",
+          ".ts",
+          ".mts",
+          ".cts",
+          ".tsx",
+          ".py",
+          ".rs",
+          ".go",
+          ".java",
+          ".c",
+          ".h",
+          ".cpp",
+          ".cc",
+          ".hpp",
+          ".cs",
+          ".rb",
+          ".php",
+          ".swift",
+          ".kt",
+          ".scala",
+          ".lua",
+          ".pl",
+          ".r",
+          ".jl",
+          ".dart",
+          ".html",
+          ".htm",
+          ".xml",
+          ".css",
+          ".scss",
+          ".sass",
+          ".less",
+          ".vue",
+          ".yaml",
+          ".yml",
+          ".toml",
+          ".ini",
+          ".sh",
+          ".bash",
+          ".zsh",
+          ".ps1",
+          ".sql",
+          ".diff",
+          ".patch",
+          ".env",
+          ".cfg",
+          ".conf"
         ],
         "name": "Source Code",
         "description": "Source Code File",
@@ -53,14 +98,26 @@
         "role": "Editor"
       },
       {
-        "ext": [".pdf"],
+        "ext": [
+          ".pdf"
+        ],
         "name": "PDF Document",
         "description": "PDF Document",
         "mimeType": "application/pdf",
         "role": "Viewer"
       },
       {
-        "ext": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".avif", ".tif", ".tiff"],
+        "ext": [
+          ".png",
+          ".jpg",
+          ".jpeg",
+          ".gif",
+          ".webp",
+          ".bmp",
+          ".avif",
+          ".tif",
+          ".tiff"
+        ],
         "name": "Image",
         "description": "Image File",
         "mimeType": "image/*",

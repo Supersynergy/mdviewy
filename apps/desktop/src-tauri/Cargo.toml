@@ -1,6 +1,6 @@
 [package]
 name = "mdviewy"
-version = "0.100.0"
+version = "0.101.0"
 description = "A Markdown Editor App"
 authors = ["Supersynergy"]
 license = "AGPL-3.0-only"
@@ -12,9 +12,6 @@ ignored = ["log"]
 
 [lib]
 name = "mdviewy"
-# Desktop-only build — staticlib/cdylib exist for mobile embedding and each
-# cost a full fat-LTO link of the whole dep graph. rlib alone is what the
-# `mdviewy` bin target consumes.
 crate-type = ["rlib"]
 
 [build-dependencies.tauri-build]
@@ -118,10 +115,6 @@ path = "../../../crates/file_search"
 
 [dependencies.download_npm]
 path = "../../../crates/download_npm"
-
-# mdviewy-core (tantivy/comrak/syntect/…) was wired as `full` but every core_*
-# command it served had zero frontend callers — removed from the app binary;
-# the crate stays in the workspace for when the features get real callers.
 
 [target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
 window-vibrancy = "0.5.0"
