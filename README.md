@@ -17,6 +17,8 @@
 
 ![mdviewy focused Markdown workspace](public/showcase.png)
 
+[📦 Downloads](#downloads) · [✨ Features](#what-is-included) · [🛠️ Build](#build-from-source) · [🔒 Privacy](#privacy-and-security) · [License](#license)
+
 ## Markdown without the machinery
 
 Open a file and read. Open a folder when you want a workspace. mdviewy does not ask for an account, copy your notes into a database, or index home folders behind your back.
@@ -40,7 +42,10 @@ Open a file and read. Open a folder when you want a workspace. mdviewy does not 
 
 README files open in the dedicated preview automatically. If a document contains GitHub-only syntax that the visual editor cannot round-trip safely, mdviewy opens Source mode instead of silently changing the file.
 
-## Download 0.92.1
+## Downloads
+
+[Browse current releases and platform assets](https://github.com/Supersynergy/mdviewy/releases).
+The version-specific links below point to the documented 0.92.1 preview.
 
 Choose your platform on the [v0.92.1 release page](https://github.com/Supersynergy/mdviewy/releases/tag/v0.92.1).
 
