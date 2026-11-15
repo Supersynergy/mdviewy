@@ -5,12 +5,11 @@
 <h1 align="center">mdviewy</h1>
 
 <p align="center">
-  <strong>Your Markdown. Your files. Your flow.</strong><br>
-  A calm, fast, local-first Markdown workspace for macOS, Windows, and Linux.
+  <strong>A local Markdown editor and document viewer for macOS, Windows and Linux.</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Supersynergy/mdviewy/releases/tag/v0.92.1"><img alt="Release" src="https://img.shields.io/badge/release-v0.92.1-70d4c5?style=flat-square"></a>
+  <a href="https://github.com/Supersynergy/mdviewy/releases/latest"><img alt="Latest stable release" src="https://img.shields.io/github/v/release/Supersynergy/mdviewy?style=flat-square"></a>
   <a href="https://github.com/Supersynergy/mdviewy/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/Supersynergy/mdviewy/ci.yml?branch=main&style=flat-square&label=checks"></a>
   <a href="LICENSE"><img alt="AGPL-3.0-only" src="https://img.shields.io/badge/license-AGPL--3.0--only-6366f1?style=flat-square"></a>
 </p>
@@ -19,14 +18,9 @@
 
 [📦 Downloads](#downloads) · [✨ Features](#what-is-included) · [🛠️ Build](#build-from-source) · [🔒 Privacy](#privacy-and-security) · [License](#license)
 
-## Markdown without the machinery
+## Open a document
 
-Open a file and read. Open a folder when you want a workspace. mdviewy does not ask for an account, copy your notes into a database, or index home folders behind your back.
-
-- **Instant focus:** files opened from Finder, Explorer, the CLI, or the app collapse surrounding panels and use the available reading space.
-- **Your format stays yours:** ordinary Markdown files on disk, with source, WYSIWYG, and safe preview modes.
-- **Smart when invited:** document briefs, frontmatter insights, path and repository actions, optional AI providers, and agent-ready context packs.
-- **Native and calm:** Tauri desktop shell, adaptive document widths, keyboard-first navigation, and no browser tab clutter.
+Open a Markdown file to start writing, or open a folder to search and navigate a workspace. Use Preview to read a README with its tables, task lists and relative images. Switch to Source to edit the original Markdown. Documents stay on disk and opening a folder limits indexing to that workspace.
 
 ## What is included
 
@@ -44,27 +38,19 @@ README files open in the dedicated preview automatically. If a document contains
 
 ## Downloads
 
-[Browse current releases and platform assets](https://github.com/Supersynergy/mdviewy/releases).
-The version-specific links below point to the documented 0.92.1 preview.
+For the stable build, use the [latest stable release](https://github.com/Supersynergy/mdviewy/releases/latest). The [0.101.0 preview](https://github.com/Supersynergy/mdviewy/releases/tag/v0.101.0) also opens RTF text, PDFs, images and source files. Choose a preview installer below. MSI packages are available on the same release page.
 
-Choose your platform on the [v0.92.1 release page](https://github.com/Supersynergy/mdviewy/releases/tag/v0.92.1).
-
-| Platform | Recommended package |
+| Platform | 0.101.0 preview download |
 | --- | --- |
-| macOS Apple Silicon | `aarch64.dmg` |
-| macOS Intel | `x64.dmg` |
-| Windows 11 | `x64-setup.exe` |
-| Windows managed install | `.msi` |
-| Windows without WebView2 | `mdviewy_offline_*_x64-setup.exe` |
-| Linux | `.AppImage`, `.deb`, or `.rpm` |
+| macOS · Apple Silicon | [mdviewy_0.101.0_aarch64.dmg](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_aarch64.dmg) |
+| macOS · Intel | [mdviewy_0.101.0_x64.dmg](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_x64.dmg) |
+| Windows · x64 | [mdviewy_0.101.0_x64-setup.exe](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_x64-setup.exe) |
+| Windows · offline WebView2 installer | [mdviewy_offline_0.101.0_x64-setup.exe](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_offline_0.101.0_x64-setup.exe) |
+| Debian or Ubuntu · x64 | [mdviewy_0.101.0_amd64.deb](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_amd64.deb) |
+| Fedora or RPM-based Linux · x64 | [mdviewy-0.101.0-1.x86_64.rpm](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy-0.101.0-1.x86_64.rpm) |
+| Linux AppImage · x64 | [mdviewy_0.101.0_amd64.AppImage](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_amd64.AppImage) |
 
-The 0.92 binaries are public prerelease builds. macOS notarization and Windows code signing are not configured yet, so the operating system may show a first-launch warning. Download only from this repository.
-
-If macOS quarantines the app after you verify the download, use:
-
-```bash
-xattr -cr /Applications/mdviewy.app
-```
+The macOS preview uses an ad-hoc signature and has not been notarized. Windows installers are unsigned. Your operating system may ask you to confirm the developer when opening the installer.
 
 ## Build from source
 
@@ -91,7 +77,7 @@ Your documents remain local unless you explicitly configure and call an external
 
 ## Project status
 
-0.92 focuses on trustworthy file opening, atomic saves, GitHub README fidelity, clean startup, and recovery from renderer failures. The remaining 1.0 gates are tracked in [the roadmap](docs/ROADMAP-1.0.md), including signed/notarized releases, external-edit conflict handling, and end-to-end platform tests.
+The desktop app focuses on trustworthy file opening, atomic saves, GitHub README fidelity, clean startup, and recovery from renderer failures. The remaining 1.0 gates are tracked in [the roadmap](docs/ROADMAP-1.0.md), including signed/notarized releases, external-edit conflict handling, and end-to-end platform tests.
 
 Issues and focused pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), use the [issue tracker](https://github.com/Supersynergy/mdviewy/issues), and keep user files and privacy as the first constraint.
 
