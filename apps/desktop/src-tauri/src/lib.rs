@@ -332,7 +332,7 @@ pub fn run() {
             // creation order before, so menu commands and warm opens could
             // route to a stale window.
             if let tauri::WindowEvent::Focused(true) = event {
-                window_manager::record_last_window_label(window.label());
+                app::window_manager::record_last_window_label(window.label());
 
                 // A restored position can reference a now-disconnected
                 // external monitor — the window then opens off-screen and
