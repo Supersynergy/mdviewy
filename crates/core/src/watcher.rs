@@ -241,9 +241,14 @@ mod tests {
         fs::write(tmp.path().join("b.rs"), "fn main() {}").unwrap();
         fs::write(tmp.path().join("c.pdf"), b"binary").unwrap();
         fs::write(tmp.path().join("d.bin"), b"binary").unwrap();
+        fs::write(tmp.path().join("e.rtf"), b"{\\rtf1 hello}").unwrap();
         let entries = scan(tmp.path()).unwrap();
-        let files: Vec<_> = entries.iter().filter(|e| !e.is_dir).collect();
-        assert_eq!(files.len(), 3);
-        assert!(files[0].path.ends_with("a.md"));
+        let mut files: Vec<_> = entries
+            .iter()
+            .filter(|entry| !entry.is_dir)
+            .map(|entry| entry.path.file_name().unwrap())
+            .collect();
+        files.sort_unstable();
+        assert_eq!(files, ["a.md", "b.rs", "c.pdf", "e.rtf"]);
     }
 }
