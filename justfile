@@ -39,7 +39,7 @@ lean:
 # scans only the npm lockfile to avoid duplicate ignore-list maintenance.
 security:
     gitleaks dir . -c .gitleaks.toml --redact --no-banner
-    osv-scanner --config osv-scanner.toml --lockfile yarn.lock
+    osv-scanner --config tools/config/osv-scanner.toml --lockfile yarn.lock
 
 # Build the desktop app and deploy straight to /Applications: strips
 # quarantine + re-signs ad-hoc + re-registers with LaunchServices, so the

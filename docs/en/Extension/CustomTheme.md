@@ -51,7 +51,7 @@ If you want more users to use your theme, you can submit it to mdviewy's officia
    - Create a release on GitHub
 
 2. **Submit to community theme list**
-   Edit the `community-themes.json` file in the project root directory and add your theme information:
+   Edit the `apps/desktop/src/assets/community-themes.json` file and add your theme information:
 
 ```json
 {

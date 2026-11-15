@@ -14,10 +14,10 @@
     "strict": true,
     "target": "ES2019",
     "declaration": true,
-    "declarationDir": ".",
-    "outDir": "./dist",
+    "declarationDir": "../..",
+    "outDir": "../../dist",
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["../../src/*"],
     }
   }
 }

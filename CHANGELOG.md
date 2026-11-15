@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Reorganized the repository without shortening the README: community documents
+  now live in `.github/`, attributions in `docs/ATTRIBUTIONS.md`, shared build,
+  TypeScript, and OSV configuration in `tools/config/`, and the community theme
+  catalog in `apps/desktop/src/assets/community-themes.json`. Updated consumers
+  and contributor documentation; retained root package-manager entry points.
+
 ## 0.102.0 — 2026-11-15
 
 - Markdown handoffs open in the source editor. Answer markers show which fields are open, and Alt+Shift+N moves the cursor to the next one. RTF handoff previews highlight answer markers too.

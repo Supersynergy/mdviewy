@@ -77,17 +77,26 @@ yarn build:desktop
 
 ## Privacy and security
 
-Your documents remain local unless you explicitly configure and call an external AI provider. Provider keys are stored in the local app settings; do not sync that settings file. See [SECURITY.md](SECURITY.md) for supported versions, the security posture, and private reporting.
+Your documents remain local unless you explicitly configure and call an external AI provider. Provider keys are stored in the local app settings; do not sync that settings file. See [SECURITY.md](.github/SECURITY.md) for supported versions, the security posture, and private reporting.
 
 ## Project status
 
 The desktop app focuses on trustworthy file opening, atomic saves, GitHub README fidelity, clean startup, and recovery from renderer failures. The remaining 1.0 gates are tracked in [the roadmap](docs/ROADMAP-1.0.md), including signed/notarized releases, external-edit conflict handling, and end-to-end platform tests.
 
-Issues and focused pull requests are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), use the [issue tracker](https://github.com/Supersynergy/mdviewy/issues), and keep user files and privacy as the first constraint.
+Issues and focused pull requests are welcome. Start with [CONTRIBUTING.md](.github/CONTRIBUTING.md), use the [issue tracker](https://github.com/Supersynergy/mdviewy/issues), and keep user files and privacy as the first constraint.
 
 ## Provenance
 
 mdviewy began as a fork of [MarkFlowy](https://github.com/drl990114/MarkFlowy) and is now independently maintained with a local-first product direction.
+
+## Repository structure
+
+- `apps/`: desktop and web applications; desktop assets include the community theme catalog.
+- `packages/` and `crates/`: shared TypeScript packages and Rust crates.
+- `docs/`: documentation, architecture decisions, and [attributions](docs/ATTRIBUTIONS.md).
+- `.github/`: workflows and community guidelines, including the [Code of Conduct](.github/CODE_OF_CONDUCT.md).
+- `tools/config/`: shared build, TypeScript, and vulnerability-scanner configuration.
+- `scripts/`, `locales/`, and `public/`: automation, translations, and public assets.
 
 ## License
 

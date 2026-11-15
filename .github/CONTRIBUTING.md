@@ -40,4 +40,4 @@ For file-opening, saving, parsing, or security changes, include a regression tes
 
 Describe the user-visible outcome, the root cause, and the exact checks you ran. Add screenshots for layout changes. Do not mix generated formatting, dependency upgrades, and product changes unless they are required for the same fix.
 
-By participating, you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md). Contributions are licensed under [AGPL-3.0-only](LICENSE).
+By participating, you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md). Contributions are licensed under [AGPL-3.0-only](../LICENSE).

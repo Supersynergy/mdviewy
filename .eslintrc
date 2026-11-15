@@ -17,6 +17,6 @@
       ]
     },
     "requireConfigFile": false,
-    "project": "./tsconfig.eslint.json"
+    "project": "./tools/config/tsconfig.eslint.json"
   }
 }

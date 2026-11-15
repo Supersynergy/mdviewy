@@ -24,4 +24,4 @@ We will acknowledge actionable reports, investigate privately, and publish a sec
 - AI is optional. Requests leave the device only after a provider is configured and an AI action is invoked.
 - AI provider keys currently live in the local settings store as plaintext. Do not sync or commit that file; operating-system keychain storage remains a 1.0 gate.
 
-Architecture details and verification commands live in [the security posture ADR](docs/adr/2026-06-05-security-posture-1.0.md).
+Architecture details and verification commands live in [the security posture ADR](../docs/adr/2026-06-05-security-posture-1.0.md).

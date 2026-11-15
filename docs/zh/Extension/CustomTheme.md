@@ -49,7 +49,7 @@ output: {
    - 发布到 npm 包管理器 [npm 包发布流程](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/)
 
 2. **提交到社区主题列表**
-   编辑项目根目录的 `community-themes.json` 文件，添加你的主题信息：
+   编辑 `apps/desktop/src/assets/community-themes.json` 文件，添加你的主题信息：
 
 ```json
 {
