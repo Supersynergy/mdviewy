@@ -21,6 +21,23 @@ describe('rtfToText', () => {
     expect(rtfToText('{\\rtf1\\uc0 \\u169x}').trim()).toBe('©x')
   })
 
+  it('consumes an escaped fallback without losing the next letter', () => {
+    expect(rtfToText(String.raw`{\rtf1\u228\'e4pfel}`)).toBe('äpfel')
+    expect(rtfToText(String.raw`{\rtf1\u123\{ok}`)).toBe('{ok')
+  })
+
+  it('preserves escaped line breaks from macOS text documents', () => {
+    expect(rtfToText('{\\rtf1 one\\\ntwo\\\r\nthree}')).toBe('one\ntwo\nthree')
+  })
+
+  it('reads Windows ANSI smart quotes and euros', () => {
+    expect(rtfToText(String.raw`{\rtf1\ansi\ansicpg1252 \'93Preis: 5 \'80\'94}`)).toBe('“Preis: 5 €”')
+  })
+
+  it('recovers from an out-of-range Unicode parameter', () => {
+    expect(rtfToText(String.raw`{\rtf1\u99999999? ok}`)).toBe('� ok')
+  })
+
   it('converts paragraph and tab control words', () => {
     const rtf = '{\\rtf1 one\\tab two\\par three}'
     expect(rtfToText(rtf)).toBe('one\ttwo\nthree')

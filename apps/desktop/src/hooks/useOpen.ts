@@ -1,6 +1,8 @@
-import { readDirectory } from '@/helper/filesys'
+import { readDirectory, getFileNameFromPath } from '@/helper/filesys'
 import { getFileTypeConfig, isTextfileType, OPEN_DIALOG_EXTENSIONS } from '@/helper/fileTypeHandler'
+import { getFileObjectByPath, getSaveOpenedEditorEntries } from '@/helper/files'
 import { logger } from '@/helper/logger'
+import { checkUnsavedFiles } from '@/services/checkUnsavedFiles'
 import { addExistingMarkdownFileEdit } from '@/services/editor-file'
 import { getFileContent } from '@/services/file-info'
 import { currentWindow } from '@/services/windows'
@@ -41,11 +43,29 @@ const useOpen = () => {
           return
         }
 
-        const res = await readDirectory(dir)
-        addRecentWorkspaces({ path: dir })
-        useEditorStore.getState().setFolderData(res)
+        const proceed = async () => {
+          const res = await readDirectory(dir)
+          addRecentWorkspaces({ path: dir })
+          useEditorStore.getState().setFolderData(res)
+          logger.info('Opening folder in current window:', dir)
+        }
 
-        logger.info('Opening folder in current window:', dir)
+        // setFolderData drops every open tab — unsaved edits need the same
+        // save/discard/cancel choice that window close offers.
+        const { opened } = useEditorStore.getState()
+        if (
+          checkUnsavedFiles({
+            fileIds: opened,
+            onSaveAndClose: async (ids) => {
+              for (const id of ids) await getSaveOpenedEditorEntries(id)?.()
+              void proceed()
+            },
+            onUnsavedAndClose: () => void proceed(),
+          }) > 0
+        ) {
+          return
+        }
+        void proceed()
       } catch (error) {
         logger.error('Error opening folder in current window:', error)
         toast.error(`Could not open folder: ${String(error)}`)
@@ -85,8 +105,22 @@ const useOpen = () => {
 
     if (typeof file !== 'string') return
 
-    const fileName = file.split('/').pop() || 'new-file.md'
+    // Already open → activate the existing tab instead of minting a second
+    // editor on the same disk path (two autosaving buffers = write race).
+    const existing = getFileObjectByPath(file)
+    if (existing) {
+      const { addOpenedFile, setActiveId } = useEditorStore.getState()
+      addOpenedFile(existing.id)
+      setActiveId(existing.id)
+      return
+    }
+
+    const fileName = getFileNameFromPath(file) || 'new-file.md'
     const config = getFileTypeConfig({ name: fileName, path: file } as any)
+    if (config.type === 'unsupported') {
+      toast.error(`Cannot open ${fileName}: unsupported file type`)
+      return
+    }
 
     // Binary preview types (pdf, image) have no text content to load — the
     // preview reads bytes itself. Text/RTF/code files need the content up

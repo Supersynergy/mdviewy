@@ -1,5 +1,5 @@
 import { getFolderPathFromPath } from '@/helper/filesys'
-import { resolveLocalHref } from '@/helper/localLink'
+import { isDangerousExecPath, resolveLocalHref } from '@/helper/localLink'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { openPath, openUrl } from '@tauri-apps/plugin-opener'
 import DOMPurify from 'dompurify'
@@ -127,6 +127,7 @@ export function GitHubMarkdownPreview({ content, filePath }: Props) {
     const anchor = (event.target as Element).closest('a')
     if (!anchor || !event.currentTarget.contains(anchor)) return
     event.preventDefault()
+    event.stopPropagation()
     const href = anchor.getAttribute('href') || ''
 
     try {
@@ -146,6 +147,13 @@ export function GitHubMarkdownPreview({ content, filePath }: Props) {
       if (localPath) {
         const { openPathInApp } = await import('@/services/openPaths')
         if (await openPathInApp(localPath)) return
+        if (isDangerousExecPath(localPath)) {
+          // Lazy: zens pulls antd, which must stay out of the preview chunk
+          // and the node test env.
+          const { toast } = await import('zens')
+          toast.error(`Not opened: ${localPath.split('/').pop()} would execute on open`)
+          return
+        }
         await openPath(localPath)
       }
     } catch (error) {

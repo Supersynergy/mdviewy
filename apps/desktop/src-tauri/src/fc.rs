@@ -391,7 +391,22 @@ pub fn files_to_json(files: Vec<FileInfo>) -> FileResult {
     }
 }
 
+/// Text loads stay below this; larger files would freeze the webview during
+/// IPC transfer + editor mount. Binary previews use read_u8_array_from_file.
+const MAX_TEXT_FILE_BYTES: u64 = 32 * 1024 * 1024;
+
 pub fn read_file(path: &str) -> FileResult {
+    if let Ok(meta) = fs::metadata(path) {
+        if meta.len() > MAX_TEXT_FILE_BYTES {
+            return FileResult {
+                code: FileResultCode::TooLarge,
+                content: format!(
+                    "File is too large to open as text ({} MB)",
+                    meta.len() / 1024 / 1024
+                ),
+            };
+        }
+    }
     match fs::read_to_string(path) {
         Ok(content) => FileResult {
             code: FileResultCode::Success,
@@ -722,86 +737,6 @@ pub fn get_file_normal_info(path_str: &str) -> FileNormalInfo {
     }
 }
 
-pub fn convert_text_async(
-    text: String,
-    variant: String,
-) -> impl Future<Output = Result<String, SystemError>> {
-    use crate::task_system::{
-        error::SystemError,
-        system::System,
-        task::{ExecStatus, Interrupter, Task, TaskId, TaskOutput},
-    };
-    use async_trait::async_trait;
-    use thiserror::Error;
-    use zhconv::{zhconv, Variant};
-
-    #[derive(Debug, Error)]
-    enum ConvertError {
-        #[error("System error: {0}")]
-        SystemError(#[from] SystemError),
-    }
-
-    #[derive(Debug)]
-    struct ConvertTextTask {
-        id: TaskId,
-        text: String,
-        variant: String,
-    }
-
-    impl ConvertTextTask {
-        fn new(text: String, variant: String) -> Self {
-            Self {
-                id: TaskId::new_v4(),
-                text,
-                variant,
-            }
-        }
-    }
-
-    #[async_trait]
-    impl Task<ConvertError> for ConvertTextTask {
-        fn id(&self) -> TaskId {
-            self.id
-        }
-
-        fn with_priority(&self) -> bool {
-            true
-        }
-
-        async fn run(&mut self, _interrupter: &Interrupter) -> Result<ExecStatus, ConvertError> {
-            let variant_enum = match self.variant.as_str() {
-                "zh-TW" => Variant::ZhTW,
-                "zh-HK" => Variant::ZhHK,
-                "zh-CN" => Variant::ZhCN,
-                "zh-Hans" => Variant::ZhHans,
-                _ => Variant::ZhTW,
-            };
-            let result = zhconv(&self.text, variant_enum);
-            Ok(ExecStatus::Done(TaskOutput::Out(Box::new(result))))
-        }
-    }
-
-    async move {
-        let system = System::<ConvertError>::new();
-        let task = ConvertTextTask::new(text, variant);
-        let handle = system
-            .dispatch(task)
-            .await
-            .map_err(|_| SystemError::TaskAborted(TaskId::nil()))?;
-
-        match handle.await {
-            Ok(crate::task_system::task::TaskStatus::Done((_, TaskOutput::Out(out)))) => {
-                let text = out
-                    .downcast::<String>()
-                    .map_err(|_| SystemError::TaskAborted(TaskId::nil()))?;
-                Ok(*text)
-            }
-            Ok(crate::task_system::task::TaskStatus::Error(ConvertError::SystemError(e))) => Err(e),
-            _ => Err(SystemError::TaskAborted(TaskId::nil())),
-        }
-    }
-}
-
 pub mod cmd {
     use crate::fc::{self, FileNormalInfo, FileResultCode};
     use base64::engine::Engine;
@@ -812,37 +747,6 @@ pub mod cmd {
     use trash;
 
     use super::{FileResult, MoveFileInfo};
-
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    #[tauri::command]
-    pub fn open_folder(folder_path: &str) -> FileResult {
-        let dir_data = fc::read_directory(folder_path);
-        match dir_data {
-            Ok(files) => {
-                let json_data = fc::files_to_json(files);
-                let content = match json_data.code {
-                    fc::FileResultCode::Success => json_data.content,
-                    _ => String::from(""),
-                };
-
-                if content.is_empty() {
-                    return FileResult {
-                        code: fc::FileResultCode::NotFound,
-                        content: String::from("Folder not found"),
-                    };
-                }
-
-                FileResult {
-                    code: fc::FileResultCode::Success,
-                    content,
-                }
-            }
-            Err(_) => FileResult {
-                code: fc::FileResultCode::UnknownError,
-                content: String::from("Failed to read directory"),
-            },
-        }
-    }
 
     #[tauri::command]
     pub async fn open_folder_async(folder_path: String) -> FileResult {
@@ -955,9 +859,8 @@ pub mod cmd {
     }
 
     #[tauri::command]
-    pub fn delete_file(file_path: &str) -> String {
-        fc::remove_file(file_path);
-        String::from("OK")
+    pub fn delete_file(file_path: &str) -> FileResult {
+        fc::remove_file(file_path)
     }
 
     #[tauri::command]
@@ -1115,8 +1018,17 @@ pub mod cmd {
     }
 
     #[tauri::command]
-    pub fn trash_delete(path: &str) -> bool {
-        trash::delete(path).is_ok()
+    pub fn trash_delete(path: &str) -> FileResult {
+        match trash::delete(path) {
+            Ok(()) => FileResult {
+                code: FileResultCode::Success,
+                content: String::from("Moved to trash"),
+            },
+            Err(e) => FileResult {
+                code: FileResultCode::UnknownError,
+                content: format!("Failed to trash: {}", e),
+            },
+        }
     }
 
     #[tauri::command]
@@ -1206,20 +1118,6 @@ pub mod cmd {
                     content: format!("Failed to copy file from '{}' to '{}': {}", from, to, e),
                 }
             }
-        }
-    }
-
-    #[tauri::command]
-    pub async fn convert_text(text: String, variant: String) -> FileResult {
-        match fc::convert_text_async(text, variant).await {
-            Ok(content) => FileResult {
-                code: FileResultCode::Success,
-                content,
-            },
-            Err(e) => FileResult {
-                code: FileResultCode::UnknownError,
-                content: e.to_string(),
-            },
         }
     }
 }

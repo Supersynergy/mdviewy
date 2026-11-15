@@ -12,12 +12,16 @@ license = "AGPL-3.0-only"
 # Production binary: small, fast, single LTO unit.
 # On M-series the LTO+codegen-units=1 combo trims the binary ~25% and shaves
 # ~20-30ms off cold start vs default release.
+# NOTE: no panic="abort" — a panic inside a tauri command or spawned task
+# would kill the whole process (observed as instant SIGABRT quit at boot).
+# Unwinding lets the tokio runtime contain task panics; diagnostics.rs still
+# writes panic.log before the unwind. Panics crossing extern "C" frames
+# (AppKit callbacks) abort as before — that bound is unchanged.
 [profile.release]
 opt-level = 3
 lto = "fat"
 codegen-units = 1
 strip = "symbols"
-panic = "abort"
 incremental = false
 
 # Dev: keep fast incremental rebuilds for the app crate, but build deps once

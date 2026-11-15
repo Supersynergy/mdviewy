@@ -21,30 +21,44 @@ if [ $# -eq 0 ]; then
 fi
 
 # Resolve relative paths now — the app process may start with a different cwd.
-args=""
-for a in "$@"; do
+# Rotate "$@": shift each original off the front, append its resolved form to
+# the back — paths with spaces stay intact.
+input_args="$#"
+while [ "$input_args" -gt 0 ]; do
+  input_args=$((input_args - 1))
+  a=$1
+  shift
   case "$a" in
     -*)
       echo "mdviewy: ignoring flag '$a'" >&2
       ;;
     mdviewy://*|file://*|/*)
-      args="$args
-$a"
+      set -- "$@" "$a"
       ;;
     *)
-      args="$args
-$(cd "$(dirname "$a")" 2>/dev/null && pwd)/$(basename "$a")"
+      dir=$(dirname "$a")
+      if [ -d "$dir" ]; then
+        set -- "$@" "$(cd "$dir" && pwd)/$(basename "$a")"
+      else
+        # Directory part missing — pass through so the app reports the real
+        # path in its own not-found handling.
+        set -- "$@" "$a"
+      fi
       ;;
   esac
 done
 
+if [ $# -eq 0 ]; then
+  exit 0
+fi
+
 if [ -x "$BIN" ]; then
-  for a in $args; do
+  for a in "$@"; do
     "$BIN" "$a" &
   done
   wait
 elif [ -d "$APP" ]; then
-  for a in $args; do
+  for a in "$@"; do
     open -a mdviewy "$a"
   done
 else

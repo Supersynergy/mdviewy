@@ -98,6 +98,7 @@ export const useNativeMenuCommands = () => {
       },
     })
     addCommand({ id: 'app_openCommandPalette', handler: () => openPalette('all') })
+    addCommand({ id: 'app_goToFile', handler: () => openPalette('files') })
     addCommand({ id: 'app_openHeadingJumper', handler: () => openPalette('content') })
     addCommand({ id: 'app_openFileSearch', handler: () => openPalette('files') })
     addCommand({ id: 'app_findInFiles', handler: () => openPalette('content') })

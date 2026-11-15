@@ -1,4 +1,5 @@
 use crate::app::{conf::AppConf, window_manager};
+use std::path::PathBuf;
 use tauri::{utils::config::WebviewUrl, AppHandle, Emitter, WebviewWindowBuilder};
 
 #[cfg(target_os = "macos")]
@@ -19,7 +20,9 @@ pub fn init(
         let _ = existing_window.eval(&script);
         let _ = existing_window.emit("opened-urls", opened_paths.clone());
 
-        // 确保窗口被聚焦
+        // 确保窗口被聚焦 — unminimize first: a Dock-minimized window stays
+        // hidden even when set_focus nominally succeeds.
+        let _ = existing_window.unminimize();
         let _ = existing_window.set_focus();
         return Ok(());
     }
@@ -39,7 +42,6 @@ pub fn init(
     .resizable(true)
     .fullscreen(false)
     .theme(Some(theme))
-    .disable_drag_drop_handler()
     .inner_size(1200.0, 800.0)
     .min_inner_size(400.0, 400.0);
 
@@ -53,17 +55,21 @@ pub fn init(
     );
 
     // Vibrancy is purely cosmetic and NSVisualEffectView attach is 8-15ms
-    // synchronous. Defer to next tick so the window paints first.
+    // synchronous. Queue it on the AppKit main thread — apply_vibrancy
+    // requires it (returns NotMainThread on a tokio worker; this init also
+    // runs off-main for the single-instance callback path).
     #[cfg(target_os = "macos")]
     {
         let win_for_vib = window.clone();
-        tauri::async_runtime::spawn(async move {
-            let _ = apply_vibrancy(
+        let _ = app_handle.run_on_main_thread(move || {
+            if let Err(e) = apply_vibrancy(
                 &win_for_vib,
                 NSVisualEffectMaterial::HudWindow,
                 Some(NSVisualEffectState::Active),
                 Some(12.0),
-            );
+            ) {
+                tracing::warn!("window vibrancy skipped: {e}");
+            }
         });
     }
 
@@ -71,16 +77,18 @@ pub fn init(
     let window_label = window.label().to_string();
     let workspace_path = opened_paths.first().cloned().unwrap_or_default();
 
-    // 存储窗口实例信息到全局缓存
-    if !workspace_path.is_empty() {
+    // 存储窗口实例信息到全局缓存 — only directories are workspaces; a file
+    // path here would make check_window_by_path dedup windows on a document.
+    if !workspace_path.is_empty() && PathBuf::from(&workspace_path).is_dir() {
         use crate::WINDOW_INSTANCES;
-        use std::path::PathBuf;
 
         let mut instances = WINDOW_INSTANCES
             .lock()
             .map_err(|e| format!("Failed to lock window instances: {}", e))?;
-        instances.insert(window_label, PathBuf::from(workspace_path));
+        instances.insert(window_label.clone(), PathBuf::from(workspace_path));
     }
+
+    window_manager::record_last_window_label(&window_label);
 
     Ok(())
 }

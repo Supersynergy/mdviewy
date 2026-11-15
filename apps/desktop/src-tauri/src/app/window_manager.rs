@@ -23,22 +23,6 @@ pub(crate) fn opened_urls_initialization_script(opened_paths: &[String], notify:
     }
 }
 
-/// 获取所有窗口实例信息
-#[command]
-pub fn get_window_instances() -> Result<std::collections::HashMap<String, String>, String> {
-    let instances = WINDOW_INSTANCES
-        .lock()
-        .map_err(|_| "Failed to lock window instances")?;
-
-    // 将 PathBuf 转换为 String
-    let result: std::collections::HashMap<String, String> = instances
-        .iter()
-        .map(|(label, path)| (label.clone(), path.to_str().unwrap_or("").to_string()))
-        .collect();
-
-    Ok(result)
-}
-
 /// 创建新窗口
 #[command]
 pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String, String> {
@@ -101,6 +85,7 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
             .map_err(|_| "Failed to lock window instances")?;
         instances.insert(window_label.clone(), path.clone());
     }
+    record_last_window_label(&window_label);
 
     let opened_paths = workspace_path
         .as_ref()
@@ -117,7 +102,6 @@ pub fn create_new_window(_app: AppHandle, path: Option<String>) -> Result<String
                 .resizable(true)
                 .fullscreen(false)
                 .theme(Some(theme))
-                .disable_drag_drop_handler()
                 .inner_size(1200.0, 800.0)
                 .min_inner_size(400.0, 400.0);
 
@@ -227,33 +211,53 @@ pub fn check_window_by_path(_app: AppHandle, path: String) -> Result<Option<Stri
     Ok(None)
 }
 
-/// 获取最近打开的窗口标签
-/// 从WINDOW_INSTANCES中获取最后插入的窗口标签，如果不存在则返回"main"
+/// Records a window as the most recently opened one. WINDOW_INSTANCES is a
+/// HashMap — unordered — so "last opened" is tracked explicitly here.
+pub fn record_last_window_label(label: &str) {
+    if let Ok(mut last) = crate::LAST_WINDOW_LABEL.lock() {
+        *last = Some(label.to_string());
+    }
+}
+
+/// 获取最近打开的窗口标签 — the recorded last-opened label, or "main".
 pub fn get_last_opened_window_label() -> String {
-    if let Ok(instances) = WINDOW_INSTANCES.lock() {
-        // 获取最后插入的窗口标签（HashMap保持插入顺序）
-        if let Some((last_label, _)) = instances.iter().last() {
-            return last_label.clone();
+    if let Ok(last) = crate::LAST_WINDOW_LABEL.lock() {
+        if let Some(label) = last.as_ref() {
+            return label.clone();
         }
     }
     "main".to_string()
 }
 
-/// 获取最近打开的窗口
-/// 从WINDOW_INSTANCES中获取最后插入的窗口，如果不存在则返回None
+/// 获取最近打开的窗口 — falls back to "main", then to any live registered
+/// window, when the recorded label has gone stale.
 pub fn get_last_opened_window(app: &AppHandle) -> Option<tauri::WebviewWindow> {
     let label = get_last_opened_window_label();
-    app.get_webview_window(&label)
-}
-
-pub fn get_focused_window(app: &AppHandle) -> Option<tauri::WebviewWindow> {
+    if let Some(window) = app.get_webview_window(&label) {
+        return Some(window);
+    }
+    if label != "main" {
+        if let Some(window) = app.get_webview_window("main") {
+            return Some(window);
+        }
+    }
     if let Ok(instances) = WINDOW_INSTANCES.lock() {
         for window_label in instances.keys() {
             if let Some(window) = app.get_webview_window(window_label) {
-                if window.is_focused().unwrap_or(false) {
-                    return Some(window);
-                }
+                return Some(window);
             }
+        }
+    }
+    None
+}
+
+pub fn get_focused_window(app: &AppHandle) -> Option<tauri::WebviewWindow> {
+    // All live windows, not just workspace-mapped ones: a focused window
+    // without a folder is invisible to WINDOW_INSTANCES and would route
+    // menu commands / warm opens to the wrong window.
+    for (_label, window) in app.webview_windows() {
+        if window.is_focused().unwrap_or(false) {
+            return Some(window);
         }
     }
 

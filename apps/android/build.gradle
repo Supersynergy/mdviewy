@@ -1,0 +1,17 @@
+plugins { id 'com.android.application' version '9.1.0' }
+if (providers.gradleProperty('verificationBuildDir').isPresent()) {
+    layout.buildDirectory.set(file(providers.gradleProperty('verificationBuildDir').get()))
+}
+android {
+    namespace 'app.mdviewy.mobile'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'app.mdviewy.mobile'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '0.1'
+    }
+    sourceSets.main.assets.srcDir '../ios/Resources'
+    androidResources { ignoreAssetsPattern '!Icon*.png' }
+}

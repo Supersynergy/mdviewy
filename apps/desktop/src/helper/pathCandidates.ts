@@ -1,3 +1,5 @@
+import { homeDir } from '@tauri-apps/api/path'
+
 /**
  * Finds file paths inside document text so the menu can act on them —
  * "Reveal in Finder" for the path under the pointer, not just for the file
@@ -40,9 +42,24 @@ export const expandHome = (value: string, home?: string): string => {
   return value
 }
 
+/** Expands `~/…` via Tauri's home dir — works for docs outside `/Users` too. */
+export const expandUserPath = async (value: string): Promise<string> => {
+  if (value === '~' || value.startsWith('~/')) {
+    const home = (await homeDir()).replace(/\/+$/, '')
+    return value === '~' ? home : `${home}/${value.slice(2)}`
+  }
+  return value
+}
+
 /** Resolves a relative path against the folder of the current document. */
 export const resolveAgainst = (value: string, baseDir?: string): string => {
-  if (!baseDir || value.startsWith('/') || /^[A-Za-z]:\\/.test(value) || value.startsWith('~')) {
+  if (
+    !baseDir ||
+    value.startsWith('/') ||
+    /^[A-Za-z]:[\\/]/.test(value) ||
+    value.startsWith('\\\\') ||
+    value.startsWith('~')
+  ) {
     return value
   }
 

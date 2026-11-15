@@ -41,7 +41,8 @@ function FileNode({
   const { deleteNode, setFolderDataPure, trashNode } = useEditorStore()
 
   const delFileHandler = () => {
-    deleteNode(node.data).then(() => {
+    deleteNode(node.data).then((ok) => {
+      if (!ok) return
       simpleTree.drop({ id: node.id })
       setFolderData(simpleTree.data)
     })
@@ -220,6 +221,26 @@ function FileNode({
         }
 
         items.push({
+          value: 'trash',
+          label: t('contextmenu.explorer.moveto_trash'),
+          handler: () => {
+            NiceModal.show(MODAL_CONFIRM_ID, {
+              title: t('confirm.trash.description', {
+                name: node.data.name,
+                something: node.data.kind === 'dir' ? t('common.folder') : t('common.file'),
+              }),
+              onConfirm: () => {
+                trashNode(node.data).then((ok) => {
+                  if (!ok) return
+                  simpleTree.drop({ id: node.id })
+                  setFolderData(simpleTree.data)
+                })
+              },
+            })
+          },
+        })
+
+        items.push({
           value: node.data.kind === 'dir' ? 'delete_folder' : 'delete_file',
           label:
             node.data.kind === 'dir'
@@ -267,25 +288,6 @@ function FileNode({
             },
           })
         }
-
-        items.push({
-          value: 'trash',
-          label: t('contextmenu.explorer.moveto_trash'),
-          handler: () => {
-            NiceModal.show(MODAL_CONFIRM_ID, {
-              title: t('confirm.trash.description', {
-                name: node.data.name,
-                something: node.data.kind === 'dir' ? t('common.folder') : t('common.file'),
-              }),
-              onConfirm: () => {
-                trashNode(node.data).then(() => {
-                  simpleTree.drop({ id: node.id })
-                  setFolderData(simpleTree.data)
-                })
-              },
-            })
-          },
-        })
 
 
         showContextMenu({

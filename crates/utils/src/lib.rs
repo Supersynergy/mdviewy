@@ -244,6 +244,7 @@ pub fn get_file_type(file_name: &str) -> FileType {
                 | "licence"
                 | "copying"
                 | "changelog"
+                | "readme"
                 | "authors"
                 | "contributors"
                 | "notice"

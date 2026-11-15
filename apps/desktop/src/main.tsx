@@ -25,6 +25,30 @@ void initErrorReporting(import.meta.env.VITE_SENTRY_DSN)
 
 enableMapSet()
 
+// Persist JS failures to ~/Library/Logs/mdviewy/frontend.log — an error
+// before React mounts leaves a white window with zero trace otherwise.
+// Chunk-load failures (stale hashed assets after an in-place app update)
+// recover via a single guarded reload.
+const __mdm_report = (msg: string) => {
+  void import('@tauri-apps/api/core')
+    .then(({ invoke }) => invoke('frontend_diag_log', { message: msg.slice(0, 1800) }))
+    .catch(() => {})
+}
+window.addEventListener('error', (e) => {
+  const msg = e.message || String((e as ErrorEvent).error || e.type)
+  __mdm_report(`window.onerror: ${msg} @${e.filename ?? ''}:${e.lineno ?? 0}`)
+  if (
+    /dynamically imported module|Loading chunk|Importing a module script failed/i.test(msg) &&
+    !sessionStorage.getItem('__mdm_chunk_reload')
+  ) {
+    sessionStorage.setItem('__mdm_chunk_reload', '1')
+    window.location.reload()
+  }
+})
+window.addEventListener('unhandledrejection', (e) => {
+  __mdm_report(`unhandledrejection: ${String(e.reason)}`)
+})
+
 const queryClient = new QueryClient()
 
 // Zero-dep Suspense fallback. The pre-React skeleton in index.html stays
@@ -88,6 +112,19 @@ rootElement.addEventListener('dragover', (e) => {
 })
 rootElement.addEventListener('drop', (event) => {
   event.preventDefault()
+})
+
+// Native drag-drop is enabled (no disable_drag_drop_handler), so Tauri
+// emits real filesystem paths — the DOM drop above only suppresses
+// navigation defaults.
+void import('@tauri-apps/api/webview').then(({ getCurrentWebview }) => {
+  void getCurrentWebview().onDragDropEvent((event) => {
+    const payload = event.payload
+    if (payload.type !== 'drop' || payload.paths.length === 0) return
+    void import('@/services/openPaths').then(({ handleOpenedPaths }) =>
+      handleOpenedPaths(payload.paths),
+    )
+  })
 })
 
 ;(window as any).__mdm_log_boot('before-render')

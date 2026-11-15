@@ -9,7 +9,27 @@ permissions:
   contents: read
 
 jobs:
+  version:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Match the release tag to desktop manifests
+        run: |
+          python3 - <<'PYTHON'
+          import json, os, pathlib, tomllib
+          desktop = pathlib.Path("apps/desktop")
+          native = desktop / "src-tauri"
+          versions = {
+              json.loads((desktop / "package.json").read_text())["version"],
+              json.loads((native / "tauri.conf.json").read_text())["version"],
+              tomllib.loads((native / "Cargo.toml").read_text())["package"]["version"],
+          }
+          if versions != {os.environ["GITHUB_REF_NAME"].removeprefix("v")}:
+              raise SystemExit(f"Tag {os.environ['GITHUB_REF_NAME']} conflicts with desktop versions {versions}")
+          PYTHON
+
   build:
+    needs: version
     permissions:
       contents: read
     strategy:
@@ -119,6 +139,7 @@ jobs:
             ./target/${{ matrix.target }}/release/bundle/nsis/**
 
   build-offline-installer:
+    needs: version
     permissions:
       contents: read
     strategy:
@@ -221,12 +242,10 @@ jobs:
           shopt -s globstar nullglob
           mkdir -p release-assets
 
-          copied=0
           copy_asset() {
             local source="$1"
             local target="$2"
             cp "$source" "release-assets/$target"
-            copied=$((copied + 1))
           }
 
           for file in artifacts/x86_64/**/* artifacts/aarch64/**/*; do
@@ -248,52 +267,27 @@ jobs:
             esac
           done
 
-          if [ "$copied" -eq 0 ]; then
-            echo "No release assets found"
-            exit 1
-          fi
-
-          ls -lah release-assets
+          cd release-assets
+          for pattern in "mdviewy_${version}_aarch64.dmg" "mdviewy_${version}_x64.dmg" "mdviewy_${version}_x64-setup.exe" "mdviewy_offline_${version}_x64-setup.exe" "mdviewy_${version}_x64_*.msi" "mdviewy_offline_${version}_x64_*.msi" "mdviewy_${version}_amd64.deb" "mdviewy-${version}-*.x86_64.rpm" "mdviewy_${version}_amd64.AppImage"; do
+            compgen -G "$pattern" > /dev/null || { echo "Missing release asset: $pattern"; exit 1; }
+          done
+          sha256sum * > SHA256SUMS.txt
 
       - run: |
-          tee release.txt >/dev/null << 'EOF'
-          # mdviewy ${{ env.release_tag }}
+          cat > release.txt << 'EOF'
+          ## Warm handoffs
 
-          Fast, local-first document workspace for Windows, macOS, and Linux.
+          Open `_handoff-project.md` and type your answer after `>>>Userantwort:`. Open fields appear in gold and answered fields in green. Alt+Shift+N jumps to the next open field. Code examples are skipped.
 
-          ## Highlights
+          ## RTF preview
 
-          - Universal workspace: Markdown, ~120 code extensions with syntax highlighting, RTF preview, PDF rendering, and images.
-          - Sublime-style source editing: multi-cursor, rectangular selection, next/all-occurrence selection, line ops.
-          - Local links and paths resolve and open in-app or in the right tool; right-click reveals files and folders in the file manager.
-          - Agent-ready opening: `mdviewy://open?path=…` deep links, CLI/Finder file associations, warm-instance routing.
-          - GitHub-style preview, adaptive focus layout, Smart Actions, speech voices, and Print / Save as PDF.
+          The reader preserves paragraphs in macOS documents, Windows punctuation and Unicode fallback characters. RTF handoff previews highlight exported answer labels.
 
-          ## Windows 11
+          ## Downloads
 
-          - Recommended: download `mdviewy_*_x64-setup.exe`.
-          - Offline/no-WebView2 machines: download `mdviewy_offline_*_x64-setup.exe`.
-          - MSI packages are included for managed installs.
-          - Unsigned builds may show Microsoft SmartScreen until Windows code signing is configured.
+          Choose the Apple Silicon or Intel DMG, the x64 Windows installer, or a Linux AppImage, DEB or RPM. Windows offline installers include WebView2. SHA256SUMS.txt lists the download checksums.
 
-          <details>
-
-          <summary>FAQ</summary>
-
-          ### Windows
-
-          The normal installer downloads WebView2 when Windows does not already have it. The offline installer bundles WebView2 and is larger.
-
-          ### macOS
-
-          The app bundle carries a CI-verified ad-hoc seal, but these prerelease builds are not Developer ID signed or notarized yet. If macOS blocks first launch, open System Settings > Privacy & Security and allow the app, or run:
-
-          ```bash
-          xattr -cr /Applications/mdviewy.app
-          ```
-
-          </details>
-
+          macOS bundles have an ad-hoc signature and are not notarized. Windows installers are unsigned.
           EOF
 
       - name: Create Release
@@ -303,6 +297,6 @@ jobs:
           name: ${{ env.release_tag }}
           body_path: release.txt
           draft: false
-          prerelease: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
           files: ./release-assets/*
           fail_on_unmatched_files: true

@@ -67,8 +67,7 @@
     "create_file": "Crear un archivo nuevo",
     "unsave": "Unguardar",
     "save_and_close": "Guardar y cerrar",
-    "unsave_and_close": "Cierre directo",
-    "convert_text": "Conversión simplificada y tradicional"
+    "unsave_and_close": "Cierre directo"
   },
   "placeholder": {
     "translate": "Idioma destino"

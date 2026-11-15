@@ -19,12 +19,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "incremental": true,
-    "paths": {
-      "contentlayer/generated": [
-        ".contentlayer/generated"
-      ]
-    }
+    "incremental": true
   },
   "include": [
     "next-env.d.ts",

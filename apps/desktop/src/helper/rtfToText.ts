@@ -11,6 +11,7 @@
 
 interface RtfGroupState {
   ucskip: number
+  codePage: number
   ignorable: boolean
 }
 
@@ -36,6 +37,9 @@ const SKIP_DESTINATIONS = new Set([
   'shppict',
   'nonshppict',
 ])
+
+// Windows ANSI maps the C1 range to punctuation and symbols.
+const WINDOWS_1252_C1 = '€\u0081‚ƒ„…†‡ˆ‰Š‹Œ\u008dŽ\u008f\u0090‘’“”•–—˜™š›œ\u009džŸ'
 
 // Control words that emit literal text.
 const SYMBOL_CHARS: Record<string, string> = {
@@ -65,16 +69,20 @@ export function rtfToText(rtf: string): string {
   const stack: RtfGroupState[] = []
   let ucskip = 1
   let curskip = 0
+  let codePage = 1252
   let ignorable = false
+  const wordPattern = /[a-zA-Z]+/y
+  const numberPattern = /-?\d+/y
   let i = 0
   const n = rtf.length
 
   const push = () => {
-    stack.push({ ucskip, ignorable })
+    stack.push({ ucskip, ignorable, codePage })
   }
   const pop = () => {
     const s = stack.pop()
     if (s) {
+      codePage = s.codePage
       ucskip = s.ucskip
       ignorable = s.ignorable
     }
@@ -84,11 +92,13 @@ export function rtfToText(rtf: string): string {
     const c = rtf[i]
 
     if (c === '{') {
+      curskip = 0
       push()
       i++
       continue
     }
     if (c === '}') {
+      curskip = 0
       pop()
       i++
       continue
@@ -103,17 +113,29 @@ export function rtfToText(rtf: string): string {
       if (i >= n) break
       const nc = rtf[i]
 
+      // Cocoa RTF writers use a backslash followed by a physical newline.
+      if (nc === '\n' || nc === '\r') {
+        if (curskip > 0) curskip--
+        else if (!ignorable) out.push('\n')
+        i += nc === '\r' && rtf[i + 1] === '\n' ? 2 : 1
+        continue
+      }
+
       // Escaped literal or hex escape.
       if (nc === '\\' || nc === '{' || nc === '}') {
-        if (!ignorable && curskip === 0) out.push(nc)
+        if (curskip > 0) curskip--
+        else if (!ignorable) out.push(nc)
         i++
         continue
       }
       if (nc === "'") {
         const hex = rtf.slice(i + 1, i + 3)
         const byte = parseInt(hex, 16)
-        if (!ignorable && curskip === 0 && !Number.isNaN(byte)) {
-          out.push(String.fromCharCode(byte))
+        if (curskip > 0) curskip--
+        else if (!ignorable && !Number.isNaN(byte)) {
+          out.push(codePage === 1252 && byte >= 0x80 && byte <= 0x9f
+            ? WINDOWS_1252_C1[byte - 0x80]
+            : String.fromCharCode(byte))
         }
         i += 3
         continue
@@ -121,7 +143,9 @@ export function rtfToText(rtf: string): string {
       if (nc === '|' || nc === '-' || nc === '_' || nc === '~' || nc === '*') {
         if (nc === '*') {
           ignorable = true
-        } else if (!ignorable && curskip === 0) {
+        } else if (curskip > 0) {
+          curskip--
+        } else if (!ignorable) {
           out.push(SYMBOL_CHARS[nc] ?? nc)
         }
         i++
@@ -129,7 +153,8 @@ export function rtfToText(rtf: string): string {
       }
 
       // Control word: letters then optional signed number then one space delimiter.
-      const wordMatch = /^[a-zA-Z]+/.exec(rtf.slice(i))
+      wordPattern.lastIndex = i
+      const wordMatch = wordPattern.exec(rtf)
       if (!wordMatch) {
         i++
         continue
@@ -137,7 +162,8 @@ export function rtfToText(rtf: string): string {
       const word = wordMatch[0]
       i += word.length
       let param: number | undefined
-      const numMatch = /^-?\d+/.exec(rtf.slice(i))
+      numberPattern.lastIndex = i
+      const numMatch = numberPattern.exec(rtf)
       if (numMatch) {
         param = parseInt(numMatch[0], 10)
         i += numMatch[0].length
@@ -148,14 +174,17 @@ export function rtfToText(rtf: string): string {
         ignorable = true
         continue
       }
+      if (word === 'ansicpg' && param !== undefined) {
+        codePage = param
+        continue
+      }
       if (word === 'uc' && param !== undefined) {
         ucskip = param
         continue
       }
       if (word === 'u' && param !== undefined) {
         if (!ignorable && curskip === 0) {
-          const code = param < 0 ? param + 65536 : param
-          out.push(String.fromCodePoint(code))
+          out.push(param >= -32768 && param <= 65535 ? String.fromCharCode(param) : '�')
         }
         curskip = ucskip
         continue

@@ -1,6 +1,6 @@
 [package]
 name = "mdviewy"
-version = "0.101.0"
+version = "0.102.0"
 description = "A Markdown Editor App"
 authors = ["Supersynergy"]
 license = "AGPL-3.0-only"
@@ -47,7 +47,6 @@ downcast-rs = "1.2"
 notify = "6.1"
 arboard = "3.6.1"
 base64 = "^0.21.7"
-zhconv = "^0.4.0"
 
 [dependencies.chrono]
 version = "0.4"

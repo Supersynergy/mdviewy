@@ -108,16 +108,6 @@ impl FileWatcher {
         self.watcher = None;
         self.path = None;
     }
-
-    /// 获取监听的路径
-    pub fn get_path(&self) -> Option<&String> {
-        self.path.as_ref()
-    }
-
-    /// 检查监听器是否正在运行
-    pub fn is_watching(&self) -> bool {
-        self.watcher.is_some()
-    }
 }
 
 /// 文件监听器管理器，支持通过key管理多个watcher
@@ -161,49 +151,6 @@ impl FileWatcherManager {
             false
         }
     }
-
-    /// 停止指定key的文件监听器但不移除
-    pub fn stop(&mut self, key: &str) -> bool {
-        if let Some(watcher) = self.watchers.get_mut(key) {
-            watcher.stop();
-            true
-        } else {
-            false
-        }
-    }
-
-    /// 获取指定key的文件监听器
-    pub fn get(&self, key: &str) -> Option<&FileWatcher> {
-        self.watchers.get(key)
-    }
-
-    /// 获取可变的指定key的文件监听器
-    pub fn get_mut(&mut self, key: &str) -> Option<&mut FileWatcher> {
-        self.watchers.get_mut(key)
-    }
-
-    /// 检查指定key的文件监听器是否存在
-    pub fn contains_key(&self, key: &str) -> bool {
-        self.watchers.contains_key(key)
-    }
-
-    /// 获取所有监听器的key列表
-    pub fn keys(&self) -> Vec<String> {
-        self.watchers.keys().cloned().collect()
-    }
-
-    /// 停止所有文件监听器
-    pub fn stop_all(&mut self) {
-        for watcher in self.watchers.values_mut() {
-            watcher.stop();
-        }
-    }
-
-    /// 清空所有文件监听器
-    pub fn clear(&mut self) {
-        self.stop_all();
-        self.watchers.clear();
-    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -236,7 +183,9 @@ pub mod cmd {
 
         println!("Watching file: {} with key: {}", path, key);
 
-        let mut manager = FILE_WATCHER_MANAGER.lock().unwrap();
+        let mut manager = FILE_WATCHER_MANAGER
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         manager
             .watch(key, path, move |event: notify::Event| {
                 let _ = app_clone.emit_to(
@@ -253,18 +202,13 @@ pub mod cmd {
 
     #[command]
     pub fn stop_file_watcher(key: &str) -> Result<(), String> {
-        let mut manager = FILE_WATCHER_MANAGER.lock().unwrap();
+        let mut manager = FILE_WATCHER_MANAGER
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         if manager.remove(key) {
             Ok(())
         } else {
             Err("File watcher not found".to_string())
         }
-    }
-
-    #[command]
-    pub fn stop_all_file_watchers() -> Result<(), String> {
-        let mut manager = FILE_WATCHER_MANAGER.lock().unwrap();
-        manager.stop_all();
-        Ok(())
     }
 }

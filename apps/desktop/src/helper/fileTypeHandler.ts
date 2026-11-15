@@ -1,3 +1,4 @@
+import { isHandoffFile } from './handoff'
 import useAppSettingStore from '@/stores/useAppSettingStore'
 import type { EditorViewType } from 'rme'
 import { IFile } from './filesys'
@@ -76,7 +77,7 @@ const IMAGE_EXTENSIONS = new Set([
 // Extensions offered by the File ▸ Open dialog and used to decide whether an
 // arbitrary path can be opened as a document at all.
 export const OPEN_DIALOG_EXTENSIONS: string[] = [
-  'md', 'markdown', 'rtf', 'pdf',
+  'md', 'markdown', 'json', 'rtf', 'pdf',
   ...IMAGE_EXTENSIONS,
   ...CODE_EXTENSIONS,
   ...PLAIN_TEXT_EXTENSIONS,
@@ -97,7 +98,7 @@ export function getFileTypeConfig(file: IFile): FileTypeConfig {
   const markdownFileType: FileTypeConfig = {
     type: 'markdown',
     supportedModes: [VIEW_PREVIEW, VIEW_WYSIWYG, VIEW_SOURCECODE],
-    defaultMode: isReadme ? VIEW_PREVIEW : settingData.md_editor_default_mode || VIEW_WYSIWYG,
+    defaultMode: isHandoffFile(fileName) ? VIEW_SOURCECODE : isReadme ? VIEW_PREVIEW : settingData.md_editor_default_mode || VIEW_WYSIWYG,
     exporters: ['Html', 'Image', 'Pdf'],
   }
 

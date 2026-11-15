@@ -1,5 +1,141 @@
 # Changelog
 
+## 0.102.0 — 2026-11-15
+
+- Markdown handoffs open in the source editor. Answer markers show which fields are open, and Alt+Shift+N moves the cursor to the next one. RTF handoff previews highlight answer markers too.
+- The RTF text preview preserves letters after escaped Unicode fallback bytes and handles invalid Unicode values.
+
+### Fixed
+
+- **Startup crash**: launching a second instance while the first was still
+  booting could abort the running app (`SIGABRT` on a `tokio-rt-worker`).
+  Root cause: `conf::app_root()` did `APP_DIR.get(&0).unwrap()`, but
+  `APP_DIR[0]` is only registered inside `.setup()` — the single-instance
+  callback reaches `setup::init` → `AppConf::theme_mode` → `app_root()`
+  before that insert lands. `app_root()` now falls back to the process home
+  dir (then cwd) instead of unwrapping an empty map.
+- Release builds no longer use `panic = "abort"`: a panic inside a tauri
+  command or spawned task previously killed the whole process. Unwinding
+  lets the tokio runtime contain task panics.
+- Malformed or unreadable themes no longer panic startup: `AppThemes::init`
+  uses `create_dir_all` (fresh-boot parent gap), tolerant `read_dir`, and
+  skips bad `package.json`/`index.js` entries with a warning instead of
+  unwrapping.
+- Window vibrancy is now applied on the AppKit main thread via
+  `run_on_main_thread` — the previous `async_runtime::spawn` always failed
+  silently with `NotMainThread`.
+- `refresh_native_menu` hops to the main thread via `run_on_main_thread` —
+  muda menu construction on a tokio worker was a latent panic.
+- A failed write of `opened_cache.json`, `bookmarks.json` or
+  `keybord_map_v1.json` no longer recurses into `Self::default().write()`
+  until the stack overflows — the error is logged instead.
+- `AppConf::amend` ignores malformed config patches instead of panicking;
+  `font_list` degrades to an empty list when the system font source fails;
+  poisoned mutexes (`OpenedPaths`, `FILE_WATCHER_MANAGER`, `APP_DIR`)
+  recover their guard instead of panicking; setup errors propagate as
+  `Result` instead of `expect` aborts.
+- White-window recovery ("the app opened then vanished"): a JS heartbeat
+  (`mdviewy:heartbeat`, 10 s) feeds a Rust watchdog — a visible window
+  silent for 150 s gets `location.reload()`ed, and a still-dead renderer
+  restarts the app when the user focuses it. Hidden/minimized windows are
+  skipped so App Nap cannot trigger false positives.
+- Frontend failures now persist to `~/Library/Logs/mdviewy/frontend.log`:
+  `window.onerror`, `unhandledrejection` and the React error boundary all
+  report via the new `frontend_diag_log` command — errors before React
+  mounts were previously invisible.
+- Stale-chunk loads (hashed assets missing after an in-place update)
+  auto-reload once instead of staying on a white page.
+- A window restored to a disconnected external monitor is recentered on
+  first focus — previously it opened off-screen and read as a crash.
+- Window close/destroy and app exit events are logged to `mdviewy.log`,
+  so a normal close is distinguishable from a crash in the log.
+
+### Added
+
+- `diagnostics.rs`: persistent boot logging. tracing events go to
+  `~/Library/Logs/mdviewy/mdviewy.log` (stdout tee, 4 MB rotation) and every
+  panic — including ones that still abort — is appended to
+  `~/Library/Logs/mdviewy/panic.log` with thread name, location, version,
+  uptime and a backtrace. The hook never touches stderr (a dead stderr in
+  console-less launches is what turned panics into silent crashes).
+
+### Security
+
+- Agent handoff commands (`Ask an agent`, `Open folder in Claude Code/Codex`)
+  now pass document text and directory paths through POSIX single-quote
+  escaping — embedded `$(…)`, backticks, quotes or newlines in a document can
+  no longer inject shell syntax.
+- Clicking a local Markdown link that resolves to an executable bundle or
+  script (`.app`, `.command`, `.scpt`, `.workflow`, `.exe`, …) is blocked
+  with an explanation instead of being handed to the system opener.
+- `file://` links that name a remote host are rejected; only `localhost` /
+  empty-host file URLs resolve.
+- `read_file` refuses files larger than 64 MiB instead of loading them into
+  the webview unbounded.
+- `delete_file` now reports failures to the UI instead of always returning
+  `OK`; the file context menu offers Move to Trash before permanent delete.
+
+### Fixed
+
+- `⌘W` / close commands now run the unsaved-changes guard instead of
+  discarding dirty buffers silently.
+- Opening a different folder no longer drops dirty tabs without asking.
+- Opening a path that is already open activates its tab instead of creating
+  a duplicate.
+- Open Recent routes PDFs, images and RTF through the same type-aware open
+  path as Finder/CLI instead of reading them as text.
+- A failed path in a multi-file open no longer aborts the remaining opens or
+  suppresses window focus.
+- New untitled files are no longer born dirty.
+- ⌘⇧P is no longer bound to `Open File…` in the menu — it reaches the
+  Commands palette again.
+- Drag-and-drop of files/folders onto the window opens them (Tauri
+  drag-drop events re-enabled).
+- `mdviewy://open` without a `path` parameter no longer opens a literal
+  `open` file.
+- Relative links without a base document no longer resolve against the
+  process cwd.
+- CodeMirror multi-selection is force-enabled in source mode (in case `rme`
+  ever drops the facet), and stale editor views are removed from the
+  view-map on unmount.
+- `scripts/mdviewy` no longer word-splits paths with spaces when forwarding
+  them to a running instance.
+- `file://` links with encoded `#`/`%23` in the filename resolve correctly —
+  query/hash is stripped before percent-decoding, and unknown schemes
+  (`obsidian:`, `vscode:`, …) now fall through to the system handler instead
+  of being mangled as relative paths.
+- `~/…` paths expand in the inline reference hover actions and
+  `openPathInApp`.
+- Warm-instance file opens unminimize the target window before focusing it —
+  a Dock-minimized window previously loaded the file invisibly.
+- Rapid consecutive file opens append to the pending-path queue instead of
+  overwriting it, and a bare relaunch no longer wipes the queue.
+- Preview link clicks no longer bubble into a second open attempt.
+- The inline path hover bar no longer fires inside code blocks.
+- Native menu: `Settings` no longer emits twice, and `Go to File` (⌘P) no
+  longer shares the Command Palette command id — it opens the files palette.
+- Opening a folder that fails to read surfaces a toast instead of silently
+  doing nothing; unsupported file types do the same.
+- Window bookkeeping: workspace cache only records directory paths, and
+  last-window tracking survives window destruction order.
+
+### Removed
+
+- Dead Tauri commands (`open_folder`, `convert_text`, `open_conf_window`,
+  `get_window_instances`, `extensions_init`, `app_exit`, `app_restart`,
+  `stop_all_file_watchers`) and their backing modules; the `zhconv`
+  dependency went with them.
+- Twelve unused frontend dependencies (`react-markdown`, `zod`, `dayjs`,
+  `color`, `ts-node`, `url`, …).
+
+### Security
+
+- `crossbeam-epoch` → 0.9.21 (RUSTSEC-2026-0204) and `plist` → 1.10.1, which
+  clears `quick-xml` 0.42 into the macOS build graph. The remaining
+  `RUSTSEC-2026-0194/0195` copies are Windows- and Linux-only transitive deps
+  with no upstream fix yet; see
+  `docs/adr/2026-06-05-security-posture-1.0.md`.
+
 ## 0.101.0 - 2026-09-16
 
 mdviewy becomes a general local document workspace. It opens source code, RTF,

@@ -83,8 +83,19 @@ fn create_store(app: &AppHandle) -> Result<std::sync::Arc<Store<tauri::Wry>>, St
 }
 
 pub fn app_root() -> PathBuf {
-    let app_dir = APP_DIR.lock().unwrap();
-    let home_dir = app_dir.get(&0).unwrap();
+    // APP_DIR[0] is only filled once the first `.setup()` runs — the
+    // single-instance callback (and any early task) can reach app_root()
+    // before that on a tokio worker. Never unwrap: fall back to the process
+    // home dir, then to cwd. (Previously `.get(&0).unwrap()` → SIGABRT.)
+    let home_dir = APP_DIR
+        .lock()
+        .ok()
+        .and_then(|dirs| dirs.get(&0).cloned())
+        .or_else(std::env::home_dir);
+    let Some(home_dir) = home_dir else {
+        tracing::error!("app_root: home dir unavailable, using cwd");
+        return std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+    };
     let legacy_path = home_dir.join(".mdviewy");
 
     // One-shot migration from any pre-rename dotdir → `.mdviewy`.
@@ -384,9 +395,17 @@ impl AppConf {
     }
 
     pub fn amend(self, json: Value) -> Self {
-        let val = serde_json::to_value(&self).unwrap();
-        let mut config: BTreeMap<String, Value> = serde_json::from_value(val).unwrap();
-        let new_json: BTreeMap<String, Value> = serde_json::from_value(json).unwrap();
+        let (Ok(val), Ok(new_json)) = (
+            serde_json::to_value(&self),
+            serde_json::from_value::<BTreeMap<String, Value>>(json),
+        ) else {
+            tracing::warn!("amend: malformed conf patch ignored");
+            return self;
+        };
+        let mut config: BTreeMap<String, Value> = match serde_json::from_value(val) {
+            Ok(c) => c,
+            Err(_) => return self,
+        };
 
         for (k, v) in new_json {
             config.insert(k, v);
@@ -406,7 +425,10 @@ impl AppConf {
     }
 
     pub fn get_theme_with_app(app: &AppHandle) -> String {
-        Self::read_with_app(app).theme.unwrap().to_lowercase()
+        Self::read_with_app(app)
+            .theme
+            .unwrap_or_default()
+            .to_lowercase()
     }
 
     pub fn theme_mode(app: &AppHandle) -> Theme {
@@ -469,11 +491,27 @@ mod tests {
         assert_eq!(conf.autosave, Some(true));
         assert_eq!(conf.editor_content_width.as_deref(), Some("adaptive"));
     }
+
+    #[test]
+    fn app_root_survives_empty_app_dir() {
+        // APP_DIR[0] is populated by .setup(); the single-instance callback
+        // can call app_root() before that — it must fall back, not panic.
+        let root = super::app_root();
+        assert!(!root.as_os_str().is_empty());
+        assert!(
+            root.file_name()
+                .and_then(|n| n.to_str())
+                .map(|n| n.contains("mdviewy"))
+                .unwrap_or(false),
+            "unexpected app_root: {:?}",
+            root
+        );
+    }
 }
 
 pub mod cmd {
     use super::AppConf;
-    use tauri::{command, AppHandle, WebviewUrl, WebviewWindowBuilder};
+    use tauri::{command, AppHandle};
 
     #[command]
     pub fn get_app_conf(app: AppHandle) -> AppConf {
@@ -490,30 +528,5 @@ pub mod cmd {
         AppConf::read_with_app(&app)
             .amend(serde_json::json!(data))
             .write_with_app(&app);
-    }
-
-    #[command]
-    pub fn open_conf_window(app: AppHandle) {
-        let theme = AppConf::theme_mode_with_app(&app);
-
-        tauri::async_runtime::spawn(async move {
-            let conf_win =
-                WebviewWindowBuilder::new(&app, "conf", WebviewUrl::App("./setting".into()))
-                    .title("mdviewy setting")
-                    .resizable(true)
-                    .fullscreen(false)
-                    .theme(Some(theme))
-                    .inner_size(1000.0, 600.0)
-                    .min_inner_size(500.0, 500.0);
-
-            // #[cfg(target_os = "macos")]
-            // {
-            //     conf_win = conf_win
-            //         .title_bar_style(TitleBarStyle::Overlay)
-            //         .hidden_title(true);
-            // }
-
-            conf_win.build().unwrap();
-        });
     }
 }

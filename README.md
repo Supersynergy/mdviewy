@@ -36,21 +36,25 @@ Open a Markdown file to start writing, or open a folder to search and navigate a
 
 README files open in the dedicated preview automatically. If a document contains GitHub-only syntax that the visual editor cannot round-trip safely, mdviewy opens Source mode instead of silently changing the file.
 
+## Warm handoffs
+
+Open a file named `_handoff-project.md` to answer questions in the source editor. Put `>>>Userantwort:` on its own line under each question. Empty fields appear in gold. Typing an answer on the same line turns the field green and updates the open count. Press Alt+Shift+N to move to the next open field, then save the Markdown file as usual.
+
+Use `> [!IMPORTANT]` for a decision or `> [!WARNING]` for a risk. The editor also highlights the standard NOTE, TIP and CAUTION markers. Handoff RTF previews highlight answer lines, including exported `Userantwort:` labels.
+
 ## Downloads
 
-For the stable build, use the [latest stable release](https://github.com/Supersynergy/mdviewy/releases/latest). The [0.101.0 preview](https://github.com/Supersynergy/mdviewy/releases/tag/v0.101.0) also opens RTF text, PDFs, images and source files. Choose a preview installer below. MSI packages are available on the same release page.
+Download mdviewy for your platform from the [latest stable release](https://github.com/Supersynergy/mdviewy/releases/latest). Each release lists its version and installer filenames. Older versions remain in the [release archive](https://github.com/Supersynergy/mdviewy/releases).
 
-| Platform | 0.101.0 preview download |
+| Platform | Asset to download |
 | --- | --- |
-| macOS · Apple Silicon | [mdviewy_0.101.0_aarch64.dmg](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_aarch64.dmg) |
-| macOS · Intel | [mdviewy_0.101.0_x64.dmg](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_x64.dmg) |
-| Windows · x64 | [mdviewy_0.101.0_x64-setup.exe](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_x64-setup.exe) |
-| Windows · offline WebView2 installer | [mdviewy_offline_0.101.0_x64-setup.exe](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_offline_0.101.0_x64-setup.exe) |
-| Debian or Ubuntu · x64 | [mdviewy_0.101.0_amd64.deb](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_amd64.deb) |
-| Fedora or RPM-based Linux · x64 | [mdviewy-0.101.0-1.x86_64.rpm](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy-0.101.0-1.x86_64.rpm) |
-| Linux AppImage · x64 | [mdviewy_0.101.0_amd64.AppImage](https://github.com/Supersynergy/mdviewy/releases/download/v0.101.0/mdviewy_0.101.0_amd64.AppImage) |
+| macOS, Apple Silicon | DMG ending in `_aarch64.dmg` |
+| macOS, Intel | DMG ending in `_x64.dmg` |
+| Windows x64 | `mdviewy_<version>_x64-setup.exe`, or MSI for managed installations |
+| Windows without WebView2 | `mdviewy_offline_<version>_x64-setup.exe` |
+| Linux x64 | AppImage, Debian package or RPM |
 
-The macOS preview uses an ad-hoc signature and has not been notarized. Windows installers are unsigned. Your operating system may ask you to confirm the developer when opening the installer.
+macOS packages use an ad-hoc signature and have not been notarized. Windows installers are unsigned. Your operating system may ask you to confirm the developer when opening the installer.
 
 ## Build from source
 

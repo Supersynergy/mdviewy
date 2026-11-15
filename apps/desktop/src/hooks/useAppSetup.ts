@@ -16,6 +16,7 @@ import type { DocumentInfo, WorkspaceInfo } from '@/stores/useOpenedCacheStore'
 import useOpenedCacheStore from '@/stores/useOpenedCacheStore'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
+import { emit } from '@tauri-apps/api/event'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { LazyStore } from '@tauri-apps/plugin-store'
 import { useCallback, useEffect } from 'react'
@@ -297,8 +298,11 @@ const useAppSetup = () => {
     })
 
     const unListenMenu = currentWindow.listen<string>('native:menu', ({ payload }) => {
-      bus.emit(payload)
-      useCommandStore.getState().execute(payload)
+      // One channel per id: a registered command wins, otherwise fall back
+      // to the bus — firing both double-executed handlers like app_save.
+      const { commands, execute } = useCommandStore.getState()
+      if (commands[payload]) execute(payload)
+      else bus.emit(payload)
     })
 
     const consumeAndFocus = async (event?: unknown) => {
@@ -312,7 +316,14 @@ const useAppSetup = () => {
     window.addEventListener('mdviewy-opened-urls', consumeAndFocus)
     window.addEventListener('focus', consumeAndFocus)
 
+    // Webview liveness heartbeat — the Rust watchdog reloads (then restarts)
+    // a window whose renderer died, instead of leaving a white window up.
+    const heartbeat = setInterval(() => {
+      void emit('mdviewy:heartbeat', currentWindow.label)
+    }, 10_000)
+
     return () => {
+      clearInterval(heartbeat)
       unListenMenu.then((fn) => fn())
       closeRequest.then((fn) => fn())
       unListenOpenedUrls.then((fn) => fn())

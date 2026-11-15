@@ -1,24 +1,30 @@
-import { allMarkdowns, Markdown } from 'contentlayer/generated'
+import { documentFiles } from './documentFiles'
 
-export const getSections = (locale?: string) => {
-  const sections: Record<string, Markdown[]> = {}
+interface Doc {
+  slug: string
+  title: string
+  locale: string
+  key: string
+}
 
-  allMarkdowns.forEach((markdown) => {
-    const slug = markdown.slug
-    const pathParts = slug.split('/')
-    const docLocale = markdown.locale 
+export const docs: Doc[] = documentFiles.keys().sort().map((key: string) => {
+  const [, locale, ...parts] = key.slice(0, -3).split('/')
+  return { key, locale, slug: '/' + parts.join('/'), title: parts[parts.length - 1] }
+})
 
-    // Filter by locale if specified
-    if (locale && docLocale !== locale) {
-      return
-    }
+export function readDocument(doc: Doc): string {
+  const source = documentFiles(doc.key)
+  const text: string = typeof source === 'string' ? source : source.default
+  return text.replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, '')
+}
 
-    const section = pathParts[1] || docLocale
-    if (!sections[section]) {
-      sections[section] = []
-    }
-    sections[section].push(markdown)
-  })
-
+export function getSections(locale?: string) {
+  const sections: Record<string, Doc[]> = {}
+  for (const doc of docs) {
+    if (locale && doc.locale !== locale) continue
+    const section = doc.slug.split('/')[1] || doc.locale
+    const items = sections[section] ??= []
+    items.push(doc)
+  }
   return sections
 }

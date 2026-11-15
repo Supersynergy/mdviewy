@@ -1,9 +1,12 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
-# Fixed releases for these 2026-07 advisories are below the repository's
-# 14-day package-age floor. Review/remove all three ignores on 2026-07-22;
+# quick-xml DoS advisories remain only on platform-specific transitive deps
+# with no upstream fix yet: notify-rust/tauri-winrt-notification (Windows
+# toast XML, generated locally) and wayland-scanner (Linux build-time
+# proc-macro over bundled protocol schemas). The shipped macOS binary is
+# clean. Review/remove on upstream releases;
 # rationale: docs/adr/2026-06-05-security-posture-1.0.md.
-rustsec_fresh_fix_ignores := "--ignore RUSTSEC-2026-0204 --ignore RUSTSEC-2026-0194 --ignore RUSTSEC-2026-0195"
+rustsec_fresh_fix_ignores := "--ignore RUSTSEC-2026-0194 --ignore RUSTSEC-2026-0195"
 
 fmt:
     cargo fmt --all

@@ -1,7 +1,7 @@
 use super::conf;
 use crate::fc::exists;
 use serde::{Deserialize, Serialize};
-use std::{fs::create_dir, path::PathBuf, vec};
+use std::{fs::create_dir_all, path::PathBuf, vec};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Theme {
@@ -28,30 +28,51 @@ pub const APP_THEMES_PATH: &str = "themes";
 pub const APP_LOCAL_THEMES_PATH: &str = "local_themes";
 
 fn build_theme(path: PathBuf) -> Option<Theme> {
-    println!("build_themes: {:?}", path);
+    tracing::debug!("build_theme: {:?}", path);
     let pkg_path = path.join("package.json");
     let script_file_path = path.join("index.js");
 
-    if exists(&pkg_path) {
-        let pkg = std::fs::read_to_string(pkg_path).unwrap();
-        let pkg: serde_json::Value = serde_json::from_str(&pkg).unwrap();
-        let pkg = pkg.to_string();
-
-        let script_text = if exists(&script_file_path) {
-            Some(std::fs::read_to_string(script_file_path).unwrap())
-        } else {
-            None
-        };
-
-        return Some(Theme {
-            id: path.file_name().unwrap().to_str().unwrap().to_string(),
-            path: path.to_str().unwrap().to_string(),
-            pkg,
-            script_text,
-        });
+    if !exists(&pkg_path) {
+        return None;
     }
 
-    None
+    // A malformed or unreadable theme must be skipped, not crash the app —
+    // this runs inside a tauri command on a tokio worker where a panic is
+    // fatal for the whole process.
+    let pkg = match std::fs::read_to_string(&pkg_path) {
+        Ok(pkg) => pkg,
+        Err(e) => {
+            tracing::warn!("theme {:?}: package.json unreadable: {e}", path);
+            return None;
+        }
+    };
+    let pkg: serde_json::Value = match serde_json::from_str(&pkg) {
+        Ok(pkg) => pkg,
+        Err(e) => {
+            tracing::warn!("theme {:?}: package.json invalid: {e}", path);
+            return None;
+        }
+    };
+    let pkg = pkg.to_string();
+
+    let script_text = if exists(&script_file_path) {
+        match std::fs::read_to_string(&script_file_path) {
+            Ok(text) => Some(text),
+            Err(e) => {
+                tracing::warn!("theme {:?}: index.js unreadable: {e}", path);
+                None
+            }
+        }
+    } else {
+        None
+    };
+
+    Some(Theme {
+        id: path.file_name()?.to_str()?.to_string(),
+        path: path.to_str()?.to_string(),
+        pkg,
+        script_text,
+    })
 }
 
 impl AppThemes {
@@ -71,61 +92,67 @@ impl AppThemes {
     }
 
     fn build_local_theme(path: &PathBuf) -> Option<LocalTheme> {
-        if path.extension().map(|e| e.to_str().unwrap()) == Some("css") {
-            let file_name = path.file_stem()?.to_str().unwrap().to_string();
-            let css_content = std::fs::read_to_string(path).ok()?;
-            return Some(LocalTheme {
-                id: file_name.clone(),
-                name: file_name,
-                path: path.to_str().unwrap().to_string(),
-                css_content,
-            });
+        if path.extension().and_then(|e| e.to_str()) != Some("css") {
+            return None;
         }
-        None
+        let file_name = path.file_stem()?.to_str()?.to_string();
+        let css_content = std::fs::read_to_string(path).ok()?;
+        Some(LocalTheme {
+            id: file_name.clone(),
+            name: file_name,
+            path: path.to_str()?.to_string(),
+            css_content,
+        })
     }
 
-    pub async fn init(mut self) -> Self {
-        if !exists(&Self::dir_path()) {
-            let _ = create_dir(Self::dir_path());
-        }
+    pub async fn init(self) -> Self {
+        self.init_in(Self::dir_path(), Self::local_themes_dir_path())
+            .await
+    }
 
-        if !exists(&Self::local_themes_dir_path()) {
-            let _ = create_dir(Self::local_themes_dir_path());
+    /// Directory-injected variant so tests can point at a tempdir and so a
+    /// missing/unreadable parent degrades to "no themes" instead of a panic.
+    async fn init_in(mut self, dir: PathBuf, local_dir: PathBuf) -> Self {
+        for d in [&dir, &local_dir] {
+            if !exists(d) {
+                // create_dir_all — plain create_dir fails when the parent
+                // doesn't exist yet, which is exactly the fresh-boot case.
+                if let Err(e) = create_dir_all(d) {
+                    tracing::warn!("theme dir {:?} not creatable: {e}", d);
+                }
+            }
         }
 
         let mut themes = vec![];
-        let dir = Self::dir_path();
-
-        for entry in std::fs::read_dir(dir).unwrap() {
-            let entry = entry.unwrap();
-            let path = entry.path();
-            if !path.is_dir() {
-                continue;
+        match std::fs::read_dir(&dir) {
+            Ok(entries) => {
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if !path.is_dir() {
+                        continue;
+                    }
+                    if let Some(theme) = build_theme(path) {
+                        themes.push(theme);
+                    }
+                }
             }
-
-            let theme = build_theme(path);
-
-            if theme.is_none() {
-                continue;
-            }
-            themes.push(theme.unwrap());
+            Err(e) => tracing::warn!("theme dir {:?} unreadable: {e}", dir),
         }
 
         let mut local_themes = vec![];
-        let local_dir = Self::local_themes_dir_path();
-
-        if exists(&local_dir) {
-            for entry in std::fs::read_dir(local_dir).unwrap() {
-                let entry = entry.unwrap();
-                let path = entry.path();
-                if !path.is_file() {
-                    continue;
-                }
-
-                if let Some(local_theme) = Self::build_local_theme(&path) {
-                    local_themes.push(local_theme);
+        match std::fs::read_dir(&local_dir) {
+            Ok(entries) => {
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if !path.is_file() {
+                        continue;
+                    }
+                    if let Some(local_theme) = Self::build_local_theme(&path) {
+                        local_themes.push(local_theme);
+                    }
                 }
             }
+            Err(e) => tracing::warn!("local theme dir {:?} unreadable: {e}", local_dir),
         }
 
         self.themes = themes;
@@ -145,7 +172,7 @@ pub mod cmd {
     use super::{AppThemes, LocalTheme, Theme};
     use crate::fc::exists;
     use download_npm;
-    use std::fs::create_dir;
+    use std::fs::create_dir_all;
     use std::path::PathBuf;
     use tauri::command;
 
@@ -167,7 +194,7 @@ pub mod cmd {
             return Err("File does not exist".to_string());
         }
 
-        if source_path.extension().map(|e| e.to_str().unwrap()) != Some("css") {
+        if source_path.extension().and_then(|e| e.to_str()) != Some("css") {
             return Err("Only CSS files are supported".to_string());
         }
 
@@ -181,7 +208,8 @@ pub mod cmd {
         let dest_dir = AppThemes::local_themes_dir_path();
 
         if !exists(&dest_dir) {
-            let _ = create_dir(&dest_dir);
+            create_dir_all(&dest_dir)
+                .map_err(|e| format!("Failed to create theme directory: {}", e))?;
         }
 
         let dest_path = dest_dir.join(format!("{}.css", file_name));
@@ -195,7 +223,10 @@ pub mod cmd {
         Ok(LocalTheme {
             id: file_name.clone(),
             name: file_name,
-            path: dest_path.to_str().unwrap().to_string(),
+            path: dest_path
+                .to_str()
+                .ok_or("Invalid destination path encoding")?
+                .to_string(),
             css_content,
         })
     }
@@ -263,5 +294,70 @@ pub mod cmd {
         })?;
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::AppThemes;
+
+    #[tokio::test]
+    async fn init_creates_missing_dirs_with_missing_parents() {
+        // Fresh-boot case: neither the theme dir nor its parent exists —
+        // plain create_dir used to fail here and read_dir then panicked.
+        let tmp = tempfile::tempdir().unwrap();
+        let themes_dir = tmp.path().join("deep/nested/themes");
+        let local_dir = tmp.path().join("deep/nested/local_themes");
+
+        let t = AppThemes::default()
+            .init_in(themes_dir.clone(), local_dir.clone())
+            .await;
+
+        assert!(t.themes.is_empty());
+        assert!(t.local_themes.is_empty());
+        assert!(themes_dir.is_dir());
+        assert!(local_dir.is_dir());
+    }
+
+    #[tokio::test]
+    async fn init_skips_malformed_theme_instead_of_panicking() {
+        let tmp = tempfile::tempdir().unwrap();
+        let themes_dir = tmp.path().join("themes");
+        let bad = themes_dir.join("broken-theme");
+        std::fs::create_dir_all(&bad).unwrap();
+        std::fs::write(bad.join("package.json"), "{not json").unwrap();
+        // A theme dir without package.json at all must also be skipped.
+        std::fs::create_dir_all(themes_dir.join("empty-theme")).unwrap();
+        // A stray file in the themes dir is not a theme.
+        std::fs::write(themes_dir.join("README.md"), "x").unwrap();
+
+        let local_dir = tmp.path().join("local_themes");
+        std::fs::create_dir_all(&local_dir).unwrap();
+        std::fs::write(local_dir.join("ok.css"), "body{}").unwrap();
+        // Invalid UTF-8 CSS is skipped, not fatal.
+        std::fs::write(local_dir.join("bad.css"), [0xff, 0xfe]).unwrap();
+        // Non-css files are ignored.
+        std::fs::write(local_dir.join("notes.txt"), "x").unwrap();
+
+        let t = AppThemes::default().init_in(themes_dir, local_dir).await;
+
+        assert!(t.themes.is_empty());
+        assert_eq!(t.local_themes.len(), 1);
+        assert_eq!(t.local_themes[0].id, "ok");
+    }
+
+    #[tokio::test]
+    async fn init_survives_unreadable_theme_dir() {
+        // read_dir on a path that exists but is a file (not a dir) errors —
+        // must degrade to empty, not unwrap-panic.
+        let tmp = tempfile::tempdir().unwrap();
+        let not_a_dir = tmp.path().join("themes");
+        std::fs::write(&not_a_dir, "oops").unwrap();
+        let local_dir = tmp.path().join("local_themes");
+        std::fs::create_dir_all(&local_dir).unwrap();
+
+        let t = AppThemes::default().init_in(not_a_dir, local_dir).await;
+        assert!(t.themes.is_empty());
+        assert!(t.local_themes.is_empty());
     }
 }

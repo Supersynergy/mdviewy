@@ -21,7 +21,7 @@ import { analyzeMarkdownContent } from '@/helper/markdownInsights'
 import { normalizeMarkdownSource } from '@/helper/markdownText'
 import { expandHome, findPathCandidates, pathLabel, resolveAgainst } from '@/helper/pathCandidates'
 import { speak, speechEngines, stopSpeaking, type SpeechEngine } from '@/helper/speech'
-import { openTerminalAt } from '@/helper/terminal'
+import { openTerminalAt, shellQuote } from '@/helper/terminal'
 import { printActiveDocument } from '@/helper/printDocument'
 import { debounce, type DebouncedFunc, throttle } from '@/helper/timing'
 import { useEditorKeybindingStore } from '@/hooks/useKeyboard'
@@ -52,12 +52,13 @@ import {
 import { toast } from 'zens'
 import { toggleContextMenu } from '@/components/ui-v2/ContextMenu'
 import { buildEditorContextMenu, readEditorContextTarget } from './editorContextMenu'
-import { resolveLocalHref } from '@/helper/localLink'
+import { isDangerousExecPath, resolveLocalHref } from '@/helper/localLink'
 import { installSublimeSourceEditing } from './sublimeSourceEditing'
 import { applySourceLanguage } from './sourceLanguage'
 import { createWysiwygDelegateOptions } from './createWysiwygDelegateOptions'
 import { createMdviewyWysiwygDelegate } from './createMdviewyWysiwygDelegate'
 import { EditorWrapper, normalizeEditorContentWidth } from './EditorWrapper'
+import { installHandoffEditing } from './handoffEditing'
 import { GitHubMarkdownPreview, requiresSourceSafeEditing } from './GitHubMarkdownPreview'
 import { WarningHeader } from './styles'
 
@@ -94,6 +95,7 @@ function TextEditor(props: TextEditorProps) {
           clipboardReadFunction: clipboardRead,
           onCodemirrorViewLoad: (cmView) => {
             installSublimeSourceEditing(cmView)
+            installHandoffEditing(cmView, curFile.name)
             applySourceLanguage(cmView, curFile.name)
             sourceCodeCodemirrorViewMap.set(id, cmView)
           },
@@ -166,6 +168,9 @@ function TextEditor(props: TextEditorProps) {
   useUnmount(() => {
     debounceUpdateEditorCounter.cancel()
     useEditorCounterStore.getState().deleteEditorCounter({ id })
+    // Path-stable ids mean a reopened file would briefly see the destroyed
+    // view — drop the reference on unmount.
+    sourceCodeCodemirrorViewMap.delete(id)
     const { delIdStateMap } = useEditorStateStore.getState()
 
     delIdStateMap(id)
@@ -415,6 +420,7 @@ function TextEditor(props: TextEditorProps) {
                 clipboardReadFunction: clipboardRead,
                 onCodemirrorViewLoad: (cmView) => {
                   installSublimeSourceEditing(cmView)
+                  installHandoffEditing(cmView, curFile.name)
                   applySourceLanguage(cmView, curFile.name)
                   sourceCodeCodemirrorViewMap.set(curFile.id, cmView)
                   setTimeout(() => {
@@ -606,8 +612,12 @@ function TextEditor(props: TextEditorProps) {
           if (localPath) {
             void import('@/services/openPaths').then(({ openPathInApp }) =>
               openPathInApp(localPath).then((opened) => {
-                if (!opened)
-                  void openPath(localPath).catch(() => toast.error(`Cannot open ${localPath}`))
+                if (opened) return
+                if (isDangerousExecPath(localPath)) {
+                  toast.error(`Not opened: ${localPath.split('/').pop()} would execute on open`)
+                  return
+                }
+                void openPath(localPath).catch(() => toast.error(`Cannot open ${localPath}`))
               }),
             )
           }
@@ -701,8 +711,12 @@ function TextEditor(props: TextEditorProps) {
           if (!localPath) return
           void import('@/services/openPaths').then(({ openPathInApp }) =>
             openPathInApp(localPath).then((opened) => {
-              if (!opened)
-                void openPath(localPath).catch(() => toast.error(`Cannot open ${localPath}`))
+              if (opened) return
+              if (isDangerousExecPath(localPath)) {
+                toast.error(`Not opened: ${localPath.split('/').pop()} would execute on open`)
+                return
+              }
+              void openPath(localPath).catch(() => toast.error(`Cannot open ${localPath}`))
             }),
           )
         },
@@ -721,6 +735,10 @@ function TextEditor(props: TextEditorProps) {
           void revealItemInDir(path).catch(() => toast.error(`Not found: ${path}`))
         },
         openPath: (path) => {
+          if (isDangerousExecPath(path)) {
+            toast.error(`Not opened: ${path.split('/').pop()} would execute on open`)
+            return
+          }
           void openPath(path).catch(() => toast.error(`Cannot open ${path}`))
         },
         openPathInTerminal: (path) => {
@@ -730,9 +748,9 @@ function TextEditor(props: TextEditorProps) {
         askAgent: (agent, text) => {
           const dir = baseDir || home || '.'
           const prompt = `Regarding ${file?.name ?? 'this document'}: ${text}`
-          void openTerminalAt(dir, `${agent} ${JSON.stringify(prompt)}`).then((launch) => {
+          void openTerminalAt(dir, `${agent} ${shellQuote(prompt)}`).then((launch) => {
             if (!launch.ranCommand) {
-              void writeText(`${agent} ${JSON.stringify(prompt)}`)
+              void writeText(`${agent} ${shellQuote(prompt)}`)
               toast.success(`${launch.id} opened; command on clipboard`)
             }
           })

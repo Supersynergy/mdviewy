@@ -95,6 +95,23 @@ const EditorAreaTabs = memo(() => {
       handler: () => {
         const activeId = useEditorStore.getState().activeId
         if (activeId) {
+          // Same guard as middle-click/context-menu close — ⌘W is the most
+          // common close path and must not discard unsaved edits silently.
+          if (
+            checkUnsavedFiles({
+              fileIds: [activeId],
+              onSaveAndClose: async () => {
+                const saveHandler = getSaveOpenedEditorEntries(activeId)
+                await saveHandler?.()
+                close(undefined, activeId)
+              },
+              onUnsavedAndClose: () => {
+                close(undefined, activeId)
+              },
+            }) > 0
+          ) {
+            return
+          }
           close(undefined, activeId)
         }
       },

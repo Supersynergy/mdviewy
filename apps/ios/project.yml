@@ -1,0 +1,46 @@
+name: mdviewy
+options:
+  deploymentTarget:
+    iOS: "18.0"
+targets:
+  mdviewy:
+    type: application
+    platform: iOS
+    sources:
+      - MarkdownDocument.swift
+      - Reader.swift
+      - MdviewyApp.swift
+      - Assets.xcassets
+      - path: Resources
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mdviewy.mobile
+        TARGETED_DEVICE_FAMILY: "1,2"
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "5.0"
+      configs:
+        Debug:
+          EXCLUDED_SOURCE_FILE_NAMES: Assets.xcassets
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: mdviewy
+        CFBundleIconFiles: [Icon60, Icon76]
+        UISupportsDocumentBrowser: true
+        LSSupportsOpeningDocumentsInPlace: true
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Markdown
+            CFBundleTypeRole: Editor
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [net.daringfireball.markdown, public.plain-text]
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: net.daringfireball.markdown
+            UTTypeDescription: Markdown
+            UTTypeConformsTo: [public.plain-text]
+            UTTypeTagSpecification:
+              public.filename-extension: [md, markdown, mdown]
+              public.mime-type: text/markdown

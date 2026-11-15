@@ -134,10 +134,12 @@ impl OpenedCache {
     pub fn write(self) -> Self {
         let path = &Self::get_path();
         if let Ok(v) = serde_json::to_string_pretty(&self) {
-            std::fs::write(path, v).unwrap_or_else(|err| {
-                println!("err: {:?}", err);
-                Self::default().write();
-            });
+            // No fallback rewrite: a failed write would fail identically for
+            // the defaults — the old `Self::default().write()` recursion
+            // grew the stack until it overflowed on a tokio worker.
+            if let Err(err) = std::fs::write(path, v) {
+                tracing::error!("opened_cache write to {:?} failed: {err}", path);
+            }
         }
         self
     }
@@ -179,10 +181,17 @@ pub mod cmd {
     }
 
     /// Rebuilds the native menubar so `File ▸ Open Recent` matches the cache.
+    /// muda requires the AppKit main thread — commands run on tokio workers,
+    /// so hop over instead of letting the menu build panic there.
     #[command]
     pub fn refresh_native_menu(app: tauri::AppHandle) {
-        if let Err(err) = crate::menu::refresh_menu(&app) {
-            println!("failed to refresh menu: {:?}", err);
+        let app2 = app.clone();
+        if let Err(err) = app.run_on_main_thread(move || {
+            if let Err(err) = crate::menu::refresh_menu(&app2) {
+                tracing::error!("failed to refresh menu: {:?}", err);
+            }
+        }) {
+            tracing::error!("failed to dispatch menu refresh: {:?}", err);
         }
     }
 }

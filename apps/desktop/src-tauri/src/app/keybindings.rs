@@ -306,9 +306,11 @@ impl Keybindings {
         };
 
         if let Ok(v) = serde_json::to_string_pretty(&user_keybindings) {
-            std::fs::write(path, v).unwrap_or_else(|_err| {
-                Self::default().write();
-            });
+            // No fallback rewrite — a failed write would fail identically
+            // for the defaults and recursed until stack overflow.
+            if let Err(err) = std::fs::write(path, v) {
+                tracing::error!("keybindings write to {:?} failed: {err}", path);
+            }
         }
 
         self

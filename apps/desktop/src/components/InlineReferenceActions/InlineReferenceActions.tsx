@@ -6,9 +6,9 @@ import {
   type InlineSmartReference,
 } from '@/helper/smartActions'
 import { getFileObject } from '@/helper/files'
+import { expandUserPath } from '@/helper/pathCandidates'
 import { useEditorStore } from '@/stores'
 import { invoke } from '@tauri-apps/api/core'
-import { homeDir } from '@tauri-apps/api/path'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { Command } from '@tauri-apps/plugin-shell'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -97,12 +97,6 @@ const getInlineContext = (): InlineContext => {
   }
 }
 
-const expandUserPath = async (path: string) => {
-  if (!path.startsWith('~/')) return path
-  const home = await homeDir()
-  return `${home.replace(/\/+$/g, '')}/${path.slice(2)}`
-}
-
 const runOpenCommand = async (target: string) => {
   const resolved = await expandUserPath(target)
   const platform = navigator.platform.toLowerCase()
@@ -130,10 +124,11 @@ const getPathTargetKind = async (
 
 const openReference = async (ref: InlineSmartReference) => {
   // Renderable types open in a tab; everything else goes to the system app.
+  const target = await expandUserPath(ref.value)
   const openInApp =
     ref.kind === 'path' &&
     (await import('@/services/openPaths')
-      .then(({ openPathInApp }) => openPathInApp(ref.value))
+      .then(({ openPathInApp }) => openPathInApp(target))
       .catch(() => false))
   if (!openInApp) await runOpenCommand(ref.value)
 }
@@ -181,7 +176,9 @@ const detectTextReference = (event: PointerEvent, context: InlineContext): Hover
   }
 
   const parent = textNode.parentElement
-  if (!parent?.closest(MARKDOWN_SCOPE)) {
+  // No bar inside fenced code or the CM source view — a path in code is text,
+  // not a reference to act on.
+  if (!parent?.closest(MARKDOWN_SCOPE) || parent.closest('pre, .cm-editor')) {
     return null
   }
 
@@ -199,11 +196,16 @@ const detectTextReference = (event: PointerEvent, context: InlineContext): Hover
 
 const detectElementReference = (target: Element, context: InlineContext): HoverState | null => {
   const element = target.closest('code, a')
-  if (!element || !element.closest(MARKDOWN_SCOPE)) {
+  if (!element || !element.closest(MARKDOWN_SCOPE) || element.closest('pre, .cm-editor')) {
     return null
   }
 
-  const text = element.textContent || element.getAttribute('href') || ''
+  // For anchors the href carries the path (`[guide](./guide.md)`); for code
+  // spans the text does.
+  const text =
+    element.tagName === 'A'
+      ? element.getAttribute('href') || element.textContent || ''
+      : element.textContent || ''
   const ref = findFirstSmartReference(text, context)
   if (!ref || !isPathRef(ref)) return null
 

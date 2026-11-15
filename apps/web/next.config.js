@@ -1,4 +1,3 @@
-const { withContentlayer } = require('next-contentlayer2')
 const { i18n } = require('./next-i18next.config.js')
 const path = require('path')
 
@@ -6,7 +5,7 @@ const path = require('path')
  * @type {import('next').NextConfig}
  */
 
-module.exports = withContentlayer({
+module.exports = {
   compiler: {
     styledComponents: true,
     styledJsx: true
@@ -15,5 +14,6 @@ module.exports = withContentlayer({
   output: 'standalone',
   turbopack: {
     root: path.resolve(__dirname, '../..'),
+    rules: { '*.md': { type: 'text' } },
   },
-})
+}

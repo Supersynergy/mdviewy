@@ -67,8 +67,7 @@
     "create_file": "Nouveau fichier",
     "unsave": "Unsave",
     "save_and_close": "Enregistrer et fermer",
-    "unsave_and_close": "Fermeture directe",
-    "convert_text": "Conversion simple et complexe"
+    "unsave_and_close": "Fermeture directe"
   },
   "confirm": {
     "delete": {

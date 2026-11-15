@@ -79,20 +79,20 @@ direct upgrade path appears or severity rises.
 - [ ] assetProtocol rationale linked from SECURITY.md.
 - [ ] audit warnings re-reviewed at release cut.
 
-### Time-bounded July 2026 Rust advisories
+### July 2026 Rust advisories — status after the post-0.101 cleanup
 
-Release `0.92.0` updates the mature QUIC fix to `quinn-proto 0.11.15`. Three
-advisory IDs remain explicitly ignored by the release gate until **2026-07-22**
-because every compatible fixed dependency was published less than 14 days
-before the release cut:
+- `RUSTSEC-2026-0204` (`crossbeam-epoch`): **resolved** — lockfile now pins
+  `0.9.21`, ignore removed.
+- `RUSTSEC-2026-0194` and `RUSTSEC-2026-0195` (`quick-xml`): the macOS build
+  graph is clean (`plist 1.10.1` pulls `quick-xml 0.42`). Two platform-scoped
+  copies remain unfixed upstream and keep their ignores:
+  - `0.37.5` via `notify-rust`/`tauri-winrt-notification`, Windows-only, where
+    the parsed toast XML is generated locally rather than attacker-controlled.
+  - `0.39.4` via `wayland-scanner`, a Linux build-time proc-macro over bundled
+    Wayland protocol schemas.
 
-- `RUSTSEC-2026-0204`: `crossbeam-epoch 0.9.18`; the affected pointer formatter
-  is transitive through Rayon/Ignore and is not called directly by mdviewy.
-- `RUSTSEC-2026-0194` and `RUSTSEC-2026-0195`: `quick-xml 0.37/0.39`; the fixed
-  `0.41` line currently requires the 2026-07-04/06 `plist` and Windows toast
-  wrapper releases. mdviewy does not expose `NsReader` or XML parsing to opened
-  Markdown content.
-
-The `justfile` owns the matching ignore list. On 2026-07-22, remove the ignores,
-update the lockfile, and run `just check` plus Windows/macOS packaging. This is a
-temporary supply-chain quarantine, not a claim that the advisories are fixed.
+The `justfile` owns the matching ignore list. Remove the ignores once
+`notify-rust`/`tauri-plugin-notification` and `wayland-scanner` ship releases
+on `quick-xml >= 0.41`, then run `just check` plus Windows/Linux packaging.
+This is a platform-scoped supply-chain quarantine, not a claim that the
+advisories are fixed.

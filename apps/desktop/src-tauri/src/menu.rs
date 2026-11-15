@@ -83,11 +83,6 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
             let focused_window_label = window.label();
             println!("focused_window: {}", focused_window_label);
 
-            // 发送菜单事件到焦点窗口
-            app.emit_to(focused_window_label, "native:menu", menu_id)
-                .expect("failed to emit");
-
-            // 处理特定的菜单事件
             if let Some(path) = menu_id.strip_prefix(OPEN_RECENT_PREFIX) {
                 app.emit_to(focused_window_label, "native:open_recent", path)
                     .map_err(|err| println!("{:?}", err))
@@ -95,6 +90,8 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                 return;
             }
 
+            // One emit per item — ids that are not command ids are translated
+            // here so the frontend's native:menu → command map stays clean.
             match menu_id {
                 "About" => {
                     app.emit_to(focused_window_label, "app_about", ())
@@ -106,7 +103,11 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
                         .map_err(|err| println!("{:?}", err))
                         .ok();
                 }
-                _ => {}
+                _ => {
+                    if let Err(err) = app.emit_to(focused_window_label, "native:menu", menu_id) {
+                        tracing::error!("menu emit '{}' failed: {:?}", menu_id, err);
+                    }
+                }
             }
         } else {
             println!("No focused window found for menu event");
@@ -115,7 +116,7 @@ pub fn generate_menu(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
 
     let menu_items = build_menu(app)?;
 
-    app.set_menu(menu_items).expect("failed to set menu");
+    app.set_menu(menu_items)?;
 
     app.on_menu_event(menu_handler);
 
@@ -174,7 +175,6 @@ fn build_menu<R: Runtime, M: Manager<R>>(app: &M) -> Result<Menu<R>, Box<dyn std
                         .build(app)?,
                     &MenuItemBuilder::new("Open File...")
                         .id("app_openFile")
-                        .accelerator("CmdOrCtrl+Shift+P")
                         .build(app)?,
                     &build_open_recent_submenu(app)?,
                     &MenuItemBuilder::new("Quick Open")
@@ -311,8 +311,7 @@ fn build_menu<R: Runtime, M: Manager<R>>(app: &M) -> Result<Menu<R>, Box<dyn std
                 true,
                 &[
                     &MenuItemBuilder::new("Go to File...")
-                        .id("app_openCommandPalette")
-                        .accelerator("CmdOrCtrl+P")
+                        .id("app_goToFile")
                         .build(app)?,
                     &MenuItemBuilder::new("Go to Heading...")
                         .id("app_openHeadingJumper")

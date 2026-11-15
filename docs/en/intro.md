@@ -10,7 +10,7 @@ Currently, mdviewy is in the beta stage, and it is recommended to use it with da
 ## Feature
 
 - **Built-in AI**. Currently, it supports one click export of conversations, translation of articles to any language, and obtaining article abstracts. It also supports large models such as `DeepSeek` and `Chatgpt` to make them your intelligent assistants.
-- **Super lightweight**. The mdviewy is based on tauri and has a volume of less than 10MB and better performance.
+- **Super lightweight**. The mdviewy is based on tauri and ships as a ~16MB binary with a ~70ms cold start.
 - **High availability**. mdviewy uses the remirror editor, which not only provides high scalability, but also has a great editing experience. And, mdviewy supports multiple editing modes, such as `source code`, `wysiwyg`.
 - **Custom Theme**. mdviewy supports custom themes, and you can also share your themes with others.
 

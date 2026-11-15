@@ -13,6 +13,7 @@ import {
 import { selectSelectionMatches } from '@codemirror/search'
 import {
   EditorSelection,
+  EditorState,
   Prec,
   StateEffect,
   type Extension,
@@ -95,8 +96,11 @@ const editingKeymap = keymap.of([
 ])
 
 const sublimeExtensions = (): Extension[] => [
-  // The missing piece that turns EditorState.allowMultipleSelections (already
-  // enabled by rme) into visible, editable multi-caret editing.
+  // Belt-and-suspenders: if rme ever stops enabling this facet, every
+  // multi-caret command below silently no-ops. Idempotent when already set.
+  EditorState.allowMultipleSelections.of(true),
+  // The missing piece that turns allowMultipleSelections into visible,
+  // editable multi-caret editing.
   drawSelection(),
   // Option+drag column selection (Sublime default on macOS too).
   rectangularSelection(),

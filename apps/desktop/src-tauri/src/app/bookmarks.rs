@@ -49,9 +49,11 @@ impl BookMarks {
             create_file(path);
         }
         if let Ok(v) = serde_json::to_string_pretty(&self) {
-            std::fs::write(path, v).unwrap_or_else(|_err| {
-                Self::default().write();
-            });
+            // No fallback rewrite — a failed write would fail identically
+            // for the defaults and recursed until stack overflow.
+            if let Err(err) = std::fs::write(path, v) {
+                tracing::error!("bookmarks write to {:?} failed: {err}", path);
+            }
         }
         self
     }

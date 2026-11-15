@@ -17,6 +17,9 @@ export class AppErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('[mdviewy] UI recovery boundary', error, info)
     void captureError(error)
+    void invoke('frontend_diag_log', {
+      message: `react-boundary: ${error.message} | ${info.componentStack?.slice(0, 800) ?? ''}`,
+    }).catch(() => {})
   }
 
   private reload = () => window.location.reload()

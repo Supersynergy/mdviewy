@@ -1,11 +1,9 @@
 pub mod bookmarks;
 pub mod clipboard;
 pub mod conf;
-pub mod extensions;
 pub mod file_watcher;
 pub mod keybindings;
 pub mod opened_cache;
-pub mod process;
 pub mod speech;
 pub mod themes;
 pub mod window_manager;

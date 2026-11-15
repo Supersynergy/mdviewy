@@ -107,6 +107,14 @@ export const MAC_TERMINALS: MacTerminal[] = [
 export const isMac = () => navigator.platform.toLowerCase().includes('mac')
 export const isWindows = () => navigator.platform.toLowerCase().includes('win')
 
+/**
+ * POSIX single-quote escaping — the only quoting that survives `sh -lc`
+ * unchanged: nothing inside `'…'` expands (no `$(…)``, backticks, `!`),
+ * and an embedded `'` becomes `'\''`. Use for any user- or document-derived
+ * string that lands in a shell command.
+ */
+export const shellQuote = (value: string) => `'${value.replace(/'/g, `'\\''`)}'`
+
 let cachedTerminal: MacTerminal | null | undefined
 
 const appExists = async (app: string) => {
@@ -158,7 +166,9 @@ export type TerminalLaunch = {
  */
 export const openTerminalAt = async (dir: string, command?: string): Promise<TerminalLaunch> => {
   if (isWindows()) {
-    await Command.create('cmd', ['/c', 'start', '', 'cmd', '/k', `cd /d "${dir}"`]).execute()
+    // cmd expands %VAR% even inside quotes — neutralize it for fs paths.
+    const safeDir = dir.replace(/%/g, '%%')
+    await Command.create('cmd', ['/c', 'start', '', 'cmd', '/k', `cd /d "${safeDir}"`]).execute()
     return { id: 'terminal', ranCommand: false }
   }
 

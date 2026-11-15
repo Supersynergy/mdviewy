@@ -1,0 +1,51 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; img-src data:; style-src 'unsafe-inline'; form-action 'none'; base-uri 'none'">
+<style>
+:root {
+  color-scheme: light dark;
+  --paper: #fcfbf8; --ink: #1a202b; --muted: #56606d; --accent: #214bb8;
+  --rule: #d3d6da; --wash: #eef0f3; --code: #202d28; --code-ink: #eff3e9;
+  font: -apple-system-body;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #17191e; --ink: #eeedf1; --muted: #b6bac4; --accent: #a9bbff;
+    --rule: #414652; --wash: #282d37; --code: #101815; --code-ink: #e5eee7;
+  }
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--paper); color: var(--ink); overflow-wrap: anywhere }
+main {
+  max-width: 66ch; margin: auto; padding: clamp(1.9rem, 6vw, 4rem) clamp(1.4rem, 6vw, 3rem) 4rem;
+  font: 1.125rem/1.65 Georgia, 'Noto Serif', serif;
+}
+main > :first-child { margin-top: 0 }
+h1, h2, h3 { font-family: system-ui, sans-serif; line-height: 1.15; letter-spacing: -.035em; text-wrap: balance }
+h1 { font-size: clamp(2.65rem, 8vw, 4rem); margin-bottom: .4em }
+h2 { margin: 1.35em 0 .55em; font-size: 1.25em }
+h3 { font-size: 1.25em }
+p, ul, ol { margin: .8em 0 }
+ul, ol { padding-inline-start: 1.4em }
+a { color: var(--accent); text-underline-offset: .17em }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+blockquote { margin: 1.25em 0; padding: .35em 1em; border-inline-start: 3px solid var(--accent); color: var(--muted); font-style: italic }
+blockquote p { margin: .2em 0 }
+.table-scroll { max-width: 100%; overflow-x: auto }
+table { width: 100%; border-collapse: collapse; font: .93rem/1.5 system-ui, sans-serif }
+th, td { padding: .6em .85em; border-bottom: 1px solid var(--rule); text-align: start }
+th { border-block: 1px solid var(--rule); color: var(--muted); font-weight: 600 }
+li:has(> input[type=checkbox]:first-child) { list-style: none; margin-inline-start: -1.4em }
+li > input[type=checkbox] { margin-inline: 0 .5em }
+code { background: var(--wash); padding: .15em .35em; border-radius: .25em; font: .88em ui-monospace, monospace }
+pre { overflow-x: auto; border-radius: .6rem; padding: 1em; background: var(--code); color: var(--code-ink) }
+pre code { padding: 0; background: transparent }
+hr { margin: 2em 0; border: 0; border-top: 1px solid var(--rule) }
+img { max-width: 100%; height: auto }
+input { accent-color: var(--accent) }
+@media print {
+  :root { color-scheme: light; --paper: white; --ink: black; --muted: #333; --accent: #174735; --wash: #eee; --rule: #aaa }
+  main { max-width: none; padding: 0 }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere }
+}
+</style><script defer src="marked.js"></script><script defer src="purify.js"></script><script defer src="reader.js"></script></head><body><main></main></body></html>

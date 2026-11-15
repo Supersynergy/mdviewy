@@ -12,7 +12,7 @@ import { useEditorStore } from '@/stores'
 import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { Command } from '@tauri-apps/plugin-shell'
-import { openTerminalAt } from '@/helper/terminal'
+import { openTerminalAt, shellQuote } from '@/helper/terminal'
 import { useCallback, useRef } from 'react'
 import { toast } from 'zens'
 
@@ -38,7 +38,7 @@ const openPathOrUrl = async (value: string) => {
  */
 const runAgent = async (dir: string, agent: 'claude' | 'codex') => {
   if (!dir) return
-  const command = `cd "${dir}" && ${agent}`
+  const command = `cd ${shellQuote(dir)} && ${agent}`
   const launch = await openTerminalAt(dir, command)
 
   if (launch.ranCommand) {

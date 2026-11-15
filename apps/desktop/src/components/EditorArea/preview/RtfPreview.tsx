@@ -1,4 +1,5 @@
 import { FileResultCode, FileSysResult } from '@/helper/filesys'
+import { answerStatus, isHandoffFile } from '@/helper/handoff'
 import { rtfToText } from '@/helper/rtfToText'
 import { invoke } from '@tauri-apps/api/core'
 import { openPath } from '@tauri-apps/plugin-opener'
@@ -54,7 +55,9 @@ export const RtfPreview: FC<RtfPreviewProps> = ({ filePath }) => {
 
   return (
     <Container>
-      <DocumentText>{state.text || ' '}</DocumentText>
+      <DocumentText>{isHandoffFile(filePath) && state.text
+        ? state.text.split('\n').map((line, i) => <div key={i} data-answer={answerStatus(line)}>{line || ' '}</div>)
+        : state.text || ' '}</DocumentText>
     </Container>
   )
 }
@@ -68,6 +71,9 @@ const Container = styled.div`
 `
 
 const DocumentText = styled.div`
+  [data-answer] { border-inline-start: 3px solid; padding-inline-start: 0.6em; }
+  [data-answer='open'] { border-color: #c58a16; background: rgba(215,158,33,.16); }
+  [data-answer='answered'] { border-color: #369a77; background: rgba(48,157,117,.12); }
   max-width: 720px;
   width: 100%;
   padding: 32px 24px;

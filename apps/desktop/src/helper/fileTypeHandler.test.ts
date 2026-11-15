@@ -17,6 +17,11 @@ describe('getFileTypeConfig', () => {
     expect(cfg.supportedModes).toContain('wysiwyg')
   })
 
+  it('opens Markdown handoffs directly in the editable source view', () => {
+    expect(getFileTypeConfig(file('/x/_handoff-projekt.md')).defaultMode).toBe('sourceCode')
+    expect(getFileTypeConfig(file('/x/README.md')).defaultMode).toBe('preview')
+  })
+
   it('routes code files to the source editor', () => {
     for (const p of ['/x/a.py', '/x/b.tsx', '/x/c.rs', '/x/d.yaml', '/x/e.css']) {
       const cfg = getFileTypeConfig(file(p))

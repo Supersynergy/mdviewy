@@ -67,8 +67,7 @@
     "summary": "summary",
     "create_file": "Create a new file",
     "save_and_close": "Save and close",
-    "unsave_and_close": "Direct Close",
-    "convert_text": "Simplified transformation"
+    "unsave_and_close": "Direct Close"
   },
   "placeholder": {
     "translate": "Please enter target language"

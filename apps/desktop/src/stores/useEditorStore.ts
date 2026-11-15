@@ -1,9 +1,19 @@
 import { replaceFileObjects } from '@/helper/files'
-import { createFile, getFolderPathFromPath, isMdFile, type IFile } from '@/helper/filesys';
+import {
+  createFile,
+  FileResultCode,
+  type FileSysResult,
+  getFolderPathFromPath,
+  isMdFile,
+  type IFile,
+} from '@/helper/filesys';
 import { isEmptyEditor } from '@/services/editor-file';
 import { invoke } from '@tauri-apps/api/core';
 import type { EditorContext, EditorDelegate } from 'rme';
 import { create } from 'zustand';
+
+// zens→antd must not enter the test/node env via the stores barrel.
+const toastError = async (msg: string) => (await import('zens')).toast.error(msg)
 
 const findParentNode = (fileNode: IFile, rootFile: IFile) => {
   const dfs = (file: IFile): undefined | IFile => {
@@ -135,9 +145,14 @@ const useEditorStore = create<EditorStore>((set, get) => {
       const parent = findParentNode(fileNode, folderData![0])
 
       if (parent?.children) {
-        await invoke(fileNode.kind === 'dir' ? 'delete_folder' : 'delete_file', {
-          filePath: fileNode.path,
-        })
+        const res = await invoke<FileSysResult>(
+          fileNode.kind === 'dir' ? 'delete_folder' : 'delete_file',
+          { filePath: fileNode.path },
+        )
+        if (res.code !== FileResultCode.Success) {
+          void toastError(res.content || `Could not delete ${fileNode.name}`)
+          return false
+        }
 
         delOpenedFile(fileNode!.id)
         set((state) => {
@@ -146,7 +161,9 @@ const useEditorStore = create<EditorStore>((set, get) => {
             activeId: activeId === fileNode!.id ? opened[opened.length - 1] : activeId,
           }
         })
+        return true
       }
+      return false
     },
 
     trashNode: async (fileNode) => {
@@ -154,9 +171,11 @@ const useEditorStore = create<EditorStore>((set, get) => {
       const parent = findParentNode(fileNode, folderData![0])
 
       if (parent?.children) {
-        await invoke('trash_delete', {
-          path: fileNode.path,
-        })
+        const res = await invoke<FileSysResult>('trash_delete', { path: fileNode.path })
+        if (res.code !== FileResultCode.Success) {
+          void toastError(res.content || `Could not trash ${fileNode.name}`)
+          return false
+        }
 
         delOpenedFile(fileNode!.id)
         set((state) => {
@@ -165,7 +184,9 @@ const useEditorStore = create<EditorStore>((set, get) => {
             activeId: activeId === fileNode!.id ? opened[opened.length - 1] : activeId,
           }
         })
+        return true
       }
+      return false
     },
 
     setActiveId: (id: string) => {
@@ -307,8 +328,8 @@ type EditorStore = {
   setActiveId: (id: string) => void
   addFile: (file: IFile, target: BaseIFile) => Promise<void | IFile>
   insertNodeToFolderData: (fileNode: IFile) => void
-  deleteNode: (fileNode: IFile) => Promise<void>
-  trashNode: (fileNode: IFile) => Promise<void>
+  deleteNode: (fileNode: IFile) => Promise<boolean>
+  trashNode: (fileNode: IFile) => Promise<boolean>
   addOpenedFile: (id: string) => void
   delOpenedFile: (id: string) => void
   delOtherOpenedFile: (id: string) => void

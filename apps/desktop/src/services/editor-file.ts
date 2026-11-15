@@ -48,8 +48,10 @@ export const addMarkdownFileEdit = async (params: AddMarkdownFileEditParams) => 
 
     setIdStateMap(newFile.id, state)
   } else {
+    // A brand-new document holds nothing the user typed yet — dirty only
+    // turns on via tr.docChanged, so closing an untouched file stays silent.
     setIdStateMap(newFile.id, {
-      hasUnsavedChanges: true,
+      hasUnsavedChanges: false,
     })
   }
 }

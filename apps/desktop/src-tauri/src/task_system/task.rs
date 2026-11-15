@@ -162,6 +162,7 @@ pub trait Task<E: RunError>: Downcast + Send + Sync + 'static {
     /// The [`interrupter`](Interrupter) is a helper object that can be used to check if the user requested a pause or a cancel,
     /// so the user can decide the appropriated moment to pause or cancel the task. Avoiding corrupted data or
     /// inconsistent states.
+    #[must_use = "poll the returned future to execute this task"]
     async fn run(&mut self, interrupter: &Interrupter) -> Result<ExecStatus, E>;
 }
 

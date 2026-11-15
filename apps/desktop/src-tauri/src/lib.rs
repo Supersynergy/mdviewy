@@ -5,6 +5,7 @@
 #![allow(dead_code)]
 
 mod app;
+mod diagnostics;
 mod fc;
 mod font;
 mod menu;
@@ -18,10 +19,7 @@ use std::{collections::HashMap, sync::Mutex};
 
 #[cfg(target_os = "macos")]
 use app::window_manager;
-use app::{
-    bookmarks, conf, extensions, file_watcher, keybindings, opened_cache, process, speech, themes,
-    workspace,
-};
+use app::{bookmarks, conf, file_watcher, keybindings, opened_cache, speech, themes, workspace};
 use lazy_static::lazy_static;
 use tauri::{Manager, State};
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
@@ -39,6 +37,10 @@ lazy_static! {
         let m = HashMap::new();
         sync::Mutex::new(m)
     };
+
+    /// Most recently registered window label — HashMap has no insertion
+    /// order, so "last opened" needs its own record.
+    pub static ref LAST_WINDOW_LABEL: sync::Mutex<Option<String>> = sync::Mutex::new(None);
 }
 
 struct OpenedPaths(Mutex<Vec<String>>);
@@ -59,6 +61,11 @@ fn opened_path_from_url(url: &url::Url) -> String {
             }
         }
         let host = url.host_str().unwrap_or_default();
+        // `mdviewy://open` with no ?path= must not become a literal "open"
+        // path — the verb is a route, not a file.
+        if host == "open" && url.path().is_empty() {
+            return String::new();
+        }
         let combined = format!("{}{}", host, url.path());
         if !combined.is_empty() {
             return urlencoding::decode(&combined)
@@ -109,7 +116,8 @@ where
 
 #[tauri::command]
 fn take_opened_paths(opened_paths: State<OpenedPaths>) -> Vec<String> {
-    let mut paths = opened_paths.0.lock().unwrap();
+    // Poisoned mutex must not kill the command — recover the queue instead.
+    let mut paths = opened_paths.0.lock().unwrap_or_else(|e| e.into_inner());
     std::mem::take(&mut *paths)
 }
 
@@ -122,7 +130,11 @@ pub fn run() {
     #[cfg(target_os = "linux")]
     std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
 
-    tracing_subscriber::fmt::init();
+    // Panic hook first: it must be installed before anything can panic, so
+    // even a failure inside tracing init lands in panic.log.
+    diagnostics::install_panic_hook();
+    diagnostics::init_tracing();
+    tracing::info!("mdviewy v{} boot", env!("CARGO_PKG_VERSION"));
     dotenvy::dotenv().ok();
 
     let context = tauri::generate_context!();
@@ -142,18 +154,35 @@ pub fn run() {
             |app_handle: &tauri::AppHandle, args: Vec<String>, _cwd: String| {
                 let opened_paths = opened_paths_from_args(args.iter().skip(1), &_cwd);
 
-                if let Some(state) = app_handle.try_state::<OpenedPaths>() {
-                    *state.0.lock().unwrap() = opened_paths.clone();
+                // Append, don't overwrite: two rapid opens before a frontend
+                // drain must not lose the first batch, and a bare second
+                // launch (empty args) must not wipe a pending queue.
+                if !opened_paths.is_empty() {
+                    if let Some(state) = app_handle.try_state::<OpenedPaths>() {
+                        let mut queue = state.0.lock().unwrap_or_else(|e| e.into_inner());
+                        for path in &opened_paths {
+                            if !queue.contains(path) {
+                                queue.push(path.clone());
+                            }
+                        }
+                    }
                 }
 
                 // 调用setup函数处理参数和窗口复用逻辑
+                // NOTE: this callback can run on a tokio worker before the
+                // first .setup() has finished — nothing here may assume the
+                // main window or APP_DIR registration exists.
+                tracing::info!(
+                    "single-instance callback: {} opened paths",
+                    opened_paths.len()
+                );
                 if let Err(e) = crate::setup::init(app_handle.clone(), opened_paths) {
-                    println!("单例参数处理失败: {:?}", e);
+                    tracing::error!("single-instance setup failed: {:?}", e);
                 }
             },
         ))
         .invoke_handler(tauri::generate_handler![
-            fc::cmd::open_folder,
+            diagnostics::frontend_diag_log,
             fc::cmd::open_folder_async,
             fc::cmd::get_file_content,
             fc::cmd::write_file,
@@ -167,7 +196,6 @@ pub fn run() {
             fc::cmd::move_files_to_target_folder,
             fc::cmd::path_join,
             fc::cmd::get_md_relative_path,
-            fc::cmd::convert_text,
             fc::cmd::rename_fs,
             fc::cmd::trash_delete,
             fc::cmd::export_html_to_path,
@@ -178,9 +206,7 @@ pub fn run() {
             conf::cmd::get_app_conf,
             conf::cmd::reset_app_conf,
             conf::cmd::save_app_conf,
-            conf::cmd::open_conf_window,
             app::window_manager::create_new_window,
-            app::window_manager::get_window_instances,
             app::window_manager::update_window_path,
             app::window_manager::check_window_by_path,
             app::window_manager::focus_window_by_label,
@@ -200,9 +226,6 @@ pub fn run() {
             bookmarks::cmd::edit_bookmark,
             bookmarks::cmd::remove_bookmark,
             search::cmd::search_files_async,
-            extensions::cmd::extensions_init,
-            process::app_exit,
-            process::app_restart,
             themes::cmd::load_themes,
             themes::cmd::download_theme,
             themes::cmd::remove_theme,
@@ -213,14 +236,21 @@ pub fn run() {
             workspace::cmd::is_git_repository,
             file_watcher::cmd::watch_file,
             file_watcher::cmd::stop_file_watcher,
-            file_watcher::cmd::stop_all_file_watchers,
             app::clipboard::get_clipboard_html,
             app::clipboard::get_clipboard_text,
             take_opened_paths,
         ])
         .setup(|app: &mut tauri::App| {
-            let home_dir_path = app.path().home_dir().expect("failed to get home dir");
-            APP_DIR.lock().unwrap().insert(0, home_dir_path);
+            match app.path().home_dir() {
+                Ok(home_dir_path) => {
+                    APP_DIR
+                        .lock()
+                        .unwrap_or_else(|e| e.into_inner())
+                        .insert(0, home_dir_path);
+                }
+                // Not fatal: app_root() falls back to std::env::home_dir().
+                Err(e) => tracing::warn!("home_dir unavailable at setup: {e}"),
+            }
 
             let opened_paths: State<OpenedPaths> = app.state();
             let file_paths = opened_paths.inner().to_owned();
@@ -237,28 +267,42 @@ pub fn run() {
                 let paths = opened_paths_from_args(std::env::args().skip(1), &cwd);
 
                 if !paths.is_empty() {
-                    *file_paths.0.lock().unwrap() = paths;
+                    *file_paths.0.lock().unwrap_or_else(|e| e.into_inner()) = paths;
                 }
             }
 
-            let opened_paths = file_paths.0.lock().unwrap().clone();
+            let opened_paths = file_paths
+                .0
+                .lock()
+                .unwrap_or_else(|e| e.into_inner())
+                .clone();
 
-            setup::init(app.handle().clone(), opened_paths).expect("failed to setup app");
+            // `?` unwinds the setup closure instead of panicking — tauri
+            // reports a clean init error rather than an abort.
+            setup::init(app.handle().clone(), opened_paths)?;
 
             #[cfg(target_os = "macos")]
-            menu::generate_menu(app).expect("failed to generate menu");
+            menu::generate_menu(app)?;
 
             // Deferred plugins: spawn after window has been built so the
             // webview paints first. Network updater is intentionally disabled
             // until mdviewy owns a reliable release endpoint.
+            diagnostics::spawn_webview_watchdog(app.handle().clone());
+
             let h = app.handle().clone();
             tauri::async_runtime::spawn(async move {
-                eprintln!("[BOOT] deferred plugins starting");
+                tracing::info!("[BOOT] deferred plugins starting");
                 let t = std::time::Instant::now();
-                let _ = h.plugin(tauri_plugin_http::init());
-                let _ = h.plugin(tauri_plugin_clipboard_manager::init());
-                let _ = h.plugin(tauri_plugin_notification::init());
-                eprintln!(
+                if let Err(e) = h.plugin(tauri_plugin_http::init()) {
+                    tracing::error!("plugin http init failed: {e}");
+                }
+                if let Err(e) = h.plugin(tauri_plugin_clipboard_manager::init()) {
+                    tracing::error!("plugin clipboard init failed: {e}");
+                }
+                if let Err(e) = h.plugin(tauri_plugin_notification::init()) {
+                    tracing::error!("plugin notification init failed: {e}");
+                }
+                tracing::info!(
                     "[BOOT] deferred plugins done in {}ms",
                     t.elapsed().as_millis()
                 );
@@ -278,8 +322,49 @@ pub fn run() {
                 let _ = app.save_window_state(StateFlags::all());
             }
 
+            // A window vanishing is the "it just closed" report — log every
+            // close/destroy so the next one is distinguishable from a crash.
+            if let tauri::WindowEvent::CloseRequested { .. } = event {
+                tracing::info!("window '{}' close requested", window.label());
+            }
+
+            // Focus changes update recency — LAST_WINDOW_LABEL only knew
+            // creation order before, so menu commands and warm opens could
+            // route to a stale window.
+            if let tauri::WindowEvent::Focused(true) = event {
+                window_manager::record_last_window_label(window.label());
+
+                // A restored position can reference a now-disconnected
+                // external monitor — the window then opens off-screen and
+                // reads as "the app opened and vanished". Pull it back.
+                if let (Ok(pos), Ok(size)) = (window.outer_position(), window.outer_size()) {
+                    let on_screen =
+                        window
+                            .available_monitors()
+                            .unwrap_or_default()
+                            .iter()
+                            .any(|m| {
+                                let mp = m.position();
+                                let ms = m.size();
+                                pos.x < mp.x + ms.width as i32
+                                    && pos.x + size.width as i32 > mp.x
+                                    && pos.y < mp.y + ms.height as i32
+                                    && pos.y + size.height as i32 > mp.y
+                            });
+                    if !on_screen {
+                        tracing::warn!(
+                            "window '{}' was restored off-screen — recentering",
+                            window.label()
+                        );
+                        let _ = window.center();
+                    }
+                }
+            }
+
             if let tauri::WindowEvent::Destroyed = event {
                 let window_label = window.label();
+                tracing::info!("window '{window_label}' destroyed");
+                diagnostics::forget_window(window_label);
                 if let Ok(mut instances) = WINDOW_INSTANCES.lock() {
                     instances.remove(window_label);
                     println!(
@@ -287,24 +372,52 @@ pub fn run() {
                         window_label
                     );
                 }
+                if let Ok(mut last) = LAST_WINDOW_LABEL.lock() {
+                    if last.as_deref() == Some(window_label) {
+                        *last = None;
+                    }
+                }
             }
         })
         .build(context)
-        .unwrap()
+        .unwrap_or_else(|e| {
+            tracing::error!("app build failed: {e}");
+            eprintln!("mdviewy failed to start: {e}");
+            std::process::exit(1);
+        })
         .run(|_app, _event| {
+            match _event {
+                tauri::RunEvent::ExitRequested { .. } => {
+                    tracing::info!("app exit requested")
+                }
+                tauri::RunEvent::Exit => tracing::info!("app exiting"),
+                _ => {}
+            }
             #[cfg(target_os = "macos")]
             if let tauri::RunEvent::Opened { urls, .. } = _event {
                 let opened_paths = urls.iter().map(opened_path_from_url).collect::<Vec<_>>();
                 let opened_paths_state = _app.try_state::<OpenedPaths>();
                 if let Some(u) = opened_paths_state {
-                    *u.0.lock().unwrap() = opened_paths.clone();
+                    let mut queue = u.0.lock().unwrap_or_else(|e| e.into_inner());
+                    for path in &opened_paths {
+                        if !queue.contains(path) {
+                            queue.push(path.clone());
+                        }
+                    }
                 }
 
                 println!("Processed opened paths: {:?}", opened_paths);
 
+                // get_focused_window already falls back to the last live
+                // window; None here means the app runs with zero windows —
+                // create one instead of dropping the file into a void queue.
                 if let Some(window) = window_manager::get_focused_window(_app) {
                     use tauri::Emitter;
-                    println!("Emitting to focused window: {}", window.label());
+                    println!("Emitting to window: {}", window.label());
+                    // Warm-instance file open (app already running, window not
+                    // OS-focused/minimized): without unminimize+focus the file
+                    // loads invisibly behind other apps — looks like "nothing
+                    // happened" (verified 2026-07-05).
                     let _ = window.unminimize();
                     let _ = window.set_focus();
                     let _ = window.eval(window_manager::opened_urls_initialization_script(
@@ -314,24 +427,13 @@ pub fn run() {
                     let result = window.emit("opened-urls", opened_paths.clone());
                     println!("Emit result: {:?}", result);
                 } else {
-                    if let Some(window) = window_manager::get_last_opened_window(_app) {
-                        use tauri::Emitter;
-                        println!("Emitting to last opened window: {}", window.label());
-                        // Warm-instance file open (app already running, no window
-                        // currently OS-focused): without this, the window loads
-                        // the new file silently behind other apps and looks like
-                        // "nothing happened" (verified 2026-07-05).
-                        let _ = window.unminimize();
-                        let _ = window.set_focus();
-                        let _ = window.eval(window_manager::opened_urls_initialization_script(
-                            &opened_paths,
-                            true,
-                        ));
-                        let result = window.emit("opened-urls", opened_paths.clone());
-                        println!("Emit result: {:?}", result);
-                    } else {
-                        println!("No window found to emit event");
-                    }
+                    println!("No live window — creating one for opened paths");
+                    let handle = _app.clone();
+                    tauri::async_runtime::spawn(async move {
+                        if let Err(e) = crate::setup::init(handle, opened_paths) {
+                            eprintln!("Reopen window failed: {:?}", e);
+                        }
+                    });
                 }
             }
         });

@@ -67,8 +67,7 @@
     "summary": "要約",
     "create_file": "新しいファイルを作成",
     "save_and_close": "保存して閉じる",
-    "unsave_and_close": "直接閉じる",
-    "convert_text": "簡単に変換する"
+    "unsave_and_close": "直接閉じる"
   },
   "placeholder": {
     "translate": "ターゲット言語を入力してください"
